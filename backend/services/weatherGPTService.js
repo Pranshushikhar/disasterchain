@@ -1232,6 +1232,8 @@ async function processWeatherGPTChat({
   message,
   latitude = null,
   longitude = null,
+  lat = null,
+  lon = null,
   location = null,
   language = 'en',
   conversationId = null,
@@ -1244,6 +1246,9 @@ async function processWeatherGPTChat({
 
   const cleanMessage = message.trim().slice(0, 1000);
   const validatedLang = SUPPORTED_LANGUAGES[language] ? language : 'en';
+
+  const effectiveLat = latitude != null ? latitude : lat;
+  const effectiveLon = longitude != null ? longitude : lon;
 
   // 1. Analyze User Intent
   const intent = analyzeWeatherIntent(cleanMessage);
@@ -1267,9 +1272,9 @@ async function processWeatherGPTChat({
   } else {
     // User did NOT specify a different place in the message text.
     // Prioritize active coordinates and location sent in the request (e.g. device GPS / active location).
-    if (latitude != null && !isNaN(Number(latitude)) && longitude != null && !isNaN(Number(longitude))) {
-      resolvedLat = Number(latitude);
-      resolvedLon = Number(longitude);
+    if (effectiveLat != null && !isNaN(Number(effectiveLat)) && effectiveLon != null && !isNaN(Number(effectiveLon))) {
+      resolvedLat = Number(effectiveLat);
+      resolvedLon = Number(effectiveLon);
       if (location && typeof location === 'string' && location.trim().length > 0) {
         const cleanLoc = location.trim();
         if (!STOP_WORDS.has(cleanLoc.toLowerCase()) && !isRawCoordinatesString(cleanLoc)) {
