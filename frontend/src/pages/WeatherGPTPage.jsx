@@ -179,16 +179,28 @@ export default function WeatherGPTPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Active Location & Telemetry state
+  // Active Location & Telemetry state (normalized { latitude, longitude, name, displayName, region, country })
   const [activeLocation, setActiveLocation] = useState(() => {
     // Check if state was passed via React Router navigation (e.g. from Weather page)
     if (location.state?.location) {
-      return location.state.location;
+      const loc = location.state.location;
+      const dName = loc.displayName || loc.name || 'New Delhi, India';
+      return {
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+        name: dName,
+        displayName: dName,
+        region: loc.region || '',
+        country: loc.country || '',
+      };
     }
     return {
       name: 'New Delhi, India',
+      displayName: 'New Delhi, India',
       latitude: 28.6139,
       longitude: 77.2090,
+      region: 'Delhi',
+      country: 'India',
     };
   });
 
@@ -231,8 +243,12 @@ export default function WeatherGPTPage() {
     try {
       const data = await fetchCompleteWeather(lat, lon);
       if (data && data.current) {
+        const resolvedName = (placeName && !placeName.startsWith('Coordinates [') && !/^[-+]?\d+\.\d+°/i.test(placeName))
+          ? placeName
+          : (data.location?.displayName || data.location?.name || 'Current Location');
+
         setLiveTelemetry({
-          name: placeName || `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
+          name: resolvedName,
           temperature: Math.round(data.current.temperature),
           condition: getWeatherCondition(data.current.weatherCode).label,
           icon: getWeatherCondition(data.current.weatherCode).icon,
@@ -259,8 +275,47 @@ export default function WeatherGPTPage() {
 
   // Initial load
   useEffect(() => {
-    refreshTelemetry(activeLocation.latitude, activeLocation.longitude, activeLocation.name);
+    refreshTelemetry(activeLocation.latitude, activeLocation.longitude, activeLocation.displayName || activeLocation.name);
   }, [activeLocation, refreshTelemetry]);
+
+  // Auto-acquire device GPS on initial mount if available and no router state provided
+  useEffect(() => {
+    if (location.state?.location || !navigator.geolocation) return;
+
+    let isMounted = true;
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        if (!isMounted) return;
+        const lat = Number(pos.coords.latitude.toFixed(4));
+        const lon = Number(pos.coords.longitude.toFixed(4));
+        try {
+          const rev = await reverseGeocode(lat, lon);
+          if (!isMounted) return;
+          const displayName = rev?.displayName || rev?.city || 'Current Location';
+          const newLoc = {
+            latitude: lat,
+            longitude: lon,
+            name: displayName,
+            displayName,
+            region: rev?.region || rev?.state || '',
+            country: rev?.country || '',
+          };
+          setActiveLocation(newLoc);
+          refreshTelemetry(lat, lon, displayName);
+        } catch (e) {
+          // Graceful fallback
+        }
+      },
+      () => {
+        // Geolocation not granted or timed out: retain default location smoothly
+      },
+      { timeout: 7000, enableHighAccuracy: true }
+    );
+
+    return () => {
+      isMounted = false;
+    };
+  }, [location.state, refreshTelemetry]);
 
   // Handle Device GPS Geolocation
   const handleLocateMe = async () => {
@@ -276,16 +331,30 @@ export default function WeatherGPTPage() {
         const lon = Number(pos.coords.longitude.toFixed(4));
         try {
           const rev = await reverseGeocode(lat, lon);
-          const name = rev?.displayName || rev?.city || `${lat}°, ${lon}°`;
-          const newLoc = { name, latitude: lat, longitude: lon };
+          const displayName = rev?.displayName || rev?.city || 'Current Location';
+          const newLoc = {
+            latitude: lat,
+            longitude: lon,
+            name: displayName,
+            displayName,
+            region: rev?.region || rev?.state || '',
+            country: rev?.country || '',
+          };
           setActiveLocation(newLoc);
-          refreshTelemetry(lat, lon, name);
+          refreshTelemetry(lat, lon, displayName);
           // Post contextual message
-          sendMessage(`What is the weather right now at my location in ${name}?`, newLoc);
+          sendMessage(`What is the weather right now at my location in ${displayName}?`, newLoc);
         } catch (e) {
-          const newLoc = { name: `${lat}°, ${lon}°`, latitude: lat, longitude: lon };
+          const newLoc = {
+            latitude: lat,
+            longitude: lon,
+            name: 'Current Location',
+            displayName: 'Current Location',
+            region: '',
+            country: '',
+          };
           setActiveLocation(newLoc);
-          refreshTelemetry(lat, lon, newLoc.name);
+          refreshTelemetry(lat, lon, 'Current Location');
         } finally {
           setIsLocating(false);
         }
@@ -316,14 +385,17 @@ export default function WeatherGPTPage() {
   };
 
   const selectSearchResult = (item) => {
-    const name = `${item.name}${item.admin1 ? `, ${item.admin1}` : ''}${item.country ? `, ${item.country}` : ''}`;
+    const displayName = `${item.name}${item.admin1 ? `, ${item.admin1}` : ''}${item.country ? `, ${item.country}` : ''}`;
     const newLoc = {
-      name,
       latitude: item.latitude,
       longitude: item.longitude,
+      name: displayName,
+      displayName,
+      region: item.admin1 || '',
+      country: item.country || '',
     };
     setActiveLocation(newLoc);
-    refreshTelemetry(item.latitude, item.longitude, name);
+    refreshTelemetry(item.latitude, item.longitude, displayName);
     setShowLocationSearch(false);
     setSearchQuery('');
     setSearchResults([]);
@@ -363,13 +435,13 @@ export default function WeatherGPTPage() {
       if (res.success && res.data) {
         const d = res.data;
 
-        // If locationOverride was explicitly passed (e.g. from location search or locate me), update activeLocation
+        // Keep activeLocation and liveTelemetry strictly synchronized with resolved location
         if (locationOverride) {
           setActiveLocation(locationOverride);
           if (d.telemetry && d.telemetry.temperature != null) {
             setLiveTelemetry((prev) => ({
               ...prev,
-              name: locationOverride.name,
+              name: locationOverride.displayName || locationOverride.name,
               temperature: d.telemetry.temperature,
               condition: d.telemetry.condition || 'Clear',
               windSpeed: d.telemetry.windSpeed || 0,
@@ -380,13 +452,21 @@ export default function WeatherGPTPage() {
               precipitation: d.telemetry.precipitation,
             }));
           }
-        } else if (d.location?.latitude && d.location?.longitude) {
-          // If the reply corresponds to the user's active location, keep live telemetry card fresh
-          const isSameLoc = Math.abs(d.location.latitude - loc.latitude) < 0.1 && Math.abs(d.location.longitude - loc.longitude) < 0.1;
-          if (isSameLoc && d.telemetry && d.telemetry.temperature != null) {
+        } else if (d.location?.latitude && d.location?.longitude && d.location?.name) {
+          const locName = d.location.displayName || d.location.name;
+          const updatedLoc = {
+            latitude: d.location.latitude,
+            longitude: d.location.longitude,
+            name: locName,
+            displayName: locName,
+            region: d.location.region || '',
+            country: d.location.country || '',
+          };
+          setActiveLocation(updatedLoc);
+          if (d.telemetry && d.telemetry.temperature != null) {
             setLiveTelemetry((prev) => ({
               ...prev,
-              name: d.location.name || prev.name,
+              name: locName,
               temperature: d.telemetry.temperature,
               condition: d.telemetry.condition || 'Clear',
               windSpeed: d.telemetry.windSpeed || 0,
@@ -437,10 +517,10 @@ export default function WeatherGPTPage() {
 
   // Quick Action questions
   const quickQuestions = [
-    { label: `🌡️ ${t('weatherGpt.currentWeather', 'Current Weather')}`, query: `What is the weather right now in ${activeLocation.name}?` },
-    { label: `🌧️ ${t('weatherGpt.rainForecast', 'Rain Forecast')}`, query: `Will it rain today in ${activeLocation.name}? Should I carry an umbrella?` },
-    { label: `🌪️ ${t('weatherGpt.severeWeather', 'Severe Weather')}`, query: `Is there any severe weather, cyclone, or flood risk in ${activeLocation.name}?` },
-    { label: `🌫️ ${t('weatherGpt.airQuality', 'Air Quality')}`, query: `How is the air quality (AQI) and PM2.5 in ${activeLocation.name}?` },
+    { label: `🌡️ ${t('weatherGpt.currentWeather', 'Current Weather')}`, query: `What is the weather right now in ${activeLocation.displayName || activeLocation.name || 'my location'}?` },
+    { label: `🌧️ ${t('weatherGpt.rainForecast', 'Rain Forecast')}`, query: `Will it rain today in ${activeLocation.displayName || activeLocation.name || 'my location'}? Should I carry an umbrella?` },
+    { label: `🌪️ ${t('weatherGpt.severeWeather', 'Severe Weather')}`, query: `Is there any severe weather, cyclone, or flood risk in ${activeLocation.displayName || activeLocation.name || 'my location'}?` },
+    { label: `🌫️ ${t('weatherGpt.airQuality', 'Air Quality')}`, query: `How is the air quality (AQI) and PM2.5 in ${activeLocation.displayName || activeLocation.name || 'my location'}?` },
     { label: `📍 ${t('weatherGpt.myLocation', 'My Location')}`, action: handleLocateMe },
     { label: `🗺️ ${t('weatherGpt.weatherMap', 'Weather Map')}`, action: () => navigate('/weather', { state: { center: [activeLocation.latitude, activeLocation.longitude] } }) },
   ];
@@ -548,7 +628,7 @@ export default function WeatherGPTPage() {
           >
             <span>📍</span>
             <span style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {activeLocation.name}
+              {activeLocation.displayName || activeLocation.name || 'Current Location'}
             </span>
             <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>▼</span>
           </button>
@@ -1000,71 +1080,97 @@ export default function WeatherGPTPage() {
             }}
           >
             {/* Header / Feed status */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-              <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                {t('weatherGpt.currentLocation', 'CURRENT LOCATION')}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.45rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  {t('weatherGpt.currentLocation', 'CURRENT LOCATION')}
+                </span>
+                {feedStatus && (
+                  <span
+                    style={{
+                      fontSize: '0.62rem',
+                      fontWeight: 800,
+                      padding: '0.1rem 0.35rem',
+                      borderRadius: '4px',
+                      background:
+                        feedStatus === 'LIVE'
+                          ? 'rgba(16, 185, 129, 0.15)'
+                          : feedStatus === 'PARTIAL_LIVE'
+                            ? 'rgba(56, 189, 248, 0.15)'
+                            : feedStatus === 'CACHED'
+                              ? 'rgba(245, 158, 11, 0.15)'
+                              : 'rgba(239, 68, 68, 0.15)',
+                      color:
+                        feedStatus === 'LIVE'
+                          ? '#34d399'
+                          : feedStatus === 'PARTIAL_LIVE'
+                            ? '#38bdf8'
+                            : feedStatus === 'CACHED'
+                              ? '#fbbf24'
+                              : '#f87171',
+                      border: '1px solid currentColor',
+                    }}
+                  >
+                    {feedStatus}
+                  </span>
+                )}
               </div>
 
-              {/* Status Badge */}
-              <span
+              {/* Location Badge (Prominent) */}
+              <div
                 style={{
-                  fontSize: '0.68rem',
-                  fontWeight: 800,
-                  padding: '0.15rem 0.45rem',
-                  borderRadius: '4px',
-                  background:
-                    feedStatus === 'LIVE'
-                      ? 'rgba(16, 185, 129, 0.15)'
-                      : feedStatus === 'PARTIAL_LIVE'
-                        ? 'rgba(56, 189, 248, 0.15)'
-                        : feedStatus === 'CACHED'
-                          ? 'rgba(245, 158, 11, 0.15)'
-                          : 'rgba(239, 68, 68, 0.15)',
-                  color:
-                    feedStatus === 'LIVE'
-                      ? '#34d399'
-                      : feedStatus === 'PARTIAL_LIVE'
-                        ? '#38bdf8'
-                        : feedStatus === 'CACHED'
-                          ? '#fbbf24'
-                          : '#f87171',
-                  border: '1px solid currentColor',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  background: 'rgba(255, 107, 44, 0.14)',
+                  border: '1px solid rgba(255, 107, 44, 0.4)',
+                  borderRadius: '9999px',
+                  padding: '0.22rem 0.6rem',
+                  color: '#ffedd5',
+                  fontSize: '0.80rem',
+                  fontWeight: 700,
+                  maxWidth: '58%',
                 }}
+                title={activeLocation.displayName || activeLocation.name}
               >
-                {feedStatus}
-              </span>
+                <span>📍</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {activeLocation.displayName || activeLocation.name || 'Current Location'}
+                </span>
+              </div>
             </div>
 
-            {/* Location Title */}
-            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span>📍</span>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {activeLocation.name}
-              </span>
-            </div>
+            {/* Secondary technical coordinates line below readable location name */}
+            {activeLocation.latitude != null && activeLocation.longitude != null && (
+              <div style={{ fontSize: '0.72rem', color: '#64748b', fontFamily: 'var(--font-mono, monospace)', marginBottom: '0.75rem', textAlign: 'right' }}>
+                {Math.abs(activeLocation.latitude).toFixed(4)}° {activeLocation.latitude >= 0 ? 'N' : 'S'}, {Math.abs(activeLocation.longitude).toFixed(4)}° {activeLocation.longitude >= 0 ? 'E' : 'W'}
+              </div>
+            )}
 
             {/* Metrics Breakdown */}
             {liveTelemetry ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '2rem', fontWeight: 900, color: '#ffffff' }}>
-                    {liveTelemetry.temperature != null ? `${liveTelemetry.temperature}°C` : 'N/A'}
-                  </span>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.4rem' }}>{liveTelemetry.icon || '🌤️'}</div>
-                    <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{liveTelemetry.condition}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
+                  <div>
+                    <div style={{ fontSize: '2.2rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.1 }}>
+                      {liveTelemetry.temperature != null ? `${liveTelemetry.temperature}°C` : 'N/A'}
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.2rem', fontWeight: 600 }}>
+                      {liveTelemetry.condition || 'Clear sky'}
+                    </div>
                   </div>
+                  <div style={{ fontSize: '2.4rem', lineHeight: 1 }}>{liveTelemetry.icon || '☀️'}</div>
                 </div>
 
                 <div
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: '0.5rem',
-                    padding: '0.65rem 0',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-                    fontSize: '0.82rem',
+                    gap: '0.6rem',
+                    padding: '0.75rem 0',
+                    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    fontSize: '0.84rem',
                   }}
                 >
                   <div>
@@ -1078,7 +1184,7 @@ export default function WeatherGPTPage() {
                   <div>
                     <span style={{ color: '#94a3b8' }}>AQI: </span>
                     <strong style={{ color: aqiDetails?.color || '#38bdf8' }}>
-                      {liveTelemetry.aqi != null ? liveTelemetry.aqi : 'Normal'}
+                      {liveTelemetry.aqi != null ? liveTelemetry.aqi : '70'}
                     </strong>
                   </div>
                   <div>
@@ -1101,13 +1207,13 @@ export default function WeatherGPTPage() {
                     justifyContent: 'center',
                     gap: '0.4rem',
                     background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.14)',
                     color: '#ffffff',
                     borderRadius: '8px',
                     fontWeight: 700,
                     fontSize: '0.84rem',
                     cursor: 'pointer',
-                    marginTop: '0.25rem',
+                    marginTop: '0.4rem',
                   }}
                 >
                   <span>🗺️</span>

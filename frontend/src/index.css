@@ -396,7 +396,8 @@ main {
   font-weight: 700;
   font-size: 0.88rem;
   color: #f1f5f9 !important;
-  padding: 0.42rem 0.95rem;
+  min-height: 44px;
+  padding: 0 1.15rem;
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -404,7 +405,9 @@ main {
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
+  box-sizing: border-box;
 }
 
 .navbar-public-login-btn:hover {
@@ -417,7 +420,8 @@ main {
   font-weight: 800;
   font-size: 0.90rem;
   letter-spacing: 0.04em;
-  padding: 0.45rem 1.15rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
   border-radius: var(--radius-sm);
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   border: 1px solid #f87171;
@@ -425,10 +429,12 @@ main {
   box-shadow: 0 2px 10px rgba(239, 68, 68, 0.35);
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  gap: 0.45rem;
   transition: all var(--transition-fast);
   white-space: nowrap;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .navbar-public-sos-btn:hover {
@@ -580,28 +586,80 @@ main {
   }
   .navbar-public-mobile-login {
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     color: #f1f5f9 !important;
-    padding: 0.32rem 0.65rem;
+    min-height: 44px;
+    min-width: 58px;
+    padding: 0 0.85rem;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.20);
     white-space: nowrap;
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    touch-action: manipulation;
+    transition: all var(--transition-fast);
+  }
+  .navbar-public-mobile-login:active,
+  .navbar-public-mobile-login:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #ffffff !important;
   }
   .navbar-public-mobile-sos {
     font-weight: 800;
-    font-size: 0.82rem;
-    padding: 0.35rem 0.70rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    min-height: 44px;
+    min-width: 64px;
+    padding: 0 0.85rem;
     border-radius: var(--radius-sm);
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     border: 1px solid #f87171;
     color: #ffffff !important;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    justify-content: center;
+    gap: 0.35rem;
     white-space: nowrap;
     cursor: pointer;
+    box-sizing: border-box;
+    touch-action: manipulation;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+    transition: all var(--transition-fast);
+  }
+  .navbar-public-mobile-sos:active {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: scale(0.97);
+  }
+}
+
+/* Extra small mobile (< 380px) safe padding */
+@media (max-width: 379px) {
+  .app-navbar {
+    padding: 0 0.5rem;
+  }
+  .hud-brand-container {
+    gap: 0.35rem;
+  }
+  .brand-name {
+    font-size: 0.90rem;
+  }
+  .navbar-public-mobile-actions {
+    gap: 0.30rem;
+  }
+  .navbar-public-mobile-login {
+    min-width: 52px;
+    padding: 0 0.55rem;
+    font-size: 0.80rem;
+  }
+  .navbar-public-mobile-sos {
+    min-width: 56px;
+    padding: 0 0.55rem;
+    font-size: 0.80rem;
   }
 }
 

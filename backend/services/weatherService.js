@@ -558,54 +558,118 @@ async function searchGeocoding(query) {
 }
 
 /**
- * 8. Reverse Geocoding (coordinates to location name)
+ * 8. Reverse Geocoding (coordinates to human-readable location name)
+ * Primary: Free keyless BigDataCloud reverse geocode client API
+ * Secondary: OpenStreetMap Nominatim with clean administrative parsing
+ * Fallback: Friendly "Current Location" (never raw coordinates string)
  */
 async function reverseGeocode(lat, lon) {
   const coords = validateCoordinates(lat, lon);
-  const cacheKey = `reverse_geo_${coords.latitude}_${coords.longitude}`;
+  const cacheKey = `reverse_geo_${coords.latitude.toFixed(4)}_${coords.longitude.toFixed(4)}`;
   const cached = getCached(cacheKey);
   if (cached) return { ...cached, isCached: true };
 
-  // Use OpenStreetMap Nominatim with proper User-Agent
-  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&zoom=10&addressdetails=1`;
+  // Helper to format clean human-readable display name (e.g. "Kharar, Punjab", "New Delhi, India", "Chandigarh, India")
+  const buildDisplayName = (city, state, country) => {
+    const cleanCity = String(city || '').replace(/\s+(?:Tahsil|Tehsil|District|Mandal)$/i, '').trim();
+    const cleanState = String(state || '').trim();
+    const cleanCountry = String(country || '').trim();
 
+    if (cleanCity.toLowerCase().includes('delhi')) {
+      return cleanCountry ? `${cleanCity}, ${cleanCountry}` : cleanCity;
+    }
+    if (cleanCity && cleanState && cleanCity.toLowerCase() !== cleanState.toLowerCase()) {
+      return `${cleanCity}, ${cleanState}`;
+    }
+    if (cleanCity && cleanCountry && cleanCity.toLowerCase() !== cleanCountry.toLowerCase()) {
+      return `${cleanCity}, ${cleanCountry}`;
+    }
+    return cleanCity || cleanCountry || 'Current Location';
+  };
+
+  // Provider 1: BigDataCloud Client Reverse Geocode API (Free, fast, no API key required)
   try {
-    const res = await fetchUrl(url, {
+    const bdcUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`;
+    const res = await fetchUrl(bdcUrl, {
+      timeout: 5000,
+      headers: { 'Accept': 'application/json' },
+    });
+    const parsed = JSON.parse(res.body);
+
+    const city = (parsed.city || parsed.locality || '').replace(/\s+(?:Tahsil|Tehsil|District|Mandal)$/i, '').trim();
+    const state = parsed.principalSubdivision || '';
+    const country = parsed.countryName || '';
+    const countryCode = parsed.countryCode || '';
+
+    if (city || state || country) {
+      const displayName = buildDisplayName(city, state, country);
+      const payload = {
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        name: displayName,
+        displayName,
+        city: city || 'Current Location',
+        region: state,
+        state,
+        country,
+        countryCode,
+      };
+      setCache(cacheKey, payload);
+      return payload;
+    }
+  } catch (bdcErr) {
+    // BigDataCloud unavailable or timed out: fall through to Nominatim
+  }
+
+  // Provider 2: OpenStreetMap Nominatim with proper User-Agent
+  try {
+    const nomUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&zoom=10&addressdetails=1`;
+    const res = await fetchUrl(nomUrl, {
       timeout: 6000,
       headers: { 'User-Agent': 'DisasterChain-CivicProtection/2.0' },
     });
     const parsed = JSON.parse(res.body);
 
     const address = parsed.address || {};
-    const city = address.city || address.town || address.village || address.county || address.state_district || 'Local Sector';
+    const rawCity = address.city || address.town || address.village || address.suburb || address.county || address.state_district || '';
+    const city = rawCity.replace(/\s+(?:Tahsil|Tehsil|District|Mandal)$/i, '').trim();
     const state = address.state || address.region || '';
     const country = address.country || '';
+    const countryCode = address.country_code?.toUpperCase() || '';
 
-    const payload = {
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-      displayName: parsed.display_name || `${city}, ${country}`,
-      city,
-      state,
-      country,
-      countryCode: address.country_code?.toUpperCase(),
-    };
-
-    setCache(cacheKey, payload);
-    return payload;
-  } catch (err) {
-    // Graceful fallback without crashing
-    const fallback = {
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-      displayName: `Coordinates [${coords.latitude}, ${coords.longitude}]`,
-      city: 'Current Coordinates',
-      state: '',
-      country: '',
-      countryCode: '',
-    };
-    return fallback;
+    if (city || state || country) {
+      const displayName = buildDisplayName(city, state, country);
+      const payload = {
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        name: displayName,
+        displayName,
+        city: city || 'Current Location',
+        region: state,
+        state,
+        country,
+        countryCode,
+      };
+      setCache(cacheKey, payload);
+      return payload;
+    }
+  } catch (nomErr) {
+    // Nominatim also failed: fall through to safe friendly fallback
   }
+
+  // Provider 3: Safe friendly fallback without raw coordinates
+  const fallback = {
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+    name: 'Current Location',
+    displayName: 'Current Location',
+    city: 'Current Location',
+    region: '',
+    state: '',
+    country: '',
+    countryCode: '',
+  };
+  return fallback;
 }
 
 module.exports = {

@@ -374,46 +374,123 @@ export async function searchLocations(query) {
 }
 
 /**
- * 6. Reverse Geocoding
+ * 6. Reverse Geocoding (coordinates to human-readable location name)
+ * Uses backend API first, then falls back to BigDataCloud client API, then to Nominatim,
+ * and finally to a friendly "Current Location" label. Never outputs raw coordinates as primary name.
  */
 export async function reverseGeocode(lat, lon) {
+  const buildDisplayName = (city, state, country) => {
+    const cleanCity = String(city || '').replace(/\s+(?:Tahsil|Tehsil|District|Mandal)$/i, '').trim();
+    const cleanState = String(state || '').trim();
+    const cleanCountry = String(country || '').trim();
+
+    if (cleanCity.toLowerCase().includes('delhi')) {
+      return cleanCountry ? `${cleanCity}, ${cleanCountry}` : cleanCity;
+    }
+    if (cleanCity && cleanState && cleanCity.toLowerCase() !== cleanState.toLowerCase()) {
+      return `${cleanCity}, ${cleanState}`;
+    }
+    if (cleanCity && cleanCountry && cleanCity.toLowerCase() !== cleanCountry.toLowerCase()) {
+      return `${cleanCity}, ${cleanCountry}`;
+    }
+    return cleanCity || cleanCountry || 'Current Location';
+  };
+
+  // Step 1: Try DisasterChain backend API
   try {
     const res = await axios.get(`${API_BASE_URL}/weather/reverse-geocode`, {
       params: { lat, lon },
       timeout: 8000,
     });
     if (res.data?.success && res.data.data) {
-      return res.data.data;
-    }
-  } catch (e) {
-    // Backend unavailable: fallback to Nominatim
-  }
-
-  try {
-    const nomRes = await axios.get(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`,
-      { timeout: 8000 }
-    );
-    if (nomRes.data) {
-      const addr = nomRes.data.address || {};
-      const city = addr.city || addr.town || addr.village || addr.county || 'Local Sector';
+      const d = res.data.data;
+      const displayName = d.displayName || buildDisplayName(d.city, d.region || d.state, d.country);
       return {
         latitude: lat,
         longitude: lon,
-        displayName: nomRes.data.display_name || `${city}, ${addr.country || ''}`,
-        city,
-        state: addr.state || '',
-        country: addr.country || '',
+        name: displayName,
+        displayName,
+        city: d.city || 'Current Location',
+        region: d.region || d.state || '',
+        state: d.state || d.region || '',
+        country: d.country || '',
+        countryCode: d.countryCode || '',
+      };
+    }
+  } catch (e) {
+    // Backend unavailable: fall through to client-side reverse geocoders
+  }
+
+  // Step 2: Fallback to BigDataCloud Free Client Reverse Geocode API
+  try {
+    const bdcRes = await axios.get(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+      { timeout: 6000 }
+    );
+    if (bdcRes.data) {
+      const city = (bdcRes.data.city || bdcRes.data.locality || '').replace(/\s+(?:Tahsil|Tehsil|District|Mandal)$/i, '').trim();
+      const state = bdcRes.data.principalSubdivision || '';
+      const country = bdcRes.data.countryName || '';
+      const countryCode = bdcRes.data.countryCode || '';
+      const displayName = buildDisplayName(city, state, country);
+
+      return {
+        latitude: lat,
+        longitude: lon,
+        name: displayName,
+        displayName,
+        city: city || 'Current Location',
+        region: state,
+        state,
+        country,
+        countryCode,
+      };
+    }
+  } catch (e) {
+    // BigDataCloud failed: fall through to Nominatim
+  }
+
+  // Step 3: Fallback to OpenStreetMap Nominatim
+  try {
+    const nomRes = await axios.get(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`,
+      { timeout: 6000 }
+    );
+    if (nomRes.data) {
+      const addr = nomRes.data.address || {};
+      const rawCity = addr.city || addr.town || addr.village || addr.suburb || addr.county || '';
+      const city = rawCity.replace(/\s+(?:Tahsil|Tehsil|District|Mandal)$/i, '').trim();
+      const state = addr.state || addr.region || '';
+      const country = addr.country || '';
+      const countryCode = addr.country_code?.toUpperCase() || '';
+      const displayName = buildDisplayName(city, state, country);
+
+      return {
+        latitude: lat,
+        longitude: lon,
+        name: displayName,
+        displayName,
+        city: city || 'Current Location',
+        region: state,
+        state,
+        country,
+        countryCode,
       };
     }
   } catch (e) {
     // Ignore error
   }
 
+  // Step 4: Graceful friendly fallback without raw coordinates
   return {
     latitude: lat,
     longitude: lon,
-    displayName: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
-    city: 'Current Coordinates',
+    name: 'Current Location',
+    displayName: 'Current Location',
+    city: 'Current Location',
+    region: '',
+    state: '',
+    country: '',
+    countryCode: '',
   };
 }

@@ -142,6 +142,18 @@ const STOP_WORDS = new Set([
 ]);
 
 /**
+ * Check if a location string is actually a raw coordinates format (e.g. "Coordinates [30.7643, 76.5723]")
+ */
+function isRawCoordinatesString(str) {
+  if (!str || typeof str !== 'string') return true;
+  const s = str.trim().toLowerCase();
+  if (s.startsWith('coordinates [') || s.startsWith('current coordinates') || s.startsWith('my coordinates')) return true;
+  if (/^[-+]?\d{1,3}\.?\d*°?\s*,\s*[-+]?\d{1,3}\.?\d*°?/i.test(s)) return true;
+  if (/^\[?\s*[-+]?\d{1,3}\.?\d*\s*,\s*[-+]?\d{1,3}\.?\d*\s*\]?$/i.test(s)) return true;
+  return false;
+}
+
+/**
  * Identify Named Location in message text (e.g., "weather in Delhi", "forecast for Mumbai", "Chandigarh")
  */
 function extractLocationName(message) {
@@ -586,10 +598,10 @@ function generateWeatherGPTReply({
 }) {
   const isRtl = SUPPORTED_LANGUAGES[language]?.rtl || false;
   let cleanPlace = locationName && typeof locationName === 'string' ? locationName.trim() : '';
-  if (STOP_WORDS.has(cleanPlace.toLowerCase()) || cleanPlace.length < 2) {
-    cleanPlace = 'your location';
+  if (STOP_WORDS.has(cleanPlace.toLowerCase()) || isRawCoordinatesString(cleanPlace) || cleanPlace.length < 2) {
+    cleanPlace = 'Current Location';
   }
-  const place = cleanPlace || 'your location';
+  const place = cleanPlace || 'Current Location';
 
   // 1. Off-Topic Handling
   if (intent.isOffTopic) {
@@ -876,37 +888,42 @@ function generateWeatherGPTReply({
 
   // 11. Rain & Umbrella Questions
   if (intent.isRain) {
-    const isRainingNow = effectiveCurrent && (
+    const isTomorrow = intent.isTomorrow;
+    const targetDay = isTomorrow && forecast?.daily?.[1] ? forecast.daily[1] : (forecast?.daily?.[0] || {});
+    const rainProb = targetDay.precipitationProbabilityMax != null ? targetDay.precipitationProbabilityMax : (forecast?.daily?.[0]?.precipitationProbabilityMax || 0);
+    const dayLabel = isTomorrow ? 'tomorrow' : 'today';
+
+    const isRainingNow = !isTomorrow && effectiveCurrent && (
       (effectiveCurrent.precipitation && effectiveCurrent.precipitation > 0) ||
       (effectiveCurrent.rain && effectiveCurrent.rain > 0) ||
       [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(effectiveCurrent.weatherCode)
     );
 
-    const rainProbToday = forecast?.daily?.[0]?.precipitationProbabilityMax || 0;
-    const condition = effectiveCurrent?.weatherCode != null ? getConditionDescription(effectiveCurrent.weatherCode) : 'Skies';
+    const conditionCode = isTomorrow && targetDay.weatherCode != null ? targetDay.weatherCode : effectiveCurrent?.weatherCode;
+    const condition = conditionCode != null ? getConditionDescription(conditionCode) : 'Skies';
     const curTemp = effectiveCurrent?.temperature != null ? `${Math.round(effectiveCurrent.temperature)}°C` : 'seasonal average';
     const curPrecip = effectiveCurrent?.precipitation || 0;
     const curWind = effectiveCurrent?.windSpeed != null ? `${Math.round(effectiveCurrent.windSpeed)} km/h` : 'normal';
 
-    if (isRainingNow || rainProbToday >= 40) {
-      const isHeavy = (effectiveCurrent?.precipitation >= 10) || rainProbToday >= 80;
+    if (isRainingNow || rainProb >= 40) {
+      const isHeavy = (!isTomorrow && effectiveCurrent?.precipitation >= 10) || rainProb >= 80;
       if (isHeavy) {
         return {
-          reply: `⚠️ HIGH RISK: HEAVY PRECIPITATION\n\nWhat is happening:\nHeavy rain is affecting ${place}. Current rate: ${curPrecip || 'Moderate to heavy'} mm/h with ${rainProbToday}% probability today.\n\nWhat it means:\nRoad waterlogging, reduced braking traction, and potential flash ponding in dips and underpasses.\n\nWhat to do:\n1. Yes, definitely carry an umbrella or waterproof rainwear.\n2. Avoid walking or driving through standing water of unknown depth.\n3. Allow extra travel time and use headlights.\n\nEmergency:\nCall 112 if water enters ground-floor premises.\n\nData Trust: Open-Meteo Live Telemetry & Numerical Forecast.`,
+          reply: `⚠️ HIGH RISK: HEAVY PRECIPITATION\n\n${place}\n\nHeavy rain is affecting ${place}. Current rate: ${curPrecip || 'Moderate to heavy'} mm/h with ${rainProb}% probability ${dayLabel}.\n\nWhat it means:\nRoad waterlogging, reduced braking traction, and potential flash ponding in dips and underpasses.\n\nWhat to do:\n1. Yes, definitely carry an umbrella or waterproof rainwear.\n2. Avoid walking or driving through standing water of unknown depth.\n3. Allow extra travel time and use headlights.\n\nEmergency:\nCall 112 if water enters ground-floor premises.\n\nDATA TRUST: OPEN-METEO LIVE TELEMETRY`,
           riskLevel: 'HIGH',
           actions,
         };
       }
 
       return {
-        reply: `🌧️ RAIN ADVISORY\n\nYes, you should carry an umbrella today. Current condition in ${place} is ${condition.toLowerCase()} with a ${rainProbToday}% chance of rain.\n\nPrecipitation rate is approximately ${curPrecip} mm/h with winds of ${curWind}.\n\nData Trust: Open-Meteo Live Telemetry.`,
+        reply: `🌧️ RAIN ADVISORY\n\n${place}\n\nYes, you should carry an umbrella ${dayLabel}. Skies are expected to be ${condition.toLowerCase()} with a ${rainProb}% chance of rain.\n\nPrecipitation rate is approximately ${curPrecip} mm/h with winds of ${curWind}.\n\nDATA TRUST: OPEN-METEO LIVE TELEMETRY`,
         riskLevel: 'MODERATE',
         actions,
       };
     }
 
     return {
-      reply: `✓ SAFE / NORMAL\n\nRain is unlikely in ${place} today. The chance of precipitation is only ${rainProbToday}%, and skies are currently ${condition.toLowerCase()} at ${curTemp}.\n\nYou do not need an umbrella for outdoor activities right now.\n\nData Trust: Open-Meteo Live Telemetry.`,
+      reply: `✓ SAFE / NORMAL\n\n${place}\n\nRain is unlikely ${isTomorrow ? 'tomorrow' : 'in ' + place + ' today'}. The chance of precipitation is ${rainProb}%.\nSkies are expected to remain mostly ${condition.toLowerCase()}.\n\nYou do not need an umbrella for normal outdoor activities.\n\nDATA TRUST: OPEN-METEO LIVE TELEMETRY`,
       riskLevel: 'LOW',
       actions,
     };
@@ -1238,6 +1255,8 @@ async function processWeatherGPTChat({
   let resolvedLat = null;
   let resolvedLon = null;
   let resolvedLocationName = null;
+  let resolvedRegion = '';
+  let resolvedCountry = '';
 
   if (extractedName) {
     // User explicitly queried a place in the message text (e.g. "What is the weather in Delhi?")
@@ -1253,7 +1272,7 @@ async function processWeatherGPTChat({
       resolvedLon = Number(longitude);
       if (location && typeof location === 'string' && location.trim().length > 0) {
         const cleanLoc = location.trim();
-        if (!STOP_WORDS.has(cleanLoc.toLowerCase())) {
+        if (!STOP_WORDS.has(cleanLoc.toLowerCase()) && !isRawCoordinatesString(cleanLoc)) {
           resolvedLocationName = cleanLoc;
         }
       }
@@ -1261,7 +1280,7 @@ async function processWeatherGPTChat({
       // Fallback to active session coordinates only if request provided no coordinates
       resolvedLat = session.latitude;
       resolvedLon = session.longitude;
-      if (session.locationName && !STOP_WORDS.has(session.locationName.toLowerCase())) {
+      if (session.locationName && !STOP_WORDS.has(session.locationName.toLowerCase()) && !isRawCoordinatesString(session.locationName)) {
         resolvedLocationName = session.locationName;
       }
     }
@@ -1275,6 +1294,8 @@ async function processWeatherGPTChat({
         const top = geoRes.results[0];
         resolvedLat = top.latitude;
         resolvedLon = top.longitude;
+        resolvedRegion = top.admin1 || '';
+        resolvedCountry = top.country || '';
         resolvedLocationName = `${top.name}${top.admin1 ? `, ${top.admin1}` : ''}${top.country ? `, ${top.country}` : ''}`;
       }
     } catch (err) {
@@ -1282,21 +1303,31 @@ async function processWeatherGPTChat({
     }
   }
 
-  // If we have coordinates but no location name (or name was a generic placeholder), reverse-geocode
-  if (resolvedLat != null && resolvedLon != null && (!resolvedLocationName || STOP_WORDS.has(resolvedLocationName.toLowerCase()))) {
+  // If we have coordinates but no location name (or name was a generic placeholder or raw coordinates), reverse-geocode
+  if (resolvedLat != null && resolvedLon != null && (!resolvedLocationName || STOP_WORDS.has(resolvedLocationName.toLowerCase()) || isRawCoordinatesString(resolvedLocationName))) {
     try {
       const rev = await weatherService.reverseGeocode(resolvedLat, resolvedLon);
-      resolvedLocationName = rev?.displayName || rev?.city || `${resolvedLat.toFixed(2)}°, ${resolvedLon.toFixed(2)}°`;
+      resolvedLocationName = rev?.displayName || rev?.city || 'Current Location';
+      resolvedRegion = rev?.region || rev?.state || '';
+      resolvedCountry = rev?.country || '';
     } catch (err) {
-      resolvedLocationName = `${resolvedLat.toFixed(2)}°, ${resolvedLon.toFixed(2)}°`;
+      resolvedLocationName = 'Current Location';
     }
+  }
+
+  if (isRawCoordinatesString(resolvedLocationName)) {
+    resolvedLocationName = 'Current Location';
   }
 
   // 4. Default Fallback Location (New Delhi, India) if completely unsupplied
   if (resolvedLat == null || resolvedLon == null) {
     resolvedLat = 28.6139;
     resolvedLon = 77.2090;
-    if (!resolvedLocationName) resolvedLocationName = 'New Delhi, India';
+    if (!resolvedLocationName) {
+      resolvedLocationName = 'New Delhi, India';
+      resolvedRegion = 'Delhi';
+      resolvedCountry = 'India';
+    }
   }
 
   // 5. Update Conversational Session Memory
@@ -1412,9 +1443,12 @@ async function processWeatherGPTChat({
     isEmergency: Boolean(deterministic.isEmergency),
     actions: deterministic.actions || [],
     location: {
-      name: resolvedLocationName,
       latitude: resolvedLat,
       longitude: resolvedLon,
+      name: resolvedLocationName,
+      region: resolvedRegion || '',
+      country: resolvedCountry || '',
+      displayName: resolvedLocationName,
     },
     telemetry: {
       temperature: currentWeather?.temperature != null ? Math.round(currentWeather.temperature) : null,
