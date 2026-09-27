@@ -13,6 +13,7 @@ export default function MobileMoreScreen({
   onOpenReplay,
   onOpenPersonalSafety,
   onOpenSystemStatus,
+  onOpenNativeAppDownload,
   onClose,
 }) {
   return (
@@ -36,6 +37,32 @@ export default function MobileMoreScreen({
       </section>
 
       <div className="mobile-more-grid">
+        {/* GROUP 0: NATIVE CLIENT */}
+        <div className="mobile-more-group">
+          <span className="mobile-more-group-title">NATIVE CLIENT</span>
+          <button
+            type="button"
+            className="mobile-more-item"
+            id="more-get-native-app-btn"
+            onClick={() => {
+              if (onOpenNativeAppDownload) onOpenNativeAppDownload();
+            }}
+          >
+            <div className="mobile-more-item-left">
+              <div className="mobile-more-icon">
+                <Icon name="smartphone" size={18} color="#D96B35" />
+              </div>
+              <div className="mobile-more-text" style={{ textAlign: 'left' }}>
+                <span className="mobile-more-label">GET THE NATIVE APP</span>
+                <span className="mobile-more-desc">Direct Android APK (v1.2.0) with offline maps & push alerts</span>
+              </div>
+            </div>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.6rem', color: '#D96B35', background: 'rgba(217,107,53,0.15)', padding: '2px 6px', borderRadius: '3px' }}>
+              APK v1.2.0
+            </span>
+          </button>
+        </div>
+
         {/* GROUP 1: OPERATIONAL INFRASTRUCTURE */}
         <div className="mobile-more-group">
           <span className="mobile-more-group-title">OPERATIONAL INFRASTRUCTURE</span>

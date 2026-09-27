@@ -43,6 +43,7 @@ import WeatherPage from './pages/WeatherPage';
 import WeatherGPTPage from './pages/WeatherGPTPage';
 import AdminDashboard from './pages/AdminDashboard';
 import GlobalCommandBar from './components/GlobalCommandBar';
+import DesktopAppDownloadModal from './components/DesktopAppDownloadModal';
 
 import useIsMobile from './utils/useIsMobile';
 import MobileAppShell from './components/mobile/MobileAppShell';
@@ -54,6 +55,7 @@ const AppLayout = () => {
   const [isSosOpen, setIsSosOpen] = useState(false);
   const [isIncidentOpen, setIsIncidentOpen] = useState(false);
   const [isCommandBarOpen, setIsCommandBarOpen] = useState(false);
+  const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [refreshCount, setRefreshCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -76,6 +78,13 @@ const AppLayout = () => {
   useEffect(() => {
     initNativeApp();
   }, []);
+
+  // Auto-open modal if user arrives directly at download routes
+  useEffect(() => {
+    if (location.pathname === '/android-app' || location.pathname === '/download') {
+      setIsAppModalOpen(true);
+    }
+  }, [location.pathname]);
 
   // Hardware Back-Button hierarchy: Drawer -> AI -> Modal -> History Back
   useEffect(() => {
@@ -132,12 +141,33 @@ const AppLayout = () => {
           onOpenSos={() => setIsSosOpen(true)}
           onToggleSidebar={() => setIsMobileMenuOpen((prev) => !prev)}
           isMobileMenuOpen={isMobileMenuOpen}
+          onOpenAppModal={() => setIsAppModalOpen(true)}
         />
 
         <main className={isPublicStandalone ? '' : 'page-body'}>
           <Routes>
             <Route
               path="/"
+              element={
+                <EmergencyDashboard
+                  refreshKey={refreshCount}
+                  onOpenSos={() => setIsSosOpen(true)}
+                  onOpenIncident={() => setIsIncidentOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/android-app"
+              element={
+                <EmergencyDashboard
+                  refreshKey={refreshCount}
+                  onOpenSos={() => setIsSosOpen(true)}
+                  onOpenIncident={() => setIsIncidentOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/download"
               element={
                 <EmergencyDashboard
                   refreshKey={refreshCount}
@@ -236,6 +266,13 @@ const AppLayout = () => {
         onClose={() => setIsCommandBarOpen(false)}
         onOpenSos={() => setIsSosOpen(true)}
         onOpenIncident={() => setIsIncidentOpen(true)}
+        onOpenAppModal={() => setIsAppModalOpen(true)}
+      />
+
+      {/* Desktop Native Android App Distribution Modal (Specification Section 8 & 9) */}
+      <DesktopAppDownloadModal
+        isOpen={isAppModalOpen}
+        onClose={() => setIsAppModalOpen(false)}
       />
 
       {/* PWA Mobile Installation Prompt & Service Worker Update Alert */}

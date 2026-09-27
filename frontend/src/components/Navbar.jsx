@@ -18,7 +18,7 @@ import HeaderActions from './HeaderActions';
  * Mobile Structure (< 900px):
  * [ ☰ ] DISASTERCHAIN [ SOS ]
  */
-const Navbar = ({ onOpenSos, onToggleSidebar, isMobileMenuOpen }) => {
+const Navbar = ({ onOpenSos, onToggleSidebar, isMobileMenuOpen, onOpenAppModal }) => {
   const { isAuthenticated, logout } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ const Navbar = ({ onOpenSos, onToggleSidebar, isMobileMenuOpen }) => {
 
           {/* ZONE 3: ACTIONS & IDENTITY (RIGHT) */}
           <div className="nav-zone-right">
-            <HeaderActions onOpenSos={onOpenSos} onLogout={handleLogout} />
+            <HeaderActions onOpenSos={onOpenSos} onLogout={handleLogout} onOpenAppModal={onOpenAppModal} />
           </div>
         </div>
 

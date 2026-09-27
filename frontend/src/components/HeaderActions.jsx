@@ -11,12 +11,41 @@ import ProfileDropdown from './ProfileDropdown';
  * Clean Right Header Actions Zone
  * Language Selector (compact) | Notifications (bell + badge) | Profile (avatar + menu) | Emergency SOS
  */
-const HeaderActions = ({ onOpenSos, onLogout }) => {
+const HeaderActions = ({ onOpenSos, onLogout, onOpenAppModal }) => {
   const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
 
   return (
     <div className="header-actions-track">
+      {/* 0. Restrained Native Android App Entry Point (Specification Section 8) */}
+      <div className="header-action-item">
+        <button
+          type="button"
+          onClick={onOpenAppModal}
+          className="nav-btn-app"
+          id="navbar-android-app-btn"
+          title="DisasterChain Native Android App (v1.2.0)"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(217, 107, 53, 0.08)',
+            border: '1px solid rgba(217, 107, 53, 0.28)',
+            borderRadius: '6px',
+            color: '#E6E1D6',
+            fontSize: '0.74rem',
+            fontFamily: 'JetBrains Mono, monospace',
+            padding: '5px 10px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <Icon name="smartphone" size={14} color="#D96B35" />
+          <span>GET ANDROID APP</span>
+        </button>
+      </div>
+
       {/* 1. Global Multilingual Language Selector (Compact [ EN ▾ ]) */}
       <div className="header-action-item header-lang-wrap" title="Select Global Language (20)">
         <LanguageSelector compact={true} />

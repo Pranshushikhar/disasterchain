@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
  * DISASTERCHAIN GLOBAL COMMAND PALETTE ("Ask DisasterChain")
  * Global keyboard search & operational routing engine activated via '/' or 'Ctrl+K'.
  */
-export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenIncident }) {
+export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenIncident, onOpenAppModal }) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
@@ -87,6 +87,17 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
       subtitle: 'Dos & Don’ts for Flood, Cyclone, Earthquake, Fire & Heatwaves',
       action: () => navigate('/guides'),
       keywords: ['preparedness', 'guides', 'dos and donts', 'flood guide', 'earthquake'],
+    },
+    {
+      id: 'cmd-android-app',
+      category: 'DISTRIBUTION',
+      title: 'Get DisasterChain Android App (APK)',
+      subtitle: 'Native client distribution with direct APK v1.2.0 download & QR code',
+      action: () => {
+        onClose();
+        if (onOpenAppModal) onOpenAppModal();
+      },
+      keywords: ['android', 'app', 'apk', 'mobile', 'download', 'native', 'install', 'qr'],
     },
     {
       id: 'cmd-sos',

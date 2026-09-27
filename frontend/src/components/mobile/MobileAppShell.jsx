@@ -24,6 +24,8 @@ import MobileSosModal from './MobileSosModal';
 import MobileDigitalTwinModal from './MobileDigitalTwinModal';
 import MobileReplayModal from './MobileReplayModal';
 import MobileStateView from './MobileStateView';
+import NativeAppDownloadTakeover from './NativeAppDownloadTakeover';
+import { isAndroid, isIOS, hasDismissedNativeAppPrompt, dismissNativeAppPrompt } from '../../utils/deviceDetection';
 
 // Secondary Page Fallbacks
 import WeatherPage from '../../pages/WeatherPage';
@@ -92,6 +94,22 @@ export default function MobileAppShell() {
   const [isReplayOpen, setIsReplayOpen] = useState(false);
   const [isPersonalSafetyOpen, setIsPersonalSafetyOpen] = useState(false);
   const [isSystemStatusOpen, setIsSystemStatusOpen] = useState(false);
+
+  // Native Android App Prompt State (Specification Section 1 & 5)
+  const [showNativeAppPrompt, setShowNativeAppPrompt] = useState(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.search.includes('download_native') || window.location.hash === '#get-app') {
+        return true;
+      }
+    }
+    if (hasDismissedNativeAppPrompt()) return false;
+    return isAndroid();
+  });
+
+  const handleContinueInBrowser = () => {
+    dismissNativeAppPrompt();
+    setShowNativeAppPrompt(false);
+  };
 
   // Online/Offline listeners
   useEffect(() => {
@@ -331,7 +349,30 @@ export default function MobileAppShell() {
                 onOpenReplay={() => setIsReplayOpen(true)}
                 onOpenPersonalSafety={() => setIsPersonalSafetyOpen(true)}
                 onOpenSystemStatus={() => setIsSystemStatusOpen(true)}
+                onOpenNativeAppDownload={() => setShowNativeAppPrompt(true)}
                 onClose={() => {}}
+              />
+            }
+          />
+
+          {/* Dedicated Native App Direct Entry Route */}
+          <Route
+            path="/get-app"
+            element={
+              <NativeAppDownloadTakeover
+                isOpen={true}
+                onContinueInBrowser={() => navigate('/')}
+                isIos={isIOS()}
+              />
+            }
+          />
+          <Route
+            path="/download-app"
+            element={
+              <NativeAppDownloadTakeover
+                isOpen={true}
+                onContinueInBrowser={() => navigate('/')}
+                isIos={isIOS()}
               />
             }
           />
@@ -426,6 +467,13 @@ export default function MobileAppShell() {
       <SystemStatusModal
         isOpen={isSystemStatusOpen}
         onClose={() => setIsSystemStatusOpen(false)}
+      />
+
+      {/* 7. Dedicated Native Android App Download Takeover (Specification Section 1, 2, 3, 4, 5) */}
+      <NativeAppDownloadTakeover
+        isOpen={showNativeAppPrompt}
+        onContinueInBrowser={handleContinueInBrowser}
+        isIos={isIOS()}
       />
     </div>
   );
