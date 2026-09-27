@@ -1,0 +1,1154 @@
+/* ==========================================================================
+   DISASTERCHAIN — PURPOSE-BUILT MOBILE EMERGENCY ARCHITECTURE
+   Visual Philosophy: CALM FUTURE / OPERATIONAL HUMANISM
+   Designed exclusively for 360x800, 390x844, 412x915, 768x1024
+   ========================================================================== */
+
+/* 1. Mobile Shell Container */
+.mobile-shell-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #11100E;
+  color: #F7F4ED;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 2. Compact Mobile Header (Section 2) */
+.mobile-app-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9900;
+  background: rgba(17, 16, 14, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+  padding: env(safe-area-inset-top, 0px) 1rem 0 1rem;
+  height: calc(52px + env(safe-area-inset-top, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mobile-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.mobile-brand-mark-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.mobile-brand-icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(217, 107, 53, 0.15);
+  border: 1px solid rgba(217, 107, 53, 0.4);
+  border-radius: 4px;
+  color: #D96B35;
+}
+
+.mobile-brand-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: #F7F4ED;
+}
+
+@media (max-width: 395px) {
+  .mobile-brand-text {
+    display: none;
+  }
+}
+
+.mobile-header-locality-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(242, 238, 231, 0.05);
+  border: 1px solid rgba(242, 238, 231, 0.1);
+  border-radius: 4px;
+  padding: 0.25rem 0.55rem;
+  color: #E9E5DC;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mobile-header-locality-btn:active {
+  background: rgba(242, 238, 231, 0.12);
+}
+
+.mobile-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.mobile-freshness-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #5E8B68;
+  background: rgba(94, 139, 104, 0.1);
+  border: 1px solid rgba(94, 139, 104, 0.25);
+  border-radius: 3px;
+  padding: 0.22rem 0.45rem;
+}
+
+.mobile-freshness-badge.stale {
+  color: #C69A3A;
+  background: rgba(198, 154, 58, 0.1);
+  border-color: rgba(198, 154, 58, 0.25);
+}
+
+.mobile-freshness-badge.offline {
+  color: #C84A3A;
+  background: rgba(200, 74, 58, 0.1);
+  border-color: rgba(200, 74, 58, 0.25);
+}
+
+.mobile-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.mobile-header-menu-btn {
+  background: rgba(242, 238, 231, 0.05);
+  border: 1px solid rgba(242, 238, 231, 0.1);
+  border-radius: 4px;
+  color: #A49F93;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mobile-header-menu-btn:active {
+  background: rgba(242, 238, 231, 0.12);
+  color: #F7F4ED;
+}
+
+/* 3. Mobile Main Page Content Area */
+.mobile-page-container {
+  flex: 1;
+  padding: 1rem 1rem calc(88px + env(safe-area-inset-bottom, 0px)) 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mobile-page-container.full-viewport-map {
+  padding: 0;
+  height: calc(100vh - 52px - env(safe-area-inset-top, 0px) - 64px - env(safe-area-inset-bottom, 0px));
+  height: calc(100dvh - 52px - env(safe-area-inset-top, 0px) - 64px - env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
+}
+
+/* 4. Dedicated Mobile Bottom Navigation (Section 2 & 8) */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9950;
+  height: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(17, 16, 14, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(242, 238, 231, 0.1);
+  display: grid;
+  grid-template-columns: 1fr 1fr auto 1fr 1fr;
+  align-items: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  color: #8C877D;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  gap: 4px;
+  min-height: 48px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+  position: relative;
+}
+
+.mobile-nav-item.active {
+  color: #D96B35;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.96);
+}
+
+.mobile-nav-badge {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 14px);
+  background: #C84A3A;
+  color: #FFFFFF;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 8px;
+  min-width: 14px;
+  text-align: center;
+}
+
+/* Restrained Persistent SOS in Bottom Nav (Section 2 & 8) */
+.mobile-nav-sos-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.35rem;
+}
+
+.mobile-nav-sos-btn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #C84A3A;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(200, 74, 58, 0.45);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  margin-top: -12px;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.mobile-nav-sos-btn:active {
+  transform: scale(0.94);
+  box-shadow: 0 2px 8px rgba(200, 74, 58, 0.3);
+}
+
+.mobile-sos-ring-svg {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+}
+
+/* 5. Mobile Situation Screen Architecture (Section 3) */
+.mobile-situation-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+}
+
+.mobile-locality-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #D96B35;
+}
+
+.mobile-status-tag {
+  color: #5E8B68;
+  font-size: 0.62rem;
+}
+
+/* ONE dominant situation statement */
+.mobile-dominant-statement {
+  font-family: 'Newsreader', serif;
+  font-size: 1.42rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: #F7F4ED;
+  margin: 0.35rem 0 0.15rem 0;
+  letter-spacing: -0.01em;
+}
+
+/* Current Risk Banner */
+.mobile-risk-card {
+  background: #191714;
+  border-left: 4px solid #D96B35;
+  border-radius: 4px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-top: 1px solid rgba(242, 238, 231, 0.06);
+  border-right: 1px solid rgba(242, 238, 231, 0.06);
+  border-bottom: 1px solid rgba(242, 238, 231, 0.06);
+}
+
+.mobile-risk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-risk-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: #A49F93;
+}
+
+.mobile-risk-level {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #D96B35;
+}
+
+.mobile-risk-summary {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #E9E5DC;
+}
+
+/* WHY Section */
+.mobile-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #A49F93;
+  margin-top: 0.25rem;
+  margin-bottom: 0.15rem;
+}
+
+.mobile-why-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-why-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  background: #191714;
+  border: 1px solid rgba(242, 238, 231, 0.06);
+  border-radius: 4px;
+  padding: 0.75rem 0.85rem;
+}
+
+.mobile-why-icon {
+  color: #D96B35;
+  margin-top: 1px;
+}
+
+.mobile-why-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-why-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #F7F4ED;
+}
+
+.mobile-why-desc {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #A49F93;
+}
+
+/* WHAT CHANGED Section (Latest 3 meaningful changes) */
+.mobile-what-changed-card {
+  background: #191714;
+  border: 1px solid rgba(242, 238, 231, 0.06);
+  border-radius: 4px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.mobile-change-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(242, 238, 231, 0.04);
+}
+
+.mobile-change-row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.mobile-change-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #D96B35;
+  white-space: nowrap;
+}
+
+.mobile-change-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.mobile-change-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #E9E5DC;
+  line-height: 1.35;
+}
+
+.mobile-change-source {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: #7A756D;
+}
+
+/* 6. Mobile Weather Section (Section 4) */
+.mobile-weather-card {
+  background: #191714;
+  border: 1px solid rgba(242, 238, 231, 0.06);
+  border-radius: 4px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobile-weather-now-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-weather-temp-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.mobile-weather-temp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #F7F4ED;
+}
+
+.mobile-weather-condition {
+  font-size: 0.82rem;
+  color: #A49F93;
+}
+
+.mobile-weather-metrics-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #A49F93;
+}
+
+.mobile-metric-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.mobile-metric-val {
+  color: #F7F4ED;
+  font-weight: 600;
+}
+
+/* Next 6 Hours Horizontal Timeline */
+.mobile-forecast-timeline {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-forecast-timeline::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-forecast-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: rgba(242, 238, 231, 0.03);
+  border: 1px solid rgba(242, 238, 231, 0.05);
+  border-radius: 4px;
+  padding: 0.45rem 0.55rem;
+  min-width: 54px;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.mobile-slot-time {
+  font-size: 0.6rem;
+  color: #7A756D;
+}
+
+.mobile-slot-temp {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #E9E5DC;
+}
+
+.mobile-slot-rain {
+  font-size: 0.6rem;
+  color: #D96B35;
+  font-weight: 600;
+}
+
+/* WEATHER -> IMPACT Chain */
+.mobile-impact-chain {
+  background: rgba(217, 107, 53, 0.04);
+  border: 1px solid rgba(217, 107, 53, 0.15);
+  border-radius: 4px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.mobile-chain-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #D96B35;
+}
+
+.mobile-chain-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mobile-chain-step {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.78rem;
+  color: #E9E5DC;
+}
+
+.mobile-chain-arrow {
+  color: #D96B35;
+  font-size: 0.75rem;
+}
+
+/* 7. Ask DisasterChain (WeatherGPT Accessible Entry - Section 7) */
+.mobile-ask-dc-card {
+  background: #191714;
+  border: 1px solid rgba(217, 107, 53, 0.25);
+  border-radius: 6px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.mobile-ask-dc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-ask-dc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #D96B35;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mobile-ask-dc-sub {
+  font-size: 0.65rem;
+  color: #7A756D;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.mobile-quick-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.mobile-quick-q-btn {
+  background: rgba(242, 238, 231, 0.05);
+  border: 1px solid rgba(242, 238, 231, 0.1);
+  color: #E9E5DC;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mobile-quick-q-btn:active {
+  background: rgba(217, 107, 53, 0.2);
+  border-color: #D96B35;
+  color: #D96B35;
+}
+
+/* 8. Fullscreen Map & Sheet (Section 5) */
+.mobile-map-viewport {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-map-top-bar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  pointer-events: none;
+}
+
+.mobile-map-filter-scroll {
+  display: flex;
+  gap: 0.4rem;
+  pointer-events: auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mobile-map-filter-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-map-filter-btn {
+  background: rgba(17, 16, 14, 0.92);
+  border: 1px solid rgba(242, 238, 231, 0.15);
+  color: #E9E5DC;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+
+.mobile-map-filter-btn.active {
+  background: #D96B35;
+  color: #FFFFFF;
+  border-color: #D96B35;
+}
+
+.mobile-map-floating-controls {
+  position: absolute;
+  bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-map-ctrl-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(17, 16, 14, 0.94);
+  border: 1px solid rgba(242, 238, 231, 0.15);
+  color: #F7F4ED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.mobile-map-ctrl-btn:active {
+  transform: scale(0.95);
+  background: #211E1A;
+}
+
+/* Map Bottom Sheet (Section 5) */
+.mobile-map-bottom-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  background: rgba(25, 23, 20, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(242, 238, 231, 0.12);
+  border-radius: 12px 12px 0 0;
+  padding: 0.75rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px)) 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.85);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-sheet-drag-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(242, 238, 231, 0.2);
+  border-radius: 2px;
+  align-self: center;
+  margin-bottom: 0.25rem;
+}
+
+.mobile-sheet-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-sheet-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #F7F4ED;
+}
+
+.mobile-sheet-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+}
+
+.mobile-sheet-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+}
+
+.mobile-sheet-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-sheet-detail-label {
+  color: #7A756D;
+  font-size: 0.58rem;
+}
+
+.mobile-sheet-detail-val {
+  color: #E9E5DC;
+  font-weight: 600;
+}
+
+.mobile-sheet-action-btn {
+  background: #D96B35;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 4px;
+  padding: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+/* 9. Mobile Alerts Feed Architecture (Section 6) */
+.mobile-alerts-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobile-alert-card {
+  background: #191714;
+  border-left: 4px solid #5E8B68;
+  border-top: 1px solid rgba(242, 238, 231, 0.06);
+  border-right: 1px solid rgba(242, 238, 231, 0.06);
+  border-bottom: 1px solid rgba(242, 238, 231, 0.06);
+  border-radius: 4px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.mobile-alert-card.critical {
+  border-left-color: #C84A3A;
+  background: rgba(200, 74, 58, 0.06);
+  border-top-color: rgba(200, 74, 58, 0.25);
+  border-right-color: rgba(200, 74, 58, 0.25);
+  border-bottom-color: rgba(200, 74, 58, 0.25);
+}
+
+.mobile-alert-card.elevated {
+  border-left-color: #D96B35;
+  background: rgba(217, 107, 53, 0.04);
+}
+
+.mobile-alert-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mobile-alert-severity {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #D96B35;
+}
+
+.mobile-alert-severity.critical {
+  color: #C84A3A;
+}
+
+.mobile-alert-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: #7A756D;
+}
+
+.mobile-alert-headline {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #F7F4ED;
+  line-height: 1.35;
+}
+
+.mobile-alert-what-to-do {
+  background: rgba(242, 238, 231, 0.03);
+  border: 1px solid rgba(242, 238, 231, 0.05);
+  border-radius: 4px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: #E9E5DC;
+}
+
+.mobile-alert-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: #7A756D;
+  margin-top: 0.15rem;
+}
+
+/* 10. Mobile SOS Modal & Dispatch (Section 8) */
+.mobile-sos-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(17, 16, 14, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top, 0px) 1.25rem env(safe-area-inset-bottom, 0px) 1.25rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.mobile-sos-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(242, 238, 231, 0.1);
+}
+
+.mobile-sos-top-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #C84A3A;
+}
+
+.mobile-sos-close-btn {
+  background: transparent;
+  border: none;
+  color: #A49F93;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.mobile-sos-big-trigger {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: #C84A3A;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 35px rgba(200, 74, 58, 0.6);
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 900;
+  font-size: 1.45rem;
+  margin: 1.5rem auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mobile-hold-caption {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+.mobile-sos-logged-card {
+  background: rgba(94, 139, 104, 0.1);
+  border: 1px solid #5E8B68;
+  border-radius: 6px;
+  padding: 1.15rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.mobile-sos-logged-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #5E8B68;
+  letter-spacing: 0.08em;
+}
+
+/* OFFICIAL EMERGENCY SERVICES CALL 112 PROMINENCE (Section 8) */
+.mobile-official-112-banner {
+  background: #C84A3A;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.45rem;
+  box-shadow: 0 4px 20px rgba(200, 74, 58, 0.4);
+}
+
+.mobile-official-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+
+.mobile-official-sub {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mobile-112-call-btn {
+  background: #FFFFFF;
+  color: #C84A3A;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.mobile-112-call-btn:active {
+  background: #F7F4ED;
+}
+
+.mobile-official-disclaimer {
+  font-size: 0.72rem;
+  color: #A49F93;
+  line-height: 1.45;
+  text-align: center;
+  margin-top: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+/* 11. Mobile More Menu Architecture (Section 9) */
+.mobile-more-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.mobile-more-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mobile-more-group-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #7A756D;
+  padding-left: 0.25rem;
+}
+
+.mobile-more-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #191714;
+  border: 1px solid rgba(242, 238, 231, 0.06);
+  border-radius: 4px;
+  padding: 0.75rem 0.85rem;
+  text-decoration: none;
+  color: #F7F4ED;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.mobile-more-item:active {
+  background: rgba(242, 238, 231, 0.06);
+  border-color: rgba(242, 238, 231, 0.15);
+}
+
+.mobile-more-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.mobile-more-icon {
+  color: #D96B35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-more-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-more-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #F7F4ED;
+}
+
+.mobile-more-desc {
+  font-size: 0.68rem;
+  color: #7A756D;
+}
+
+/* 12. Mobile Motion & Accessibility (Section 13) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

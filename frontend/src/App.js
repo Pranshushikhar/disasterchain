@@ -44,9 +44,13 @@ import WeatherGPTPage from './pages/WeatherGPTPage';
 import AdminDashboard from './pages/AdminDashboard';
 import GlobalCommandBar from './components/GlobalCommandBar';
 
+import useIsMobile from './utils/useIsMobile';
+import MobileAppShell from './components/mobile/MobileAppShell';
+
 const AppLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isMobile } = useIsMobile();
   const [isSosOpen, setIsSosOpen] = useState(false);
   const [isIncidentOpen, setIsIncidentOpen] = useState(false);
   const [isCommandBarOpen, setIsCommandBarOpen] = useState(false);
@@ -101,12 +105,16 @@ const AppLayout = () => {
 
   // Show clean layout without desktop sidebar on standalone authentication/landing pages
   const isPublicStandalone =
-    location.pathname === '/landing' ||
     location.pathname === '/login' ||
     location.pathname === '/register' ||
     location.pathname === '/forgot-password' ||
     location.pathname === '/reset-password' ||
     location.pathname === '/verify-email';
+
+  // DEDICATED MOBILE APP SHELL (Specification: DO NOT PATCH. REBUILD THE MOBILE EXPERIENCE)
+  if (isMobile && !isPublicStandalone) {
+    return <MobileAppShell />;
+  }
 
   return (
     <div className="app-container">
