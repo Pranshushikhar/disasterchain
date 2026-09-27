@@ -94,12 +94,12 @@ const ForgotPasswordPage = () => {
         >
           <div style={{ fontWeight: 700, color: '#ffffff', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <Icon name="shield-check" size={14} color="#38bdf8" />
-            <span>How Admin-Verified Recovery Works:</span>
+            <span>{t('auth.howRecoveryWorks', 'How Admin-Verified Recovery Works:')}</span>
           </div>
           <ol style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <li>Submit your registered email address below.</li>
-            <li>Incident Commander or System Administrator verifies your identity.</li>
-            <li>You receive a single-use 15-minute recovery code.</li>
+            <li>{t('auth.recoveryStep1', 'Submit your registered email address below.')}</li>
+            <li>{t('auth.recoveryStep2', 'Incident Commander or System Administrator verifies your identity.')}</li>
+            <li>{t('auth.recoveryStep3', 'You receive a single-use 15-minute recovery code.')}</li>
           </ol>
         </div>
 
@@ -123,7 +123,7 @@ const ForgotPasswordPage = () => {
           <div style={{ textAlign: 'center', padding: '0.5rem 0' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🛡️</div>
             <div style={{ fontWeight: 800, color: '#ffffff', fontSize: '1.15rem', marginBottom: '0.35rem' }}>
-              Recovery Request Logged
+              {t('auth.recoveryLogged', 'Recovery Request Logged')}
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
               {message}
@@ -141,7 +141,7 @@ const ForgotPasswordPage = () => {
                 lineHeight: 1.45,
               }}
             >
-              ⏱️ <strong>Next Step:</strong> Contact your field supervisor or system administrator to approve your recovery request. Once approved, you will receive a single-use code valid for 15 minutes.
+              ⏱️ <strong>{t('auth.nextStep', 'Next Step:')}</strong> {t('auth.nextStepDesc', 'Contact your field supervisor or system administrator to approve your recovery request. Once approved, you will receive a single-use code valid for 15 minutes.')}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -150,7 +150,7 @@ const ForgotPasswordPage = () => {
                 className="btn btn-primary"
                 style={{ width: '100%', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                I Received My Code → Enter Code
+                {t('auth.enterCode', 'I Received My Code → Enter Code')}
               </Link>
               <Link
                 to="/login"

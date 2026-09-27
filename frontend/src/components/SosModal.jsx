@@ -268,7 +268,7 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                     LOCAL QUEUE ID: <span style={{ color: '#f59e0b' }}>{submittedRecord?.requestId}</span>
                   </div>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
-                    STATUS: <span style={{ color: '#f59e0b', fontWeight: 700 }}>QUEUED LOCALLY (PENDING CONFIRMATION)</span>
+                    STATUS: <span style={{ color: '#f59e0b', fontWeight: 700 }}>{t('sos.queuedLocally', 'QUEUED LOCALLY (PENDING CONFIRMATION)')}</span>
                   </div>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
                     SEVERITY: <span style={{ color: 'var(--crimson)' }}>{formData.severity}</span>
@@ -286,7 +286,7 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                     style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.82rem', padding: '0.6rem' }}
                   >
                     <span>📞</span>
-                    <span>CALL 112</span>
+                    <span>{t('common.call112', 'CALL 112')}</span>
                   </a>
                   <a
                     href={`sms:112?body=${encodeURIComponent(`DISASTERCHAIN EMERGENCY SOS: ${formData.description}. Loc: ${formData.location || `${formData.latitude},${formData.longitude}`}. Contact: ${formData.contact}`)}`}
@@ -294,7 +294,7 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                     style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.82rem', padding: '0.6rem' }}
                   >
                     <span>💬</span>
-                    <span>SEND SMS</span>
+                    <span>{t('common.sendSms', 'SEND SMS')}</span>
                   </a>
                 </div>
               </>
@@ -319,10 +319,10 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                 </div>
 
                 <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>
-                  DISTRESS BEACON BROADCASTED
+                  {t('sos.beaconBroadcasted', 'DISTRESS BEACON BROADCASTED')}
                 </h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', marginBottom: '1.25rem' }}>
-                  Emergency request transmitted successfully. Responders and nearest relief shelters have received your distress telemetry.
+                  {t('sos.beaconBroadcastedDesc', 'Emergency request transmitted successfully. Responders and nearest relief shelters have received your distress telemetry.')}
                 </p>
 
                 <div
@@ -341,7 +341,7 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                     SIGNAL ID: <span style={{ color: 'var(--cyan)' }}>{submittedRecord?.requestId || submittedRecord?._id}</span>
                   </div>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
-                    STATUS: <span style={{ color: 'var(--mint)', fontWeight: 700 }}>TRANSMITTED TO LIVE DATABASE</span>
+                    STATUS: <span style={{ color: 'var(--mint)', fontWeight: 700 }}>{t('sos.transmittedLive', 'TRANSMITTED TO LIVE DATABASE')}</span>
                   </div>
                   <div style={{ color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
                     SEVERITY: <span style={{ color: 'var(--crimson)' }}>{formData.severity}</span>
@@ -354,7 +354,7 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
             )}
 
             <button onClick={onClose} className="btn btn-primary" style={{ width: '100%' }}>
-              ACKNOWLEDGE & RETURN TO COMMAND
+              {t('sos.acknowledgeReturn', 'ACKNOWLEDGE & RETURN TO COMMAND')}
             </button>
           </div>
         )}
@@ -364,10 +364,10 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
           <div style={{ textAlign: 'center', padding: '2.5rem 0' }}>
             <div className="live-beacon-pulse critical" style={{ width: 32, height: 32, margin: '0 auto 1.5rem' }} />
             <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#ffffff', marginBottom: '0.5rem' }}>
-              ACQUIRING HIGH-ACCURACY GPS TELEMETRY...
+              {t('sos.acquiringGps', 'ACQUIRING HIGH-ACCURACY GPS TELEMETRY...')}
             </div>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Contacting browser geolocation sensors and satellite triangulation.
+              {t('sos.acquiringGpsDesc', 'Contacting browser geolocation sensors and satellite triangulation.')}
             </div>
           </div>
         )}
@@ -376,10 +376,10 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
         {sosState === 'CONFIRMATION' && (
           <div>
             <div className="micro-label" style={{ color: 'var(--amber)', marginBottom: '0.5rem' }}>
-              STEP 2 OF 2: CONFIRM BROADCAST TELEMETRY
+              {t('sos.step2Confirm', 'STEP 2 OF 2: CONFIRM BROADCAST TELEMETRY')}
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
-              Review the emergency parameters below. Once confirmed, this signal is immediately routed to active rescue responders.
+              {t('sos.confirmDesc', 'Review the emergency parameters below. Once confirmed, this signal is immediately routed to active rescue responders.')}
             </p>
 
             <div
@@ -394,25 +394,25 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
             >
               <div className="form-grid-2col" style={{ marginBottom: '0.75rem' }}>
                 <div>
-                  <div className="micro-label">Caller Name</div>
+                  <div className="micro-label">{t('emergency.fullName', 'Caller Name')}</div>
                   <div style={{ fontWeight: 600, color: '#ffffff' }}>{formData.name}</div>
                 </div>
                 <div>
-                  <div className="micro-label">Emergency Category</div>
+                  <div className="micro-label">{t('emergency.emergencyType', 'Emergency Category')}</div>
                   <div style={{ fontWeight: 600, color: '#ffffff' }}>{formData.emergencyType}</div>
                 </div>
                 <div>
-                  <div className="micro-label">Severity</div>
+                  <div className="micro-label">{t('crisis.severityLevel', 'Severity')}</div>
                   <span className="badge badge-critical">{formData.severity}</span>
                 </div>
                 <div>
-                  <div className="micro-label">People Affected</div>
-                  <div style={{ fontWeight: 600, color: '#ffffff' }}>{formData.peopleAffected} Person(s)</div>
+                  <div className="micro-label">{t('emergency.peopleAffected', 'People Affected')}</div>
+                  <div style={{ fontWeight: 600, color: '#ffffff' }}>{formData.peopleAffected} {t('crisis.individuals', 'Person(s)')}</div>
                 </div>
               </div>
 
               <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.65rem' }}>
-                <div className="micro-label">Coordinates / Location</div>
+                <div className="micro-label">{t('emergency.yourLocation', 'Coordinates / Location')}</div>
                 <div style={{ color: 'var(--cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
                   {formData.location}
                 </div>
@@ -425,14 +425,14 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                 onClick={() => setSosState('READY')}
                 className="btn btn-secondary"
               >
-                ← Back to Edit
+                {t('common.back', '← Back to Edit')}
               </button>
               <button
                 type="button"
                 onClick={dispatchSosSignal}
                 className="btn btn-emergency"
               >
-                🚨 TRANSMIT NOW
+                {t('emergency.triggerSos', '🚨 TRANSMIT NOW')}
               </button>
             </div>
           </div>
@@ -461,34 +461,34 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                   value={formData.emergencyType}
                   onChange={(e) => setFormData({ ...formData, emergencyType: e.target.value })}
                 >
-                  <option value="Medical Emergency">Medical Emergency</option>
-                  <option value="Severe Trauma / Bleeding">Severe Trauma / Bleeding</option>
-                  <option value="Fire Hazard / Trapped">Fire Hazard / Trapped</option>
-                  <option value="Structural Collapse">Structural Collapse</option>
-                  <option value="Water Inundation / Flood">Water Inundation / Flood</option>
-                  <option value="Hazardous Gas / Chemical">Hazardous Gas / Chemical</option>
-                  <option value="Other Crisis">Other Crisis</option>
+                  <option value="Medical Emergency">{t('emergency.medicalEmergency', 'Medical Emergency')}</option>
+                  <option value="Severe Trauma / Bleeding">{t('emergency.severeTrauma', 'Severe Trauma / Bleeding')}</option>
+                  <option value="Fire Hazard / Trapped">{t('emergency.fireHazardTrapped', 'Fire Hazard / Trapped')}</option>
+                  <option value="Structural Collapse">{t('emergency.structuralCollapse', 'Structural Collapse')}</option>
+                  <option value="Water Inundation / Flood">{t('emergency.waterFlood', 'Water Inundation / Flood')}</option>
+                  <option value="Hazardous Gas / Chemical">{t('emergency.hazardousGas', 'Hazardous Gas / Chemical')}</option>
+                  <option value="Other Crisis">{t('emergency.otherCrisis', 'Other Crisis')}</option>
                 </select>
               </div>
             </div>
 
             <div className="form-grid-2col">
               <div className="form-group">
-                <label className="form-label">Severity Level</label>
+                <label className="form-label">{t('crisis.severityLevel', 'Severity Level')}</label>
                 <select
                   className="form-select"
                   value={formData.severity}
                   onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
                 >
-                  <option value="Critical">🔴 Critical (Life Threat)</option>
-                  <option value="High">🟠 High (Urgent Response)</option>
-                  <option value="Medium">🟡 Medium (Moderate Hazard)</option>
-                  <option value="Low">🟢 Low (Advisory)</option>
+                  <option value="Critical">{t('emergency.criticalLifeThreat', '🔴 Critical (Life Threat)')}</option>
+                  <option value="High">{t('emergency.highUrgentResponse', '🟠 High (Urgent Response)')}</option>
+                  <option value="Medium">{t('emergency.mediumModerateHazard', '🟡 Medium (Moderate Hazard)')}</option>
+                  <option value="Low">{t('emergency.lowAdvisory', '🟢 Low (Advisory)')}</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="form-label">People at Risk</label>
+                <label className="form-label">{t('emergency.peopleAffected', 'People at Risk')}</label>
                 <input
                   type="number"
                   min="1"

@@ -1,17 +1,21 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../i18n';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const { t } = useTranslation();
   const location = useLocation();
 
   if (loading) {
     return (
       <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>Authenticating session...</div>
+        <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>
+          {t('auth.authenticatingSession', 'Authenticating session...')}
+        </div>
         <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-          Verifying security tokens with DisasterChain
+          {t('auth.verifyingTokens', 'Verifying security tokens with DisasterChain')}
         </div>
       </div>
     );

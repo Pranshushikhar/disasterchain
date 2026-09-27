@@ -278,7 +278,7 @@ export const DisasterAIChat = ({ onOpenSos, onOpenShelter, externalQuery = null 
           type="button"
           onClick={() => setIsOpen(true)}
           className="disaster-ai-launcher"
-          aria-label="Open DisasterChain AI Assistant"
+          aria-label={t('auth.openAiAssistant', 'Open DisasterChain AI Assistant')}
           id="open-ai-assistant-btn"
           style={{
             position: 'fixed',
@@ -305,7 +305,7 @@ export const DisasterAIChat = ({ onOpenSos, onOpenShelter, externalQuery = null 
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
         >
           <span style={{ fontSize: '1.15rem' }}>🤖</span>
-          <span>AI ASSISTANT</span>
+          <span>{t('nav.aiAssistant', 'AI ASSISTANT')}</span>
         </button>
       )}
 
@@ -329,7 +329,7 @@ export const DisasterAIChat = ({ onOpenSos, onOpenShelter, externalQuery = null 
         <div
           className="disaster-ai-modal"
           role="dialog"
-          aria-label="DisasterChain AI Emergency Assistant"
+          aria-label={t('auth.emergencyAssistant', 'DisasterChain AI Emergency Assistant')}
           style={{
             position: 'fixed',
             bottom: '24px',
@@ -395,8 +395,8 @@ export const DisasterAIChat = ({ onOpenSos, onOpenShelter, externalQuery = null 
                 <button
                   type="button"
                   onClick={handleClearChat}
-                  title="Clear conversation"
-                  aria-label="Clear conversation"
+                  title={t('auth.clearConversation', 'Clear conversation')}
+                  aria-label={t('auth.clearConversation', 'Clear conversation')}
                   style={{
                     minWidth: '38px',
                     minHeight: '38px',
@@ -421,7 +421,7 @@ export const DisasterAIChat = ({ onOpenSos, onOpenShelter, externalQuery = null 
                 type="button"
                 onClick={() => setIsOpen(false)}
                 id="close-ai-assistant-btn"
-                aria-label="Close AI Assistant"
+                aria-label={t('common.close', 'Close AI Assistant')}
                 style={{
                   minWidth: '44px',
                   minHeight: '44px',
@@ -516,7 +516,7 @@ export const DisasterAIChat = ({ onOpenSos, onOpenShelter, externalQuery = null 
                     }}
                   >
                     <span>🌦️</span>
-                    <span>Ask WeatherGPT</span>
+                    <span>{t('weather.askWeatherGpt', 'Ask WeatherGPT')}</span>
                   </button>
                 </div>
               </div>
@@ -608,7 +608,7 @@ export const DisasterAIChat = ({ onOpenSos, onOpenShelter, externalQuery = null 
                           }}
                         >
                           <span>📞</span>
-                          <span>Call 112</span>
+                          <span>{t('common.call112', 'Call 112')}</span>
                         </a>
                       )}
                     </div>

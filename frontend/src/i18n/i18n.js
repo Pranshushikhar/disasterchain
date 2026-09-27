@@ -126,7 +126,7 @@ export const LanguageContext = createContext(null);
  */
 function getInitialLanguage() {
   try {
-    const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    const saved = localStorage.getItem('disasterchain-language') || localStorage.getItem(LANGUAGE_STORAGE_KEY);
     if (saved && isValidLanguageCode(saved)) {
       return saved;
     }
@@ -172,6 +172,7 @@ export const LanguageProvider = ({ children }) => {
 
     setCurrentLanguageState(code);
     try {
+      localStorage.setItem('disasterchain-language', code);
       localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
     } catch (e) {
       console.warn('[i18n] Failed to persist language to localStorage:', e);
@@ -214,6 +215,7 @@ export const LanguageProvider = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       currentLanguage,
+      language: currentLanguage,
       setLanguage,
       languageConfig,
       isRtl,
@@ -228,6 +230,9 @@ export const LanguageProvider = ({ children }) => {
   return <LanguageContext.Provider value={contextValue}>{children}</LanguageContext.Provider>;
 };
 
+export const I18nProvider = LanguageProvider;
+export const I18nContext = LanguageContext;
+
 /**
  * Hook for consuming translations in any functional component
  */
@@ -238,6 +243,7 @@ export const useTranslation = () => {
     return {
       t: (key, p, fallback) => translate(key, DEFAULT_LANGUAGE, p, fallback),
       currentLanguage: DEFAULT_LANGUAGE,
+      language: DEFAULT_LANGUAGE,
       setLanguage: () => {},
       languageConfig: getLanguageConfig(DEFAULT_LANGUAGE),
       isRtl: false,
@@ -249,10 +255,15 @@ export const useTranslation = () => {
   return context;
 };
 
+export const useI18n = useTranslation;
+
 export default {
   LanguageProvider,
+  I18nProvider,
   useTranslation,
+  useI18n,
   translate,
   SUPPORTED_LANGUAGES,
   DEFAULT_LANGUAGE,
 };
+

@@ -93,18 +93,18 @@ const BlockchainReceiptModal = ({ isOpen = true, onClose, record, item }) => {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase' }}>TRANSACTION ID</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase' }}>{t('blockchain.transactionId', 'TRANSACTION ID')}</div>
               <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.95rem' }}>{targetRecord.transactionId || 'TXN-881204'}</div>
             </div>
             <div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', textAlign: 'right' }}>BLOCK NUMBER</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', textAlign: 'right' }}>{t('blockchain.blockNumber', 'BLOCK NUMBER')}</div>
               <div style={{ color: '#818cf8', fontWeight: 700, textAlign: 'right' }}>#{targetRecord.blockNumber || 1001}</div>
             </div>
           </div>
 
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase' }}>BLOCK HASH (SHA-256)</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase' }}>{t('blockchain.blockHash', 'BLOCK HASH (SHA-256)')}</span>
               <button
                 type="button"
                 onClick={handleCopyHash}
@@ -121,14 +121,14 @@ const BlockchainReceiptModal = ({ isOpen = true, onClose, record, item }) => {
           </div>
 
           <div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>PREVIOUS BLOCK HASH</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>{t('blockchain.prevBlockHash', 'PREVIOUS BLOCK HASH')}</div>
             <div style={{ color: 'var(--text-secondary)', wordBreak: 'break-all', fontSize: '0.74rem' }}>
               {targetRecord.previousBlockHash || '0x0000000000000000000000000000000000000000000000000000000000000000'}
             </div>
           </div>
 
           <div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>DIGITAL SIGNATURE</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>{t('blockchain.digitalSignature', 'DIGITAL SIGNATURE')}</div>
             <div style={{ color: '#a78bfa', wordBreak: 'break-all', fontSize: '0.74rem' }}>
               {targetRecord.signature || '0xa41c7b89d6e4f3a2b1c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6'}
             </div>
@@ -136,18 +136,18 @@ const BlockchainReceiptModal = ({ isOpen = true, onClose, record, item }) => {
 
           <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-main)' }}>
             <div>
-              <span style={{ color: 'var(--text-muted)' }}>Resource: </span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('common.resource', 'Resource')}: </span>
               <strong>{targetRecord.quantity} {targetRecord.unit || 'units'} &bull; {targetRecord.resourceName}</strong>
             </div>
             <div>
-              <span className="badge badge-success">{targetRecord.status || 'Verified on Blockchain'}</span>
+              <span className="badge badge-success">{targetRecord.status || t('blockchain.verifiedLedger', 'Verified on Blockchain')}</span>
             </div>
           </div>
         </div>
 
         {/* Prototype Disclaimer */}
         <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '1rem', lineHeight: 1.5, textAlign: 'center' }}>
-          ℹ️ <em>Prototype Note:</em> This transaction provides a transparent, tamper-resistant verification reference for disaster supply allocations without involving cryptocurrency trading.
+          {t('transparency.prototypeNotice', 'ℹ️ Prototype Note: This transaction provides a transparent, tamper-resistant verification reference for disaster supply allocations without involving cryptocurrency trading.')}
         </div>
 
         <button onClick={onClose} className="btn btn-primary" style={{ width: '100%', marginTop: '1.25rem' }}>

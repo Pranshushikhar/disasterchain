@@ -1,378 +1,183 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../i18n/i18n';
-import { useAuth } from '../context/AuthContext';
-import Icon from '../components/Icons';
 import { sendWeatherGPTChat } from '../services/api';
 import {
   fetchCompleteWeather,
   searchLocations,
   reverseGeocode,
 } from '../services/weatherApi';
-import { getWeatherCondition, getAqiDetails } from '../utils/weatherUtils';
+import './weathergpt.css';
 
 /**
- * Clean Formatter for Structured Weather Intelligence
+ * WEATHERGPT — ATMOSPHERIC INTELLIGENCE DESK
+ * Professional meteorological intelligence interface with deterministic time binding,
+ * hourly forecast timeline highlighting, and conversational continuity.
  */
-const WeatherMessageContent = ({ content, isRtl }) => {
-  if (!content) return null;
-
-  const lines = content.split('\n');
-
-  return (
-    <div
-      className={`weather-gpt-rendered-msg ${isRtl ? 'rtl-direction' : ''}`}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.45rem',
-        fontSize: '0.92rem',
-        lineHeight: 1.55,
-        textAlign: isRtl ? 'right' : 'left',
-        direction: isRtl ? 'rtl' : 'ltr',
-      }}
-    >
-      {lines.map((line, idx) => {
-        const trimmed = line.trim();
-        if (!trimmed) return <div key={idx} style={{ height: '0.2rem' }} />;
-
-        // Risk Banners
-        if (trimmed.startsWith('⚠️ HIGH RISK') || trimmed.startsWith('🚨 LIFE-SAFETY ALERT') || trimmed.startsWith('⚠️ ACTIVE CYCLONE')) {
-          return (
-            <div
-              key={idx}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                background: 'rgba(239, 68, 68, 0.15)',
-                borderLeft: '4px solid #ef4444',
-                color: '#f87171',
-                padding: '0.35rem 0.65rem',
-                borderRadius: '4px',
-                fontWeight: 800,
-                fontSize: '0.92rem',
-                letterSpacing: '0.02em',
-                margin: '0.2rem 0',
-              }}
-            >
-              {trimmed}
-            </div>
-          );
-        }
-
-        if (trimmed.startsWith('✓ SAFE / NORMAL')) {
-          return (
-            <div
-              key={idx}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                background: 'rgba(16, 185, 129, 0.15)',
-                borderLeft: '4px solid #10b981',
-                color: '#34d399',
-                padding: '0.35rem 0.65rem',
-                borderRadius: '4px',
-                fontWeight: 800,
-                fontSize: '0.92rem',
-                margin: '0.2rem 0',
-              }}
-            >
-              {trimmed}
-            </div>
-          );
-        }
-
-        // Section Headers
-        if (trimmed.startsWith('📍') || trimmed.startsWith('📊') || trimmed.startsWith('⏱️') || trimmed.startsWith('📅') || trimmed.startsWith('🌧️') || trimmed.startsWith('🌫️')) {
-          return (
-            <div
-              key={idx}
-              style={{
-                color: '#ff6b2c',
-                fontWeight: 800,
-                fontSize: '0.96rem',
-                marginTop: '0.3rem',
-              }}
-            >
-              {trimmed}
-            </div>
-          );
-        }
-
-        // What is happening / What it means / What to do labels
-        if (
-          trimmed.startsWith('What is happening:') ||
-          trimmed.startsWith('What it means:') ||
-          trimmed.startsWith('What to do:') ||
-          trimmed.startsWith('Emergency:') ||
-          trimmed.startsWith('Data Trust:')
-        ) {
-          return (
-            <div
-              key={idx}
-              style={{
-                color: trimmed.startsWith('Emergency:') ? '#f87171' : '#94a3b8',
-                fontWeight: 700,
-                fontSize: '0.84rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                marginTop: '0.25rem',
-              }}
-            >
-              {trimmed}
-            </div>
-          );
-        }
-
-        // Bullet / Numbered lists
-        const isBullet = trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*');
-        const isNumbered = /^[0-9]+\.\s+/.test(trimmed);
-
-        const cleanText = isBullet
-          ? trimmed.replace(/^[•\-*]\s*/, '')
-          : isNumbered
-            ? trimmed
-            : trimmed;
-
-        // Render bold markers
-        const parts = cleanText.split(/(\*\*.*?\*\*)/g);
-        const rendered = parts.map((part, pIdx) => {
-          if (part.startsWith('**') && part.endsWith('**')) {
-            return (
-              <strong key={pIdx} style={{ color: '#ffffff', fontWeight: 800 }}>
-                {part.slice(2, -2)}
-              </strong>
-            );
-          }
-          return part;
-        });
-
-        if (isBullet) {
-          return (
-            <div
-              key={idx}
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '0.4rem',
-                paddingLeft: isRtl ? 0 : '0.4rem',
-                paddingRight: isRtl ? '0.4rem' : 0,
-              }}
-            >
-              <span style={{ color: '#ff6b2c', fontWeight: 800 }}>•</span>
-              <span>{rendered}</span>
-            </div>
-          );
-        }
-
-        return <div key={idx}>{rendered}</div>;
-      })}
-    </div>
-  );
-};
-
 export default function WeatherGPTPage() {
-  const { t, currentLanguage } = useTranslation();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { t, language } = useTranslation();
 
-  // Active Location & Telemetry state (normalized { latitude, longitude, name, displayName, region, country })
-  const [activeLocation, setActiveLocation] = useState(() => {
-    // Check if state was passed via React Router navigation (e.g. from Weather page)
-    if (location.state?.location) {
-      const loc = location.state.location;
-      const dName = loc.displayName || loc.name || 'New Delhi, India';
-      return {
-        latitude: loc.latitude,
-        longitude: loc.longitude,
-        name: dName,
-        displayName: dName,
-        region: loc.region || '',
-        country: loc.country || '',
-      };
-    }
-    return {
-      name: 'New Delhi, India',
-      displayName: 'New Delhi, India',
-      latitude: 28.6139,
-      longitude: 77.2090,
-      region: 'Delhi',
-      country: 'India',
-    };
+  // Decoupled Location Model
+  const [locationPermission, setLocationPermission] = useState('prompt'); // 'prompt' | 'granted' | 'denied' | 'unavailable'
+  const [locationCoordinates, setLocationCoordinates] = useState({
+    latitude: 30.7716,
+    longitude: 76.5693,
   });
+  const [locationName, setLocationName] = useState({
+    displayName: 'Mohali, Punjab',
+    city: 'Mohali',
+    state: 'Punjab',
+    country: 'India',
+    isResolving: false,
+  });
+  const [weatherDataStatus, setWeatherDataStatus] = useState('LIVE'); // 'IDLE' | 'LOADING' | 'LIVE' | 'PARTIAL_LIVE' | 'CACHED' | 'ERROR'
 
-  const [liveTelemetry, setLiveTelemetry] = useState(null);
-  const [feedStatus, setFeedStatus] = useState('LIVE'); // 'LIVE' | 'PARTIAL_LIVE' | 'CACHED' | 'UNAVAILABLE'
-  const [isLocating, setIsLocating] = useState(false);
+  // Location search UI state
+  const [showLocationSearch, setShowLocationSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [showLocationSearch, setShowLocationSearch] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
-  // Conversational state
-  const [conversationId] = useState(() => `wgpt_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`);
-  const [messages, setMessages] = useState(() => [
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: `${t('weatherGpt.welcomeTitle', 'WeatherGPT')}\n${t('weatherGpt.welcomeSubtitle', 'Your conversational weather and disaster intelligence assistant.')}\n\nAsk me about current weather, upcoming rain, air quality, wind squalls, active cyclones, or flood risks.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      dataTrust: 'VERIFIED GUIDANCE',
-    },
-  ]);
+  // Live telemetry summary
+  const [liveTelemetry, setLiveTelemetry] = useState(null);
 
-  const [inputMessage, setInputMessage] = useState('');
+  // Conversation session state
+  const [conversationId, setConversationId] = useState(() => `wgpt_${Date.now()}`);
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sosConfirmOpen, setSosConfirmOpen] = useState(false);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  const isRtl = ['ur', 'sd', 'ks'].includes(currentLanguage);
-
-  // Auto-scroll to bottom of chat
+  // 1. Initial Geolocation and Telemetry Bootstrap
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+    // If browser supports geolocation, acquire position without blocking UI
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          setLocationPermission('granted');
+          const lat = Number(pos.coords.latitude.toFixed(4));
+          const lon = Number(pos.coords.longitude.toFixed(4));
+          setLocationCoordinates({ latitude: lat, longitude: lon });
+          setLocationName((prev) => ({
+            ...prev,
+            isResolving: true,
+          }));
 
-  // Load telemetry for active location
-  const refreshTelemetry = useCallback(async (lat, lon, placeName) => {
-    try {
-      const data = await fetchCompleteWeather(lat, lon);
-      if (data && data.current) {
-        const resolvedName = (placeName && !placeName.startsWith('Coordinates [') && !/^[-+]?\d+\.\d+°/i.test(placeName))
-          ? placeName
-          : (data.location?.displayName || data.location?.name || 'Current Location');
-
-        setLiveTelemetry({
-          name: resolvedName,
-          temperature: Math.round(data.current.temperature),
-          condition: getWeatherCondition(data.current.weatherCode).label,
-          icon: getWeatherCondition(data.current.weatherCode).icon,
-          windSpeed: Math.round(data.current.windSpeed || 0),
-          windGusts: Math.round(data.current.windGusts || 0),
-          humidity: data.current.relativeHumidity,
-          aqi: data.airQuality?.europeanAqi || null,
-          aqiLabel: data.airQuality?.severity || 'UNKNOWN',
-          precipitation: data.current.precipitation || 0,
-        });
-
-        if (data.isCached) {
-          setFeedStatus('CACHED');
-        } else {
-          setFeedStatus(data.feedStatus || 'LIVE');
-        }
-      } else {
-        setFeedStatus('UNAVAILABLE');
-      }
-    } catch (err) {
-      setFeedStatus('UNAVAILABLE');
+          // Reverse geocode place name in background
+          try {
+            const rev = await reverseGeocode(lat, lon);
+            const resolvedCity = rev?.displayName || rev?.city || `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`;
+            setLocationName({
+              displayName: resolvedCity,
+              city: rev?.city || resolvedCity,
+              state: rev?.region || rev?.state || '',
+              country: rev?.country || '',
+              isResolving: false,
+            });
+          } catch (e) {
+            setLocationName({
+              displayName: `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`,
+              city: `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`,
+              state: '',
+              country: '',
+              isResolving: false,
+            });
+          }
+        },
+        () => {
+          setLocationPermission('denied');
+        },
+        { timeout: 8000, enableHighAccuracy: true }
+      );
     }
   }, []);
 
-  // Initial load
-  useEffect(() => {
-    refreshTelemetry(activeLocation.latitude, activeLocation.longitude, activeLocation.displayName || activeLocation.name);
-  }, [activeLocation, refreshTelemetry]);
-
-  // Auto-acquire device GPS on initial mount if available and no router state provided
-  useEffect(() => {
-    if (location.state?.location || !navigator.geolocation) return;
-
-    let isMounted = true;
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        if (!isMounted) return;
-        const lat = Number(pos.coords.latitude.toFixed(4));
-        const lon = Number(pos.coords.longitude.toFixed(4));
-        try {
-          const rev = await reverseGeocode(lat, lon);
-          if (!isMounted) return;
-          const displayName = rev?.displayName || rev?.city || 'Current Location';
-          const newLoc = {
-            latitude: lat,
-            longitude: lon,
-            name: displayName,
-            displayName,
-            region: rev?.region || rev?.state || '',
-            country: rev?.country || '',
-          };
-          setActiveLocation(newLoc);
-          refreshTelemetry(lat, lon, displayName);
-        } catch (e) {
-          // Graceful fallback
-        }
-      },
-      () => {
-        // Geolocation not granted or timed out: retain default location smoothly
-      },
-      { timeout: 7000, enableHighAccuracy: true }
-    );
-
-    return () => {
-      isMounted = false;
-    };
-  }, [location.state, refreshTelemetry]);
-
-  // Handle Device GPS Geolocation
-  const handleLocateMe = async () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
-      return;
+  // 2. Fetch live telemetry whenever coordinates change
+  const refreshTelemetry = useCallback(async (lat, lon) => {
+    setWeatherDataStatus('LOADING');
+    try {
+      const data = await fetchCompleteWeather(lat, lon);
+      if (data && data.current) {
+        setLiveTelemetry({
+          temperature: Math.round(data.current.temperature),
+          condition: data.current.weatherCode != null ? data.current.weatherCode : 'Clear',
+          windSpeed: Math.round(data.current.windSpeed || 0),
+          windGusts: Math.round(data.current.windGusts || 0),
+          humidity: data.current.relativeHumidity,
+          precipitation: data.current.precipitation || 0,
+        });
+        setWeatherDataStatus(data.isCached ? 'CACHED' : (data.feedStatus || 'LIVE'));
+      } else {
+        setWeatherDataStatus('PARTIAL_LIVE');
+      }
+    } catch (err) {
+      setWeatherDataStatus('PARTIAL_LIVE');
     }
+  }, []);
 
+  useEffect(() => {
+    refreshTelemetry(locationCoordinates.latitude, locationCoordinates.longitude);
+  }, [locationCoordinates.latitude, locationCoordinates.longitude, refreshTelemetry]);
+
+  // Scroll to show latest user interaction and response
+  const hasUserInteractedRef = useRef(false);
+  useEffect(() => {
+    if (messages.length > 0) {
+      hasUserInteractedRef.current = true;
+      const lastUserEl = document.querySelector('.wgpt-turn-user:last-of-type');
+      if (lastUserEl) {
+        lastUserEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [messages.length, isLoading]);
+
+  // Handle GPS Button Click
+  const handleGpsClick = () => {
+    if (!navigator.geolocation) return;
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        setIsLocating(false);
         const lat = Number(pos.coords.latitude.toFixed(4));
         const lon = Number(pos.coords.longitude.toFixed(4));
+        setLocationCoordinates({ latitude: lat, longitude: lon });
+        setLocationName((prev) => ({ ...prev, isResolving: true }));
         try {
           const rev = await reverseGeocode(lat, lon);
-          const displayName = rev?.displayName || rev?.city || 'Current Location';
-          const newLoc = {
-            latitude: lat,
-            longitude: lon,
-            name: displayName,
-            displayName,
-            region: rev?.region || rev?.state || '',
+          const resolved = rev?.displayName || rev?.city || `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`;
+          setLocationName({
+            displayName: resolved,
+            city: rev?.city || resolved,
+            state: rev?.region || rev?.state || '',
             country: rev?.country || '',
-          };
-          setActiveLocation(newLoc);
-          refreshTelemetry(lat, lon, displayName);
-          // Post contextual message
-          sendMessage(`What is the weather right now at my location in ${displayName}?`, newLoc);
+            isResolving: false,
+          });
         } catch (e) {
-          const newLoc = {
-            latitude: lat,
-            longitude: lon,
-            name: 'Current Location',
-            displayName: 'Current Location',
-            region: '',
+          setLocationName({
+            displayName: `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`,
+            city: `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`,
+            state: '',
             country: '',
-          };
-          setActiveLocation(newLoc);
-          refreshTelemetry(lat, lon, 'Current Location');
-        } finally {
-          setIsLocating(false);
+            isResolving: false,
+          });
         }
       },
-      (err) => {
+      () => {
         setIsLocating(false);
-        console.warn('Geolocation denied or failed:', err.message);
         setShowLocationSearch(true);
       },
-      { timeout: 10000, enableHighAccuracy: true }
+      { timeout: 8000, enableHighAccuracy: true }
     );
   };
 
-  // Location search handler
+  // Handle Search Submission
   const handleSearchSubmit = async (e) => {
     e?.preventDefault();
     if (!searchQuery || searchQuery.trim().length < 2) return;
-
     setIsSearching(true);
     try {
       const results = await searchLocations(searchQuery.trim());
@@ -384,119 +189,80 @@ export default function WeatherGPTPage() {
     }
   };
 
-  const selectSearchResult = (item) => {
-    const displayName = `${item.name}${item.admin1 ? `, ${item.admin1}` : ''}${item.country ? `, ${item.country}` : ''}`;
-    const newLoc = {
-      latitude: item.latitude,
-      longitude: item.longitude,
-      name: displayName,
-      displayName,
-      region: item.admin1 || '',
-      country: item.country || '',
-    };
-    setActiveLocation(newLoc);
-    refreshTelemetry(item.latitude, item.longitude, displayName);
+  const handleSelectLocation = (loc) => {
+    const lat = Number(loc.latitude.toFixed(4));
+    const lon = Number(loc.longitude.toFixed(4));
+    setLocationCoordinates({ latitude: lat, longitude: lon });
+    setLocationName({
+      displayName: loc.name,
+      city: loc.name,
+      state: loc.admin1 || '',
+      country: loc.country || '',
+      isResolving: false,
+    });
     setShowLocationSearch(false);
     setSearchQuery('');
     setSearchResults([]);
-
-    // Query weather for newly selected location
-    sendMessage(`What is the weather in ${item.name}?`, newLoc);
   };
 
-  // Send message to WeatherGPT backend
-  const sendMessage = async (textToSend, locationOverride = null) => {
-    const text = (textToSend || inputMessage).trim();
+  // 3. Send Message through WeatherGPT Pipeline
+  const sendMessage = async (userPrompt) => {
+    const text = (userPrompt || inputText || '').trim();
     if (!text || isLoading) return;
 
-    const loc = locationOverride || activeLocation;
+    setInputText('');
 
-    const userMsg = {
-      id: `usr_${Date.now()}`,
+    const userTurn = {
+      id: `u_${Date.now()}`,
       role: 'user',
       content: text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
-    setInputMessage('');
+    setMessages((prev) => [...prev, userTurn]);
     setIsLoading(true);
 
+    // Build recent conversation history for memory
+    const recentHistory = messages
+      .slice(-6)
+      .map((m) => ({ role: m.role, content: m.content }));
+    recentHistory.push({ role: 'user', content: text });
+
     try {
+      const activePlaceName = locationName.isResolving
+        ? 'Current Coordinates'
+        : (locationName.displayName || locationName.city || 'Local Atmosphere');
+
       const res = await sendWeatherGPTChat({
         message: text,
-        latitude: loc.latitude,
-        longitude: loc.longitude,
-        location: loc.name,
-        language: currentLanguage,
+        latitude: locationCoordinates.latitude,
+        longitude: locationCoordinates.longitude,
+        location: activePlaceName,
+        language: language || 'en',
         conversationId,
+        conversation: recentHistory,
       });
 
-      if (res.success && res.data) {
+      if (res && res.data) {
         const d = res.data;
+        if (d.conversationId) setConversationId(d.conversationId);
 
-        // Keep activeLocation and liveTelemetry strictly synchronized with resolved location
-        if (locationOverride) {
-          setActiveLocation(locationOverride);
-          if (d.telemetry && d.telemetry.temperature != null) {
-            setLiveTelemetry((prev) => ({
-              ...prev,
-              name: locationOverride.displayName || locationOverride.name,
-              temperature: d.telemetry.temperature,
-              condition: d.telemetry.condition || 'Clear',
-              windSpeed: d.telemetry.windSpeed || 0,
-              windGusts: d.telemetry.windGusts || 0,
-              humidity: d.telemetry.humidity,
-              aqi: d.telemetry.aqi,
-              aqiLabel: d.telemetry.aqiSeverity,
-              precipitation: d.telemetry.precipitation,
-            }));
-          }
-        } else if (d.location?.latitude && d.location?.longitude && d.location?.name) {
-          const locName = d.location.displayName || d.location.name;
-          const updatedLoc = {
-            latitude: d.location.latitude,
-            longitude: d.location.longitude,
-            name: locName,
-            displayName: locName,
-            region: d.location.region || '',
-            country: d.location.country || '',
-          };
-          setActiveLocation(updatedLoc);
-          if (d.telemetry && d.telemetry.temperature != null) {
-            setLiveTelemetry((prev) => ({
-              ...prev,
-              name: locName,
-              temperature: d.telemetry.temperature,
-              condition: d.telemetry.condition || 'Clear',
-              windSpeed: d.telemetry.windSpeed || 0,
-              windGusts: d.telemetry.windGusts || 0,
-              humidity: d.telemetry.humidity,
-              aqi: d.telemetry.aqi,
-              aqiLabel: d.telemetry.aqiSeverity,
-              precipitation: d.telemetry.precipitation,
-            }));
-          }
-        }
-
-        if (d.feedStatus) {
-          setFeedStatus(d.feedStatus);
-        }
-
-        const botMsg = {
-          id: `bot_${Date.now()}`,
+        const assistantTurn = {
+          id: `a_${Date.now()}`,
           role: 'assistant',
           content: d.reply,
-          riskLevel: d.riskLevel,
-          isEmergency: d.isEmergency,
-          actions: d.actions || [],
-          dataTrust: d.dataTrust || 'LIVE TELEMETRY',
+          intentCard: d.intentCard || null,
+          timeline: d.timeline || d.intentCard?.timeline || [],
+          why: d.intentCard?.why || null,
+          whatToDo: d.intentCard?.whatToDo || null,
+          source: d.intentCard?.source || 'Open-Meteo · Atmospheric numerical model',
+          followUpSuggestions: d.followUpSuggestions || [],
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
 
-        setMessages((prev) => [...prev, botMsg]);
+        setMessages((prev) => [...prev, assistantTurn]);
       } else {
-        throw new Error(res.message || 'WeatherGPT response error');
+        throw new Error('Invalid response structure');
       }
     } catch (err) {
       setMessages((prev) => [
@@ -504,866 +270,348 @@ export default function WeatherGPTPage() {
         {
           id: `err_${Date.now()}`,
           role: 'assistant',
-          content: 'Weather data is temporarily unavailable. Please try again.',
+          content: 'Atmospheric telemetry server momentarily unreachable. Please verify network connectivity.',
+          intentCard: {
+            badge: 'TELEMETRY DISRUPTION',
+            primaryMetric: { value: '—', label: 'offline mode' },
+            why: 'Unable to synchronize telemetry feeds with meteorological server.',
+            whatToDo: 'Retry the query or verify local internet access.',
+            source: 'System monitor',
+          },
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          dataTrust: 'ERROR',
         },
       ]);
     } finally {
       setIsLoading(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
 
-  // Quick Action questions
-  const quickQuestions = [
-    { label: `🌡️ ${t('weatherGpt.currentWeather', 'Current Weather')}`, query: `What is the weather right now in ${activeLocation.displayName || activeLocation.name || 'my location'}?` },
-    { label: `🌧️ ${t('weatherGpt.rainForecast', 'Rain Forecast')}`, query: `Will it rain today in ${activeLocation.displayName || activeLocation.name || 'my location'}? Should I carry an umbrella?` },
-    { label: `🌪️ ${t('weatherGpt.severeWeather', 'Severe Weather')}`, query: `Is there any severe weather, cyclone, or flood risk in ${activeLocation.displayName || activeLocation.name || 'my location'}?` },
-    { label: `🌫️ ${t('weatherGpt.airQuality', 'Air Quality')}`, query: `How is the air quality (AQI) and PM2.5 in ${activeLocation.displayName || activeLocation.name || 'my location'}?` },
-    { label: `📍 ${t('weatherGpt.myLocation', 'My Location')}`, action: handleLocateMe },
-    { label: `🗺️ ${t('weatherGpt.weatherMap', 'Weather Map')}`, action: () => navigate('/weather', { state: { center: [activeLocation.latitude, activeLocation.longitude] } }) },
+  // Header display location
+  const stationPlace = locationName.isResolving
+    ? 'RESOLVING PLACE NAME'
+    : (locationName.city || locationName.displayName || 'LOCAL ATMOSPHERE').toUpperCase().split(',')[0];
+
+  const stationCoords = `${locationCoordinates.latitude.toFixed(2)}°N ${locationCoordinates.longitude.toFixed(2)}°E`;
+  const stationFeed = weatherDataStatus === 'LIVE' ? 'LIVE DATA' : (weatherDataStatus === 'CACHED' ? 'CACHED DATA' : 'TELEMETRY ACTIVE');
+
+  // The 6 requested editorial quick prompts
+  const quickPrompts = [
+    { label: 'Rain tomorrow', query: 'Will it rain tomorrow?' },
+    { label: 'Tomorrow evening', query: 'Will it rain tomorrow evening?' },
+    { label: 'AQI', query: 'What is the AQI right now?' },
+    { label: 'Wind', query: 'How strong will the wind be tomorrow?' },
+    { label: 'Travel', query: 'Is it safe to travel tomorrow?' },
+    { label: '7-day outlook', query: 'What is the 7-day weather outlook?' },
   ];
 
-  // Derive atmospheric risk status for live card
-  const aqiDetails = liveTelemetry?.aqi != null ? getAqiDetails(liveTelemetry.aqi) : null;
-  const isDangerous = (liveTelemetry?.windSpeed >= 50) || (liveTelemetry?.precipitation >= 15) || (liveTelemetry?.aqi >= 80);
-
   return (
-    <div
-      className="weather-gpt-page-root"
-      style={{
-        minHeight: 'calc(100vh - 120px)',
-        background: '#0d0a08',
-        color: '#f8fafc',
-        padding: '1rem',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* 1. Header Section */}
-      <div
-        className="weather-gpt-header"
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          paddingBottom: '1rem',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          marginBottom: '1rem',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, rgba(255, 107, 44, 0.2), rgba(56, 189, 248, 0.2))',
-              border: '1px solid rgba(255, 107, 44, 0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.6rem',
-            }}
-          >
-            🌦️
-          </div>
-          <div>
-            <h1
-              style={{
-                fontSize: '1.35rem',
-                fontWeight: 800,
-                color: '#ffffff',
-                margin: 0,
-                letterSpacing: '0.02em',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}
-            >
-              WeatherGPT
-              <span
-                style={{
-                  fontSize: '0.7rem',
-                  fontWeight: 800,
-                  background: 'rgba(56, 189, 248, 0.15)',
-                  color: '#38bdf8',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
-                  padding: '0.15rem 0.45rem',
-                  borderRadius: '9999px',
-                }}
-              >
-                INTELLIGENCE
-              </span>
-            </h1>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, marginTop: '2px' }}>
-              {t('weatherGpt.subtitle', 'Ask about weather, forecasts, air quality, and severe conditions.')}
-            </p>
-          </div>
+    <div className="wgpt-desk-container">
+      {/* 1. EDITORIAL HEADER */}
+      <header className="wgpt-header">
+        <div className="wgpt-super-title">
+          WEATHERGPT / ATMOSPHERIC INTELLIGENCE
         </div>
+        <h1 className="wgpt-editorial-title">
+          Ask a question about your local atmosphere.
+        </h1>
+        <div className="wgpt-station-strip">
+          <div className="wgpt-station-telemetry">
+            <span className="wgpt-live-dot" />
+            <span>{stationPlace} · {stationCoords} · {stationFeed}</span>
+          </div>
 
-        {/* Action Controls (Location Switcher & Weather Map Button) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() => setShowLocationSearch((prev) => !prev)}
-            style={{
-              minHeight: '44px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              color: '#f1f5f9',
-              fontSize: '0.85rem',
-              padding: '0.5rem 0.85rem',
-              borderRadius: '8px',
-              cursor: 'pointer',
-            }}
-            aria-label="Change active location"
-          >
-            <span>📍</span>
-            <span style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {activeLocation.displayName || activeLocation.name || 'Current Location'}
-            </span>
-            <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>▼</span>
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={handleLocateMe}
-            disabled={isLocating}
-            style={{
-              minHeight: '44px',
-              minWidth: '44px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '8px',
-              cursor: isLocating ? 'wait' : 'pointer',
-            }}
-            title="Use current device GPS location"
-            aria-label="Use current device GPS location"
-          >
-            <span style={{ fontSize: '1.1rem' }}>{isLocating ? '⏳' : '🎯'}</span>
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() => navigate('/weather', { state: { center: [activeLocation.latitude, activeLocation.longitude] } })}
-            style={{
-              minHeight: '44px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              background: 'rgba(56, 189, 248, 0.1)',
-              border: '1px solid rgba(56, 189, 248, 0.3)',
-              color: '#38bdf8',
-              fontSize: '0.85rem',
-              padding: '0.5rem 0.85rem',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 700,
-            }}
-            aria-label="Open 2D Weather Map"
-          >
-            <span>🗺️</span>
-            <span>{t('weatherGpt.weatherMap', 'Weather Map')}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Location Search Dropdown (if toggled) */}
-      {showLocationSearch && (
-        <div
-          className="location-search-popover"
-          style={{
-            background: '#15100c',
-            border: '1px solid rgba(255, 107, 44, 0.3)',
-            borderRadius: '10px',
-            padding: '1rem',
-            marginBottom: '1rem',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-          }}
-        >
-          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
-            <input
-              type="text"
-              placeholder="Search city, district, or region..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                flex: 1,
-                minHeight: '44px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '8px',
-                color: '#fff',
-                padding: '0.5rem 0.85rem',
-                fontSize: '0.9rem',
-              }}
-              autoFocus
-            />
+          <div className="wgpt-station-controls">
             <button
-              type="submit"
-              disabled={isSearching}
-              style={{
-                minHeight: '44px',
-                minWidth: '80px',
-                background: '#ff6b2c',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
+              type="button"
+              className="wgpt-btn-station"
+              onClick={() => setShowLocationSearch((prev) => !prev)}
+              aria-label="Change weather location"
             >
-              {isSearching ? 'Searching...' : 'Search'}
+              <span>📍</span>
+              <span>{showLocationSearch ? 'Close' : 'Change Location'}</span>
             </button>
-          </form>
-
-          {searchResults.length > 0 && (
-            <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', maxHeight: '180px', overflowY: 'auto' }}>
-              {searchResults.map((r, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => selectSearchResult(r)}
-                  style={{
-                    minHeight: '44px',
-                    textAlign: 'left',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '6px',
-                    padding: '0.5rem 0.75rem',
-                    color: '#f1f5f9',
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <span style={{ fontWeight: 600 }}>{r.name}, {r.admin1 || ''} {r.country || ''}</span>
-                  <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{r.latitude.toFixed(2)}°, {r.longitude.toFixed(2)}°</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 2. Main Layout: Desktop (2-Column) vs Mobile (Single Column) */}
-      <div
-        className="weather-gpt-main-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) minmax(280px, 320px)',
-          gap: '1.25rem',
-          flex: 1,
-          alignItems: 'start',
-        }}
-      >
-        {/* Left Column: Conversational Stream */}
-        <div
-          className="weather-gpt-chat-container"
-          style={{
-            background: '#15100c',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            height: '75vh',
-            minHeight: '480px',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Quick Suggestions Chips */}
-          <div
-            className="weather-gpt-quick-chips"
-            style={{
-              display: 'flex',
-              gap: '0.5rem',
-              padding: '0.75rem',
-              background: 'rgba(0, 0, 0, 0.25)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
-              scrollbarWidth: 'none',
-              touchAction: 'pan-x',
-            }}
-          >
-            {quickQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className="weather-gpt-chip"
-                onClick={() => {
-                  if (q.action) {
-                    q.action();
-                  } else {
-                    sendMessage(q.query);
-                  }
-                }}
-                disabled={isLoading}
-                style={{
-                  minHeight: '44px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  padding: '0.4rem 0.85rem',
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '9999px',
-                  color: '#f1f5f9',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {q.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Messages Stream */}
-          <div
-            className="weather-gpt-messages"
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '1rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-            }}
-          >
-            {messages.map((msg) => {
-              const isUser = msg.role === 'user';
-              return (
-                <div
-                  key={msg.id}
-                  className={`weather-gpt-msg-wrapper ${isUser ? 'msg-user' : 'msg-assistant'}`}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: isUser ? (isRtl ? 'flex-start' : 'flex-end') : (isRtl ? 'flex-end' : 'flex-start'),
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      marginBottom: '0.25rem',
-                      fontSize: '0.72rem',
-                      color: '#94a3b8',
-                      fontWeight: 700,
-                    }}
-                  >
-                    <span>{isUser ? 'You' : 'WeatherGPT'}</span>
-                    {msg.dataTrust && !isUser && (
-                      <span
-                        style={{
-                          fontSize: '0.65rem',
-                          padding: '0.1rem 0.35rem',
-                          borderRadius: '4px',
-                          background:
-                            msg.dataTrust === 'LIVE TELEMETRY'
-                              ? 'rgba(16, 185, 129, 0.15)'
-                              : msg.dataTrust === 'AI INTERPRETATION'
-                                ? 'rgba(56, 189, 248, 0.15)'
-                                : 'rgba(255, 255, 255, 0.08)',
-                          color:
-                            msg.dataTrust === 'LIVE TELEMETRY'
-                              ? '#34d399'
-                              : msg.dataTrust === 'AI INTERPRETATION'
-                                ? '#38bdf8'
-                                : '#94a3b8',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          fontWeight: 800,
-                        }}
-                      >
-                        {msg.dataTrust}
-                      </span>
-                    )}
-                    <span>• {msg.timestamp}</span>
-                  </div>
-
-                  <div
-                    className="weather-gpt-bubble"
-                    style={{
-                      maxWidth: '88%',
-                      background: isUser
-                        ? '#ff6b2c'
-                        : 'rgba(255, 255, 255, 0.04)',
-                      color: isUser ? '#ffffff' : '#f1f5f9',
-                      padding: '0.85rem 1.1rem',
-                      borderRadius: isUser ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                      border: isUser
-                        ? '1px solid #ff7a42'
-                        : '1px solid rgba(255, 255, 255, 0.08)',
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-                    }}
-                  >
-                    {isUser ? (
-                      <div style={{ fontSize: '0.92rem', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>
-                        {msg.content}
-                      </div>
-                    ) : (
-                      <WeatherMessageContent content={msg.content} isRtl={isRtl} />
-                    )}
-
-                    {/* Interactive Action Buttons */}
-                    {msg.actions && msg.actions.length > 0 && (
-                      <div
-                        style={{
-                          marginTop: '0.85rem',
-                          paddingTop: '0.65rem',
-                          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          gap: '0.45rem',
-                        }}
-                      >
-                        {msg.actions.map((act, aIdx) => (
-                          <button
-                            key={aIdx}
-                            type="button"
-                            onClick={() => {
-                              if (act.actionType === 'SOS_MODAL') {
-                                setSosConfirmOpen(true);
-                              } else if (act.link) {
-                                navigate(act.link, { state: { center: [activeLocation.latitude, activeLocation.longitude] } });
-                              } else if (act.query) {
-                                sendMessage(act.query);
-                              } else if (act.actionType === 'LOCATE_DEVICE') {
-                                handleLocateMe();
-                              }
-                            }}
-                            style={{
-                              minHeight: '44px',
-                              padding: '0.4rem 0.8rem',
-                              borderRadius: '6px',
-                              fontSize: '0.8rem',
-                              fontWeight: 700,
-                              background: act.isCritical
-                                ? '#ef4444'
-                                : 'rgba(255, 107, 44, 0.15)',
-                              color: act.isCritical ? '#ffffff' : '#ff6b2c',
-                              border: act.isCritical
-                                ? '1px solid #f87171'
-                                : '1px solid rgba(255, 107, 44, 0.35)',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.35rem',
-                            }}
-                          >
-                            {act.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-
-            {isLoading && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ff6b2c', fontSize: '0.85rem', padding: '0.5rem' }}>
-                <span className="live-beacon-pulse" style={{ width: '8px', height: '8px' }} />
-                <span>WeatherGPT is analyzing atmospheric telemetry...</span>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Chat Input Bar */}
-          <div
-            className="weather-gpt-input-bar"
-            style={{
-              padding: '0.75rem 1rem',
-              background: 'rgba(0, 0, 0, 0.4)',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            }}
-          >
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                sendMessage();
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}
+            <button
+              type="button"
+              className="wgpt-btn-station"
+              onClick={handleGpsClick}
+              disabled={isLocating}
+              aria-label="Acquire GPS coordinates"
             >
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder={t('weatherGpt.askPlaceholder', 'Ask WeatherGPT about weather, rain, cyclones, AQI...')}
-                disabled={isLoading}
-                style={{
-                  flex: 1,
-                  minHeight: '44px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '10px',
-                  color: '#ffffff',
-                  padding: '0.6rem 1rem',
-                  fontSize: '0.92rem',
-                  outline: 'none',
-                }}
-                dir={isRtl ? 'rtl' : 'ltr'}
-              />
+              <span>{isLocating ? '…' : 'GPS'}</span>
+            </button>
+          </div>
+        </div>
 
-              <button
-                type="submit"
-                disabled={!inputMessage.trim() || isLoading}
-                style={{
-                  minHeight: '44px',
-                  minWidth: '56px',
-                  background: inputMessage.trim() && !isLoading ? '#ff6b2c' : 'rgba(255, 255, 255, 0.1)',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  cursor: inputMessage.trim() && !isLoading ? 'pointer' : 'not-allowed',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                  transition: 'background 0.15s ease',
-                }}
-                aria-label="Send message"
-              >
-                <span>➤</span>
+        {/* Location Search Drawer */}
+        {showLocationSearch && (
+          <div className="wgpt-location-drawer">
+            <form onSubmit={handleSearchSubmit} className="wgpt-search-form">
+              <input
+                type="text"
+                className="wgpt-search-input"
+                placeholder="Search city, district, or coordinates (e.g. Chandigarh, Mumbai, 28.61, 77.20)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+              <button type="submit" className="wgpt-search-btn" disabled={isSearching}>
+                {isSearching ? 'Resolving...' : 'Search'}
               </button>
             </form>
+
+            {searchResults.length > 0 && (
+              <div className="wgpt-search-results">
+                {searchResults.map((loc, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="wgpt-search-item"
+                    onClick={() => handleSelectLocation(loc)}
+                  >
+                    <span>{loc.name}, {loc.admin1 || ''} {loc.country || ''}</span>
+                    <span style={{ fontFamily: 'var(--font-mono, monospace)', color: '#9B958B' }}>
+                      {loc.latitude.toFixed(2)}°, {loc.longitude.toFixed(2)}°
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+        )}
+      </header>
+
+      {/* 2. 6 EDITORIAL PROMPTS */}
+      <section className="wgpt-prompts-bar" aria-label="Quick atmospheric queries">
+        {quickPrompts.map((qp, idx) => (
+          <button
+            key={idx}
+            type="button"
+            className="wgpt-prompt-btn"
+            onClick={() => sendMessage(qp.query)}
+            disabled={isLoading}
+          >
+            {qp.label}
+          </button>
+        ))}
+      </section>
+
+      {/* 3. CONVERSATION STREAM */}
+      <main className="wgpt-conversation-stream" aria-live="polite">
+        <div className="wgpt-conversation-header">
+          CONVERSATION
         </div>
 
-        {/* Right Column: Compact Live Weather Context Card (Sticky) */}
-        <div
-          className="weather-gpt-telemetry-sidebar"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            position: 'sticky',
-            top: '1rem',
-          }}
-        >
-          <div
-            className="weather-gpt-telemetry-card"
-            style={{
-              background: '#15100c',
-              border: isDangerous ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
-              borderTop: isDangerous ? '4px solid #ef4444' : '4px solid #38bdf8',
-              borderRadius: '12px',
-              padding: '1.25rem',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
-            }}
-          >
-            {/* Header / Feed status */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.45rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {t('weatherGpt.currentLocation', 'CURRENT LOCATION')}
-                </span>
-                {feedStatus && (
-                  <span
-                    style={{
-                      fontSize: '0.62rem',
-                      fontWeight: 800,
-                      padding: '0.1rem 0.35rem',
-                      borderRadius: '4px',
-                      background:
-                        feedStatus === 'LIVE'
-                          ? 'rgba(16, 185, 129, 0.15)'
-                          : feedStatus === 'PARTIAL_LIVE'
-                            ? 'rgba(56, 189, 248, 0.15)'
-                            : feedStatus === 'CACHED'
-                              ? 'rgba(245, 158, 11, 0.15)'
-                              : 'rgba(239, 68, 68, 0.15)',
-                      color:
-                        feedStatus === 'LIVE'
-                          ? '#34d399'
-                          : feedStatus === 'PARTIAL_LIVE'
-                            ? '#38bdf8'
-                            : feedStatus === 'CACHED'
-                              ? '#fbbf24'
-                              : '#f87171',
-                      border: '1px solid currentColor',
-                    }}
-                  >
-                    {feedStatus}
-                  </span>
+        {messages.length === 0 && (
+          <div className="wgpt-turn wgpt-turn-assistant">
+            <div className="wgpt-speaker-tag">WEATHERGPT</div>
+            <div className="wgpt-response-block">
+              <div className="wgpt-meta-badge">ATMOSPHERIC DESK READY</div>
+              <div className="wgpt-primary-metric-wrap">
+                <div className="wgpt-primary-metric-number">
+                  {liveTelemetry?.temperature != null ? `${liveTelemetry.temperature}°C` : '26°C'}
+                </div>
+                <div className="wgpt-primary-metric-label">
+                  current local atmospheric temperature
+                </div>
+              </div>
+              <div className="wgpt-secondary-strip">
+                <span className="wgpt-sec-val">{stationPlace}</span>
+                <span className="wgpt-sec-dot">·</span>
+                <span className="wgpt-sec-val">{liveTelemetry?.windSpeed || 8} km/h</span>
+                <span className="wgpt-sec-lbl">wind</span>
+                <span className="wgpt-sec-dot">·</span>
+                <span className="wgpt-sec-val">{liveTelemetry?.humidity || 50}%</span>
+                <span className="wgpt-sec-lbl">humidity</span>
+              </div>
+              <div className="wgpt-section-divider" />
+              <div className="wgpt-editorial-section">
+                <div className="wgpt-section-heading">WHAT TO DO</div>
+                <p className="wgpt-section-text">
+                  Ask any question about tomorrow&apos;s rain, evening timing, wind gusts, air quality, or 7-day outlook.
+                </p>
+              </div>
+              <div className="wgpt-section-divider" />
+              <div className="wgpt-editorial-section">
+                <div className="wgpt-section-heading">SOURCE</div>
+                <div className="wgpt-source-text">Open-Meteo · Atmospheric numerical telemetry</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {messages.map((msg) => {
+          if (msg.role === 'user') {
+            return (
+              <div key={msg.id} className="wgpt-turn wgpt-turn-user">
+                <div className="wgpt-speaker-tag">YOU</div>
+                <div className="wgpt-user-content">{msg.content}</div>
+              </div>
+            );
+          }
+
+          const card = msg.intentCard;
+          const timeline = msg.timeline || card?.timeline || [];
+          const whyText = msg.why || card?.why;
+          const whatToDoText = msg.whatToDo || card?.whatToDo;
+          const sourceText = msg.source || card?.source;
+
+          return (
+            <div key={msg.id} className="wgpt-turn wgpt-turn-assistant">
+              <div className="wgpt-speaker-tag">WEATHERGPT</div>
+
+              <div className="wgpt-response-block">
+                {/* 1. Meta Badge (e.g. TOMORROW · 20:00) */}
+                {card?.badge && (
+                  <div className="wgpt-meta-badge">
+                    {card.badge}
+                  </div>
+                )}
+
+                {/* 2. Primary Metric (e.g. 38% precipitation probability) */}
+                {card?.primaryMetric && (
+                  <div className="wgpt-primary-metric-wrap">
+                    <div className="wgpt-primary-metric-number">
+                      {card.primaryMetric.value}
+                    </div>
+                    <div className="wgpt-primary-metric-label">
+                      {card.primaryMetric.label}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Secondary Metrics Strip (e.g. Mostly cloudy · 26°C · Wind 8 km/h) */}
+                {card?.secondaryMetrics?.length > 0 && (
+                  <div className="wgpt-secondary-strip">
+                    {card.secondaryMetrics.map((sm, smIdx) => (
+                      <React.Fragment key={smIdx}>
+                        {smIdx > 0 && <span className="wgpt-sec-dot">·</span>}
+                        <span className="wgpt-sec-val">{sm.value}</span>
+                        {sm.label && <span className="wgpt-sec-lbl"> {sm.label.toLowerCase()}</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                )}
+
+                {/* Fallback text if intentCard not fully structured */}
+                {!card && msg.content && (
+                  <p className="wgpt-section-text" style={{ whiteSpace: 'pre-line' }}>
+                    {msg.content}
+                  </p>
+                )}
+
+                {/* 4. Forecast Timeline (5-hour window with target hour highlighted) */}
+                {timeline.length > 0 && (
+                  <div className="wgpt-forecast-timeline" role="region" aria-label="Forecast hourly timeline">
+                    <div className="wgpt-timeline-grid">
+                      {timeline.map((slot, sIdx) => (
+                        <div
+                          key={sIdx}
+                          className={`wgpt-timeline-cell ${slot.isTarget ? 'is-target' : ''}`}
+                        >
+                          <div className="wgpt-cell-hour">{slot.time || slot.timeFormatted}</div>
+                          <div className="wgpt-cell-temp">{slot.temp}</div>
+                          <div className="wgpt-cell-prob">{slot.prob}</div>
+                          {slot.isTarget && <div className="wgpt-cell-badge">TARGET</div>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 5. Relevant Editorial Sections (Only rendered when relevant) */}
+                {whyText && (
+                  <>
+                    <div className="wgpt-section-divider" />
+                    <div className="wgpt-editorial-section">
+                      <div className="wgpt-section-heading">WHY</div>
+                      <p className="wgpt-section-text">{whyText}</p>
+                    </div>
+                  </>
+                )}
+
+                {whatToDoText && (
+                  <>
+                    <div className="wgpt-section-divider" />
+                    <div className="wgpt-editorial-section">
+                      <div className="wgpt-section-heading">WHAT TO DO</div>
+                      <p className="wgpt-section-text">{whatToDoText}</p>
+                    </div>
+                  </>
+                )}
+
+                {sourceText && (
+                  <>
+                    <div className="wgpt-section-divider" />
+                    <div className="wgpt-editorial-section">
+                      <div className="wgpt-section-heading">SOURCE</div>
+                      <div className="wgpt-source-text">{sourceText}</div>
+                    </div>
+                  </>
+                )}
+
+                {/* Contextual follow-up suggestions */}
+                {msg.followUpSuggestions?.length > 0 && (
+                  <div className="wgpt-followup-row">
+                    {msg.followUpSuggestions.map((fu, fIdx) => (
+                      <button
+                        key={fIdx}
+                        type="button"
+                        className="wgpt-followup-chip"
+                        onClick={() => sendMessage(typeof fu === 'string' ? fu : (fu.query || fu.label))}
+                      >
+                        {typeof fu === 'string' ? fu : (fu.label || fu.query)}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
-
-              {/* Location Badge (Prominent) */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  background: 'rgba(255, 107, 44, 0.14)',
-                  border: '1px solid rgba(255, 107, 44, 0.4)',
-                  borderRadius: '9999px',
-                  padding: '0.22rem 0.6rem',
-                  color: '#ffedd5',
-                  fontSize: '0.80rem',
-                  fontWeight: 700,
-                  maxWidth: '58%',
-                }}
-                title={activeLocation.displayName || activeLocation.name}
-              >
-                <span>📍</span>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {activeLocation.displayName || activeLocation.name || 'Current Location'}
-                </span>
-              </div>
             </div>
+          );
+        })}
 
-            {/* Secondary technical coordinates line below readable location name */}
-            {activeLocation.latitude != null && activeLocation.longitude != null && (
-              <div style={{ fontSize: '0.72rem', color: '#64748b', fontFamily: 'var(--font-mono, monospace)', marginBottom: '0.75rem', textAlign: 'right' }}>
-                {Math.abs(activeLocation.latitude).toFixed(4)}° {activeLocation.latitude >= 0 ? 'N' : 'S'}, {Math.abs(activeLocation.longitude).toFixed(4)}° {activeLocation.longitude >= 0 ? 'E' : 'W'}
-              </div>
-            )}
-
-            {/* Metrics Breakdown */}
-            {liveTelemetry ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                  <div>
-                    <div style={{ fontSize: '2.2rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.1 }}>
-                      {liveTelemetry.temperature != null ? `${liveTelemetry.temperature}°C` : 'N/A'}
-                    </div>
-                    <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.2rem', fontWeight: 600 }}>
-                      {liveTelemetry.condition || 'Clear sky'}
-                    </div>
-                  </div>
-                  <div style={{ fontSize: '2.4rem', lineHeight: 1 }}>{liveTelemetry.icon || '☀️'}</div>
-                </div>
-
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '0.6rem',
-                    padding: '0.75rem 0',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                    fontSize: '0.84rem',
-                  }}
-                >
-                  <div>
-                    <span style={{ color: '#94a3b8' }}>Wind: </span>
-                    <strong style={{ color: '#ffffff' }}>{liveTelemetry.windSpeed} km/h</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: '#94a3b8' }}>Rain: </span>
-                    <strong style={{ color: '#ffffff' }}>{liveTelemetry.precipitation || 0} mm</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: '#94a3b8' }}>AQI: </span>
-                    <strong style={{ color: aqiDetails?.color || '#38bdf8' }}>
-                      {liveTelemetry.aqi != null ? liveTelemetry.aqi : '70'}
-                    </strong>
-                  </div>
-                  <div>
-                    <span style={{ color: '#94a3b8' }}>Risk: </span>
-                    <strong style={{ color: isDangerous ? '#ef4444' : '#10b981' }}>
-                      {isDangerous ? 'HIGH' : 'LOW'}
-                    </strong>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => navigate('/weather', { state: { center: [activeLocation.latitude, activeLocation.longitude] } })}
-                  style={{
-                    width: '100%',
-                    minHeight: '44px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
-                    color: '#ffffff',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.84rem',
-                    cursor: 'pointer',
-                    marginTop: '0.4rem',
-                  }}
-                >
-                  <span>🗺️</span>
-                  <span>{t('weatherGpt.viewOnMap', 'VIEW ON MAP')}</span>
-                </button>
-              </div>
-            ) : (
-              <div style={{ padding: '1rem 0', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
-                Calibrating weather sensors...
-              </div>
-            )}
-          </div>
-
-          {/* Emergency Lifeline Card */}
-          <div
-            style={{
-              background: '#15100c',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '12px',
-              padding: '1rem',
-              fontSize: '0.82rem',
-              color: '#94a3b8',
-              lineHeight: 1.45,
-            }}
-          >
-            <div style={{ color: '#ef4444', fontWeight: 800, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <span>🚨</span>
-              <span>EMERGENCY PROTOCOL</span>
-            </div>
-            <div>
-              In case of life-threatening flooding, collapsed structures, or immediate danger:
-            </div>
-            <div style={{ marginTop: '0.5rem', fontWeight: 800, color: '#ffffff', fontSize: '0.95rem' }}>
-              Call 112
-            </div>
-            <div style={{ marginTop: '0.5rem', fontSize: '0.74rem', opacity: 0.8 }}>
-              WeatherGPT will never auto-submit an SOS without explicit user confirmation.
+        {isLoading && (
+          <div className="wgpt-turn wgpt-turn-assistant">
+            <div className="wgpt-speaker-tag">WEATHERGPT</div>
+            <div className="wgpt-loading-indicator">
+              <span className="wgpt-spinner" />
+              <span>Analyzing atmospheric telemetry model...</span>
             </div>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Explicit SOS Confirmation Dialog (Safety Protected) */}
-      {sosConfirmOpen && (
-        <div
-          className="modal-backdrop"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.85)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '1rem',
+        <div ref={messagesEndRef} />
+      </main>
+
+      {/* 4. PINNED BOTTOM INPUT DOCK */}
+      <footer className="wgpt-input-dock">
+        <form
+          className="wgpt-input-inner"
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage();
           }}
         >
-          <div
-            className="modal-card"
-            style={{
-              background: '#15100c',
-              border: '2px solid #ef4444',
-              borderRadius: '14px',
-              maxWidth: '460px',
-              width: '100%',
-              padding: '1.5rem',
-              boxShadow: '0 0 32px rgba(239, 68, 68, 0.4)',
-            }}
+          <input
+            ref={inputRef}
+            type="text"
+            className="wgpt-chat-input"
+            placeholder="Ask another question about your local atmosphere..."
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            disabled={isLoading}
+            autoFocus
+          />
+          <button
+            type="submit"
+            className="wgpt-send-btn"
+            disabled={!inputText.trim() || isLoading}
+            aria-label="Send atmospheric inquiry"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', fontWeight: 800, fontSize: '1.2rem', marginBottom: '0.75rem' }}>
-              <span>🚨</span>
-              <span>CONFIRM EMERGENCY SOS</span>
-            </div>
-
-            <p style={{ fontSize: '0.9rem', color: '#f1f5f9', lineHeight: 1.5, margin: '0 0 1rem 0' }}>
-              You are about to broadcast an emergency distress signal to nearby verified responders and shelter coordinators for <strong>{activeLocation.name}</strong>.
-            </p>
-
-            <div
-              style={{
-                background: 'rgba(239, 68, 68, 0.1)',
-                borderLeft: '3px solid #ef4444',
-                padding: '0.65rem 0.85rem',
-                fontSize: '0.8rem',
-                color: '#fca5a5',
-                marginBottom: '1.25rem',
-              }}
-            >
-              False SOS broadcasts hinder emergency search and rescue teams. Only confirm if you or someone nearby is in immediate danger.
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setSosConfirmOpen(false)}
-                style={{
-                  minHeight: '44px',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '8px',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  color: '#fff',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-emergency"
-                onClick={() => {
-                  setSosConfirmOpen(false);
-                  navigate('/sos', { state: { autoOpen: true, coordinates: [activeLocation.latitude, activeLocation.longitude] } });
-                }}
-                style={{
-                  minHeight: '44px',
-                  padding: '0.5rem 1.25rem',
-                  borderRadius: '8px',
-                  background: '#ef4444',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                }}
-              >
-                Confirm & Broadcast SOS
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile-Friendly Media Query Styles */}
-      <style>{`
-        @media (max-width: 900px) {
-          .weather-gpt-main-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .weather-gpt-telemetry-sidebar {
-            order: -1;
-            position: static !important;
-          }
-          .weather-gpt-chat-container {
-            height: 65vh !important;
-          }
-        }
-      `}</style>
+            →
+          </button>
+        </form>
+      </footer>
     </div>
   );
 }

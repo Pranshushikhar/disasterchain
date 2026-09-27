@@ -12,8 +12,18 @@ export function register(config) {
       const swUrl = `${process.env.PUBLIC_URL || ''}/sw.js`;
 
       if (isLocalhost) {
-        // Localhost development checks
-        checkValidServiceWorker(swUrl, config);
+        // Localhost development: Unregister service worker and purge local caches
+        // so that active code changes & testing are never intercepted by stale cache bundles
+        unregister();
+        if ('caches' in window) {
+          caches.keys().then((cacheNames) => {
+            cacheNames.forEach((name) => {
+              if (name.includes('disasterchain')) {
+                caches.delete(name);
+              }
+            });
+          });
+        }
       } else {
         // Production registration
         registerValidSW(swUrl, config);

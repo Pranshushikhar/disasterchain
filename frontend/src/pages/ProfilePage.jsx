@@ -224,17 +224,17 @@ const ProfilePage = () => {
             }}
           >
             <div>
-              <span style={{ color: 'var(--text-muted)' }}>OPERATOR ID: </span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('common.operatorId', 'OPERATOR ID:')} </span>
               <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--cyan)' }}>{user?._id}</span>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)' }}>ENROLLED: </span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('common.enrolled', 'ENROLLED:')} </span>
               <span style={{ color: 'var(--text-primary)' }}>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Active'}</span>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)' }}>CLEARANCE LEVEL: </span>
+              <span style={{ color: 'var(--text-muted)' }}>{t('common.clearanceLevel', 'CLEARANCE LEVEL:')} </span>
               <span style={{ color: isAdmin ? 'var(--crimson)' : 'var(--mint)', fontWeight: 700 }}>
-                {isAdmin ? 'LEVEL 5 — FULL SYSTEM ADMIN' : 'LEVEL 1 — CIVIL DEFENSE'}
+                {isAdmin ? t('profile.level5Admin', 'LEVEL 5 — FULL SYSTEM ADMIN') : t('profile.level1Civil', 'LEVEL 1 — CIVIL DEFENSE')}
               </span>
             </div>
           </div>
@@ -506,7 +506,7 @@ const ProfilePage = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 0.85rem', background: 'rgba(5, 8, 14, 0.4)', borderRadius: 'var(--radius-xs)', border: '1px dashed var(--border-subtle)', opacity: 0.85 }}>
                     <div>
                       <div style={{ color: '#ffffff', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        Security & Credentials <span style={{ fontSize: '0.65rem', background: 'rgba(0, 240, 255, 0.1)', color: 'var(--cyan)', padding: '1px 5px', borderRadius: '3px' }}>REQUIRED</span>
+                        Security & Credentials <span style={{ fontSize: '0.65rem', background: 'rgba(0, 240, 255, 0.1)', color: 'var(--cyan)', padding: '1px 5px', borderRadius: '3px' }}>{t('common.required', 'REQUIRED')}</span>
                       </div>
                       <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>Password reset & account activity notifications</div>
                     </div>

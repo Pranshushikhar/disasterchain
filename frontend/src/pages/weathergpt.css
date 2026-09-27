@@ -1,0 +1,579 @@
+/* ==========================================================================
+   WEATHERGPT — ATMOSPHERIC INTELLIGENCE DESK
+   Mature DisasterChain Editorial Design System
+   ========================================================================== */
+
+.wgpt-desk-container {
+  max-width: 880px;
+  margin: 0 auto;
+  min-height: calc(100vh - 64px);
+  padding: 2.25rem 1.5rem 8.5rem 1.5rem;
+  color: #F2EEE7;
+  font-family: var(--font-sans, "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif);
+  position: relative;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .wgpt-desk-container {
+    padding: 1.25rem 1rem calc(130px + env(safe-area-inset-bottom, 0px)) 1rem;
+    min-height: calc(100vh - 56px);
+  }
+}
+
+/* 1. EDITORIAL HEADER */
+.wgpt-header {
+  border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.wgpt-super-title {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #D96B35;
+  margin-bottom: 0.4rem;
+}
+
+.wgpt-editorial-title {
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: clamp(2rem, 4.5vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #F2EEE7;
+  margin: 0 0 0.5rem 0;
+}
+
+.wgpt-editorial-subtitle {
+  font-size: 0.96rem;
+  color: #9B958B;
+  margin: 0 0 0.85rem 0;
+  line-height: 1.5;
+}
+
+.wgpt-station-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.wgpt-station-telemetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  color: #9B958B;
+  text-transform: uppercase;
+}
+
+.wgpt-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #628B63;
+  display: inline-block;
+  box-shadow: 0 0 6px rgba(98, 139, 99, 0.6);
+}
+
+.wgpt-station-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wgpt-btn-station {
+  background: #191714;
+  border: 1px solid rgba(242, 238, 231, 0.12);
+  color: #F2EEE7;
+  font-size: 0.76rem;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  padding: 0.35rem 0.65rem;
+  border-radius: 3px;
+  cursor: pointer;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.wgpt-btn-station:hover {
+  border-color: rgba(217, 107, 53, 0.45);
+  background: #211E1A;
+}
+
+/* Location Search Drawer */
+.wgpt-location-drawer {
+  background: #191714;
+  border: 1px solid rgba(242, 238, 231, 0.12);
+  border-radius: 4px;
+  padding: 0.85rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.wgpt-search-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wgpt-search-input {
+  flex: 1;
+  min-height: 40px;
+  background: #11100E;
+  border: 1px solid rgba(242, 238, 231, 0.12);
+  border-radius: 3px;
+  color: #F2EEE7;
+  padding: 0 0.75rem;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.wgpt-search-input:focus {
+  border-color: #D96B35;
+}
+
+.wgpt-search-btn {
+  min-height: 40px;
+  padding: 0 1rem;
+  background: #D96B35;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wgpt-search-results {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.wgpt-search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: 1px solid rgba(242, 238, 231, 0.06);
+  padding: 0.45rem 0.65rem;
+  color: #F2EEE7;
+  font-size: 0.82rem;
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.wgpt-search-item:hover {
+  background: #211E1A;
+  border-color: rgba(217, 107, 53, 0.4);
+}
+
+/* 2. 6 QUICK PROMPTS */
+.wgpt-prompts-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.25rem;
+}
+
+.wgpt-prompt-btn {
+  background: transparent;
+  border: 1px solid rgba(242, 238, 231, 0.12);
+  color: #D4CDC3;
+  font-size: 0.82rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 3px;
+  cursor: pointer;
+  min-height: 38px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.wgpt-prompt-btn:hover {
+  border-color: #D96B35;
+  color: #F2EEE7;
+  background: rgba(217, 107, 53, 0.08);
+}
+
+/* 3. CONVERSATION STREAM */
+.wgpt-conversation-header {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9B958B;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wgpt-conversation-header::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(242, 238, 231, 0.08);
+}
+
+.wgpt-conversation-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Single Message Turn */
+.wgpt-turn {
+  display: flex;
+  flex-direction: column;
+  scroll-margin-top: 90px;
+  animation: wgptFadeIn 250ms ease-out forwards;
+}
+
+@keyframes wgptFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wgpt-turn {
+    animation: none;
+  }
+}
+
+.wgpt-speaker-tag {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+}
+
+.wgpt-turn-user .wgpt-speaker-tag {
+  color: #9B958B;
+}
+
+.wgpt-turn-assistant .wgpt-speaker-tag {
+  color: #D96B35;
+}
+
+.wgpt-user-content {
+  font-size: 1.15rem;
+  color: #F2EEE7;
+  line-height: 1.45;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Intent-Aware Assistant Response Block */
+.wgpt-response-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.wgpt-meta-badge {
+  display: inline-block;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #D96B35;
+}
+
+/* Primary Metric Display */
+.wgpt-primary-metric-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.wgpt-primary-metric-number {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #F2EEE7;
+}
+
+.wgpt-primary-metric-label {
+  font-size: 0.94rem;
+  color: #9B958B;
+  font-weight: 500;
+}
+
+/* Secondary Metrics Strip */
+.wgpt-secondary-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.94rem;
+  color: #D4CDC3;
+  margin-top: -0.25rem;
+}
+
+.wgpt-sec-dot {
+  color: #9B958B;
+  opacity: 0.6;
+}
+
+.wgpt-sec-val {
+  color: #F2EEE7;
+  font-weight: 600;
+}
+
+.wgpt-sec-lbl {
+  color: #9B958B;
+  font-size: 0.88rem;
+}
+
+/* 4. FORECAST TIMELINE */
+.wgpt-forecast-timeline {
+  margin: 0.65rem 0;
+  background: #161412;
+  border: 1px solid rgba(242, 238, 231, 0.08);
+  border-radius: 4px;
+  padding: 0.85rem 0.75rem;
+  overflow-x: auto;
+}
+
+.wgpt-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  min-width: 320px;
+}
+
+.wgpt-timeline-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.55rem 0.35rem;
+  border-radius: 3px;
+  background: rgba(242, 238, 231, 0.02);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.wgpt-timeline-cell.is-target {
+  background: rgba(217, 107, 53, 0.15);
+  border-color: #D96B35;
+}
+
+.wgpt-cell-hour {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #9B958B;
+  margin-bottom: 0.35rem;
+}
+
+.wgpt-timeline-cell.is-target .wgpt-cell-hour {
+  color: #F2EEE7;
+}
+
+.wgpt-cell-temp {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #F2EEE7;
+  margin-bottom: 0.25rem;
+}
+
+.wgpt-cell-prob {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #9B958B;
+}
+
+.wgpt-timeline-cell.is-target .wgpt-cell-prob {
+  color: #D96B35;
+  font-weight: 700;
+}
+
+.wgpt-cell-badge {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #D96B35;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+}
+
+/* 5. EDITORIAL SECTIONS (WHY / WHAT TO DO / SOURCE) */
+.wgpt-section-divider {
+  height: 1px;
+  background: rgba(242, 238, 231, 0.08);
+  margin: 0.75rem 0;
+}
+
+.wgpt-editorial-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.wgpt-section-heading {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9B958B;
+}
+
+.wgpt-section-text {
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: #D4CDC3;
+  margin: 0;
+}
+
+.wgpt-source-text {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.76rem;
+  color: #9B958B;
+}
+
+/* Follow-up suggestions */
+.wgpt-followup-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.wgpt-followup-chip {
+  background: transparent;
+  border: 1px solid rgba(242, 238, 231, 0.1);
+  color: #9B958B;
+  font-size: 0.76rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wgpt-followup-chip:hover {
+  border-color: #D96B35;
+  color: #F2EEE7;
+}
+
+/* 6. PINNED BOTTOM INPUT */
+.wgpt-input-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(17, 16, 14, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(242, 238, 231, 0.1);
+  padding: 1rem 1.5rem;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .wgpt-input-dock {
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    padding: 0.75rem 1rem;
+  }
+}
+
+.wgpt-input-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.wgpt-chat-input {
+  flex: 1;
+  min-height: 48px;
+  background: #191714;
+  border: 1px solid rgba(242, 238, 231, 0.14);
+  border-radius: 4px;
+  color: #F2EEE7;
+  font-size: 0.94rem;
+  padding: 0 1rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.wgpt-chat-input:focus {
+  border-color: #D96B35;
+}
+
+.wgpt-send-btn {
+  min-height: 48px;
+  min-width: 48px;
+  background: #D96B35;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: opacity 0.15s ease;
+}
+
+.wgpt-send-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.wgpt-loading-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.8rem;
+  color: #9B958B;
+  padding: 0.5rem 0;
+}
+
+.wgpt-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(217, 107, 53, 0.25);
+  border-top-color: #D96B35;
+  border-radius: 50%;
+  animation: wgptSpin 0.75s linear infinite;
+}
+
+@keyframes wgptSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

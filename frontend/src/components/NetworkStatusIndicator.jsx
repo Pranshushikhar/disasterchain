@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePWA } from '../context/PWAContext';
+import { useTranslation } from '../i18n';
 import Icon from './Icons';
 
 /**
@@ -11,39 +12,40 @@ import Icon from './Icons';
  */
 const NetworkStatusIndicator = ({ showLabel = true, className = '' }) => {
   const { networkStatus, hasCachedData } = usePWA();
+  const { t } = useTranslation();
 
   const getStatusConfig = () => {
     switch (networkStatus) {
       case 'OFFLINE':
         return {
-          label: 'OFFLINE',
+          label: t('network.offline', 'OFFLINE'),
           color: '#E53935',
           bg: 'rgba(229, 57, 53, 0.16)',
           border: 'rgba(229, 57, 53, 0.45)',
           dotClass: 'status-dot-offline',
           icon: 'alert',
-          tooltip: 'Offline Mode: Live backend unavailable. Local survival guide active.',
+          tooltip: t('network.offlineTooltip', 'Offline Mode: Live backend unavailable. Local survival guide active.'),
         };
       case 'RECONNECTED':
         return {
-          label: 'RECONNECTED',
+          label: t('network.reconnected', 'RECONNECTED'),
           color: '#10B981',
           bg: 'rgba(16, 185, 129, 0.18)',
           border: 'rgba(16, 185, 129, 0.55)',
           dotClass: 'status-dot-reconnected',
           icon: 'check',
-          tooltip: 'Connection Restored: Resuming live crisis intelligence sync.',
+          tooltip: t('network.reconnectedTooltip', 'Connection Restored: Resuming live crisis intelligence sync.'),
         };
       case 'LIVE':
       default:
         return {
-          label: 'LIVE',
+          label: t('network.live', 'LIVE'),
           color: '#84CC16',
           bg: 'rgba(132, 204, 22, 0.10)',
           border: 'rgba(132, 204, 22, 0.32)',
           dotClass: 'status-dot-live',
           icon: 'check',
-          tooltip: 'Live: Real-time connection to DisasterChain emergency command network.',
+          tooltip: t('network.liveTooltip', 'Live: Real-time connection to DisasterChain emergency command network.'),
         };
     }
   };
@@ -73,7 +75,7 @@ const NetworkStatusIndicator = ({ showLabel = true, className = '' }) => {
           userSelect: 'none',
         }}
         title={config.tooltip}
-        aria-label={`Network status: ${networkStatus}`}
+        aria-label={`${t('common.status', 'Status')}: ${config.label}`}
       >
         <span
           style={{
@@ -107,10 +109,10 @@ const NetworkStatusIndicator = ({ showLabel = true, className = '' }) => {
             alignItems: 'center',
             gap: '3px',
           }}
-          title="CACHED DATA: Stored telemetry shown for safety while network is disconnected."
+          title={t('network.cachedDataTooltip', 'CACHED DATA: Stored telemetry shown for safety while network is disconnected.')}
         >
           <span>📦</span>
-          <span>CACHED DATA</span>
+          <span>{t('weather.cachedData', 'CACHED DATA')}</span>
         </span>
       )}
     </div>

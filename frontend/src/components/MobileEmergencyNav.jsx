@@ -13,7 +13,7 @@ import Icon from './Icons';
  * - MAP (geospatial crisis grid)
  * - REPORT (field hazard submission)
  */
-const MobileEmergencyNav = ({ onOpenSos, onOpenIncident }) => {
+const MobileEmergencyNav = ({ onOpenSos, onOpenIncident, onToggleSidebar }) => {
   const { t } = useTranslation();
   const location = useLocation();
 
@@ -32,7 +32,7 @@ const MobileEmergencyNav = ({ onOpenSos, onOpenIncident }) => {
     <>
       <nav
         className="mobile-emergency-nav"
-        aria-label="Mobile Emergency Navigation"
+        aria-label="Mobile Navigation"
         style={{
           position: 'fixed',
           bottom: 0,
@@ -40,10 +40,10 @@ const MobileEmergencyNav = ({ onOpenSos, onOpenIncident }) => {
           right: 0,
           height: 'calc(62px + env(safe-area-inset-bottom, 0px))',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          background: 'rgba(28, 17, 13, 0.97)',
+          background: 'rgba(25, 23, 20, 0.98)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid var(--border-medium)',
+          borderTop: '1px solid rgba(242, 238, 231, 0.1)',
           display: 'grid',
           gridTemplateColumns: 'repeat(5, 1fr)',
           alignItems: 'center',
@@ -53,7 +53,7 @@ const MobileEmergencyNav = ({ onOpenSos, onOpenIncident }) => {
           boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.85)',
         }}
       >
-        {/* 1. MAP / DASHBOARD */}
+        {/* 1. HOME */}
         <NavLink
           to="/dashboard"
           style={({ isActive }) => ({
@@ -62,8 +62,50 @@ const MobileEmergencyNav = ({ onOpenSos, onOpenIncident }) => {
             alignItems: 'center',
             justifyContent: 'center',
             textDecoration: 'none',
-            color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-            fontSize: '0.68rem',
+            color: isActive ? '#D96B35' : '#9B958B',
+            fontSize: '0.66rem',
+            fontWeight: 700,
+            gap: '3px',
+            minHeight: '48px',
+            touchAction: 'manipulation',
+          })}
+        >
+          <Icon name="home" size={19} />
+          <span>{t('nav.home', 'HOME')}</span>
+        </NavLink>
+
+        {/* 2. WEATHER */}
+        <NavLink
+          to="/weather"
+          style={({ isActive }) => ({
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textDecoration: 'none',
+            color: isActive ? '#D96B35' : '#9B958B',
+            fontSize: '0.66rem',
+            fontWeight: 700,
+            gap: '3px',
+            minHeight: '48px',
+            touchAction: 'manipulation',
+          })}
+        >
+          <Icon name="cloud-rain" size={19} />
+          <span>{t('nav.weather', 'WEATHER')}</span>
+        </NavLink>
+
+        {/* 3. MAP */}
+        <NavLink
+          to="/affected-areas"
+          style={({ isActive }) => ({
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textDecoration: 'none',
+            color: isActive ? '#D96B35' : '#9B958B',
+            fontSize: '0.66rem',
             fontWeight: 700,
             gap: '3px',
             minHeight: '48px',
@@ -74,102 +116,51 @@ const MobileEmergencyNav = ({ onOpenSos, onOpenIncident }) => {
           <span>{t('nav.map', 'MAP')}</span>
         </NavLink>
 
-        {/* 2. ALERTS */}
+        {/* 4. WEATHERGPT */}
         <NavLink
-          to="/alerts"
+          to="/weather-gpt"
           style={({ isActive }) => ({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             textDecoration: 'none',
-            color: isActive ? 'var(--amber)' : 'var(--text-muted)',
-            fontSize: '0.68rem',
+            color: isActive ? '#D96B35' : '#9B958B',
+            fontSize: '0.66rem',
             fontWeight: 700,
             gap: '3px',
             minHeight: '48px',
             touchAction: 'manipulation',
           })}
         >
-          <Icon name="bell" size={19} />
-          <span>{t('nav.alerts', 'ALERTS')}</span>
+          <span style={{ fontSize: '1.15rem', lineHeight: 1 }}>⚡</span>
+          <span>WEATHERGPT</span>
         </NavLink>
 
-        {/* 3. CENTER HIGHLIGHTED: SOS */}
+        {/* 5. MORE */}
         <button
           type="button"
-          onClick={onOpenSos}
+          onClick={onToggleSidebar}
           style={{
-            background: 'linear-gradient(135deg, #E53935, #B91C1C)',
-            border: '2px solid rgba(255, 255, 255, 0.55)',
-            borderRadius: '50%',
-            width: '54px',
-            height: '54px',
-            marginTop: '-18px',
-            marginInline: 'auto',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#ffffff',
-            fontWeight: 900,
-            fontSize: '0.7rem',
-            boxShadow: '0 4px 20px rgba(229, 57, 53, 0.65)',
-            cursor: 'pointer',
-            touchAction: 'manipulation',
-          }}
-          title="Broadcast Emergency SOS"
-          aria-label="Broadcast Emergency SOS"
-        >
-          <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>🚨</span>
-          <span style={{ fontSize: '0.62rem', letterSpacing: '0.04em' }}>{t('nav.emergencySos', 'SOS')}</span>
-        </button>
-
-        {/* 4. SHELTER */}
-        <NavLink
-          to="/shelters"
-          style={({ isActive }) => ({
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textDecoration: 'none',
-            color: isActive ? 'var(--safe)' : 'var(--text-muted)',
-            fontSize: '0.68rem',
-            fontWeight: 700,
-            gap: '3px',
-            minHeight: '48px',
-            touchAction: 'manipulation',
-          })}
-        >
-          <Icon name="home" size={19} />
-          <span>{t('nav.shelters', 'SHELTER')}</span>
-        </NavLink>
-
-        {/* 5. REPORT HAZARD */}
-        <button
-          type="button"
-          onClick={onOpenIncident}
-          style={{
-            background: 'none',
+            background: 'transparent',
             border: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--text-muted)',
-            fontSize: '0.68rem',
+            color: '#9B958B',
+            fontSize: '0.66rem',
             fontWeight: 700,
             gap: '3px',
             minHeight: '48px',
             cursor: 'pointer',
+            padding: 0,
             touchAction: 'manipulation',
           }}
-          title="Report Hazard Incident"
-          aria-label="Report Hazard Incident"
+          aria-label="More navigation options"
         >
-          <Icon name="warning" size={19} color="var(--amber)" />
-          <span>{t('incidents.reportIncident', 'REPORT')}</span>
+          <Icon name="menu" size={19} />
+          <span>MORE</span>
         </button>
       </nav>
 

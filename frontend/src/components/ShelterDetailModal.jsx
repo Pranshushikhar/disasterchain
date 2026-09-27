@@ -98,7 +98,7 @@ const ShelterDetailModal = ({ isOpen = true, onClose, shelter, item }) => {
               style={{ fontSize: '0.78rem', padding: '0.4rem 0.75rem' }}
             >
               <Icon name="compass" size={14} color="#38bdf8" />
-              <span>Google Maps</span>
+              <span>{t('common.googleMaps', 'Google Maps')}</span>
             </a>
             <a
               href={osmUrl}

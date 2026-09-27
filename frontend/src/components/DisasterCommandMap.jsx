@@ -535,7 +535,7 @@ const DisasterCommandMapContent = ({
             fontSize: '0.74rem',
             padding: '4px 10px',
           }}
-          title="Center Indian Subcontinent"
+          title={t('map.centerIndia', 'Center Indian Subcontinent')}
         >
           🇮🇳 {t('map.presetIndia', 'INDIA')}
         </button>
@@ -550,7 +550,7 @@ const DisasterCommandMapContent = ({
             fontSize: '0.74rem',
             padding: '4px 10px',
           }}
-          title="Global Overview"
+          title={t('map.globalOverview', 'Global Overview')}
         >
           🌐 {t('map.presetWorld', 'WORLD')}
         </button>
@@ -565,7 +565,7 @@ const DisasterCommandMapContent = ({
             fontSize: '0.74rem',
             padding: '4px 10px',
           }}
-          title="Center My Location"
+          title={t('weather.myLocation', 'Center My Location')}
         >
           📍 {t('map.presetMyLocation', 'MY LOCATION')}
         </button>
@@ -581,7 +581,7 @@ const DisasterCommandMapContent = ({
             fontSize: '0.74rem',
             padding: '4px 10px',
           }}
-          title="Fit bounds to all active emergency events"
+          title={t('map.fitAllEvents', 'Fit bounds to all active emergency events')}
         >
           🎯 {t('map.presetFitIncidents', 'FIT ACTIVE INCIDENTS')}
         </button>

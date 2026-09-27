@@ -251,7 +251,7 @@ const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
                   className="form-input"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="e.g. Blocked fire exit behind Chemistry Lab Wing B"
+                  placeholder={t('incidents.headlinePlaceholder', 'e.g. Blocked fire exit behind Chemistry Lab Wing B')}
                 />
               </div>
 
@@ -263,16 +263,16 @@ const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                   >
-                    <option value="Blocked emergency exit">Blocked Emergency Exit</option>
-                    <option value="Fire hazard">Fire Hazard</option>
-                    <option value="Flooding">Flooding / Water Inundation</option>
-                    <option value="Damaged building">Structural Damage / Cracks</option>
-                    <option value="Damaged electrical equipment">Damaged Electrical Wiring</option>
-                    <option value="Fallen tree">Fallen Tree / Roadblock</option>
-                    <option value="Unsafe construction area">Unsafe Construction Zone</option>
-                    <option value="Earthquake Damage">Earthquake Damage</option>
-                    <option value="Gas Leak">Gas Leak / Chemical Fumes</option>
-                    <option value="Other">Other Hazard</option>
+                    <option value="Blocked emergency exit">{t('incidents.blockedExit', 'Blocked Emergency Exit')}</option>
+                    <option value="Fire hazard">{t('incidents.fireHazard', 'Fire Hazard')}</option>
+                    <option value="Flooding">{t('incidents.flooding', 'Flooding / Water Inundation')}</option>
+                    <option value="Damaged building">{t('incidents.damagedBuilding', 'Structural Damage / Cracks')}</option>
+                    <option value="Damaged electrical equipment">{t('incidents.damagedElectrical', 'Damaged Electrical Wiring')}</option>
+                    <option value="Fallen tree">{t('incidents.fallenTree', 'Fallen Tree / Roadblock')}</option>
+                    <option value="Unsafe construction area">{t('incidents.unsafeConstruction', 'Unsafe Construction Zone')}</option>
+                    <option value="Earthquake Damage">{t('incidents.earthquakeDamage', 'Earthquake Damage')}</option>
+                    <option value="Gas Leak">{t('incidents.gasLeak', 'Gas Leak / Chemical Fumes')}</option>
+                    <option value="Other">{t('incidents.otherHazard', 'Other Hazard')}</option>
                   </select>
                 </div>
 
@@ -299,7 +299,7 @@ const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
                   className="form-textarea"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Describe the hazard conditions, any danger to people nearby, and specifics..."
+                  placeholder={t('incidents.descPlaceholder', 'Describe the hazard conditions, any danger to people nearby, and specifics...')}
                 />
               </div>
 
@@ -328,7 +328,7 @@ const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
                   className="form-input"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder="e.g. Science Block Wing B, 2nd Floor Emergency Stairwell"
+                  placeholder={t('incidents.locationPlaceholder', 'e.g. Science Block Wing B, 2nd Floor Emergency Stairwell')}
                 />
               </div>
 

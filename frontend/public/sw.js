@@ -8,8 +8,8 @@
  * 4. Cache application shell & static bundles for offline interface resilience.
  */
 
-const SHELL_CACHE_VERSION = 'disasterchain-shell-v1.0.0';
-const API_CACHE_VERSION = 'disasterchain-api-v1.0.0';
+const SHELL_CACHE_VERSION = 'disasterchain-shell-v2.3.0';
+const API_CACHE_VERSION = 'disasterchain-api-v2.3.0';
 
 // Core Application Shell assets to precache
 const PRECACHE_ASSETS = [
@@ -50,7 +50,6 @@ self.addEventListener('install', (event) => {
       });
     })
   );
-  // Do not automatically force-activate; wait for user confirmation via PWA update toast
 });
 
 self.addEventListener('activate', (event) => {
@@ -84,7 +83,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle HTML Navigation requests (Single Page App routing offline support)
+  // Handle HTML Navigation requests (Single Page App routing offline support) - Network First
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request).catch(async () => {
@@ -159,8 +158,33 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static Assets (JS, CSS, Fonts, Images, Leaflet tiles, etc.)
-  // Stale-While-Revalidate or Cache-First with network refresh
+  // Application Code Bundles (.js, .css, webpack chunks)
+  // MUST BE NETWORK-FIRST: Never serve stale JS bundles when live updates or redesigns are active!
+  const isScriptOrStyle =
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname.includes('/static/js/') ||
+    url.pathname.includes('/static/css/');
+
+  if (isScriptOrStyle) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const cloned = networkResponse.clone();
+            caches.open(SHELL_CACHE_VERSION).then((cache) => {
+              cache.put(request, cloned);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Static Assets (Fonts, Images, Icons, Leaflet tiles)
+  // Stale-While-Revalidate with network refresh
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)

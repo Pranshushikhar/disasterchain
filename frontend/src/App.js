@@ -14,7 +14,6 @@ import IncidentModal from './components/IncidentModal';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import MobileEmergencyNav from './components/MobileEmergencyNav';
-import AIAssistant from './components/AIAssistant';
 import ErrorBoundary from './components/ErrorBoundary';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import PWAUpdateToast from './components/PWAUpdateToast';
@@ -85,7 +84,7 @@ const AppLayout = () => {
 
   // Show clean layout without desktop sidebar on standalone authentication/landing pages
   const isPublicStandalone =
-    location.pathname === '/' ||
+    location.pathname === '/landing' ||
     location.pathname === '/login' ||
     location.pathname === '/register' ||
     location.pathname === '/forgot-password' ||
@@ -94,12 +93,12 @@ const AppLayout = () => {
 
   return (
     <div className="app-container">
-      {/* Sidebar navigation: Desktop rail hidden on public standalone; Mobile drawer always available */}
+      {/* Sidebar navigation: Desktop rail hidden in favor of clean Top Command Bar; Mobile drawer always available */}
       <Sidebar
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         onOpenSos={() => setIsSosOpen(true)}
-        hideDesktopRail={isPublicStandalone}
+        hideDesktopRail={true}
       />
 
       {/* Main Content Area */}
@@ -112,7 +111,17 @@ const AppLayout = () => {
 
         <main className={isPublicStandalone ? '' : 'page-body'}>
           <Routes>
-            <Route path="/" element={<LandingPage onOpenSos={() => setIsSosOpen(true)} />} />
+            <Route
+              path="/"
+              element={
+                <EmergencyDashboard
+                  refreshKey={refreshCount}
+                  onOpenSos={() => setIsSosOpen(true)}
+                  onOpenIncident={() => setIsIncidentOpen(true)}
+                />
+              }
+            />
+            <Route path="/landing" element={<LandingPage onOpenSos={() => setIsSosOpen(true)} />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -171,20 +180,17 @@ const AppLayout = () => {
           </Routes>
         </main>
 
-        {/* Shared Global Application Footer */}
-        <Footer />
+        {/* Shared Global Application Footer (Suppressed on full-viewport intelligence desk) */}
+        {location.pathname !== '/weather-gpt' && <Footer />}
       </div>
 
       {/* Persistent Mobile Emergency Bottom Navigation (Phase 13) */}
       <MobileEmergencyNav
         onOpenSos={() => setIsSosOpen(true)}
         onOpenIncident={() => setIsIncidentOpen(true)}
+        onToggleSidebar={() => setIsMobileMenuOpen((prev) => !prev)}
       />
 
-      {/* DISASTERCHAIN AI Emergency Assistant */}
-      {!isPublicStandalone && (
-        <AIAssistant onOpenSos={() => setIsSosOpen(true)} />
-      )}
 
       {/* Global Modals */}
       <SosModal
@@ -200,7 +206,7 @@ const AppLayout = () => {
       />
 
       {/* PWA Mobile Installation Prompt & Service Worker Update Alert */}
-      <PWAInstallPrompt />
+      {location.pathname !== '/weather-gpt' && <PWAInstallPrompt />}
       <PWAUpdateToast />
     </div>
   );

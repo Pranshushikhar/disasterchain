@@ -1,7 +1,10 @@
 import React from 'react';
 import Icon from './Icons';
+import { useTranslation } from '../i18n';
 
 const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
+  const { t } = useTranslation();
+
   if (!isOpen || !item) return null;
 
   const isCritical = item.priorityLevel === 'CRITICAL';
@@ -91,19 +94,19 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
                   }}
                 >
                   {isCritical && <span className="live-beacon-pulse critical" style={{ width: 6, height: 6 }} />}
-                  {item.priorityLevel} PRIORITY
+                  {item.priorityLevel} {t('common.priority', 'PRIORITY')}
                 </span>
                 <span
                   className="badge badge-neutral"
                   style={{ fontSize: '0.68rem', textTransform: 'uppercase' }}
                 >
-                  {item.entityType === 'sos' ? 'SOS Distressed' : 'Incident Hazard'}
+                  {item.entityType === 'sos' ? t('crisis.sosDistressed', 'SOS Distressed') : t('crisis.incidentHazard', 'Incident Hazard')}
                 </span>
                 <span
                   className="badge badge-info"
                   style={{ fontSize: '0.68rem' }}
                 >
-                  {item.status || 'Active'}
+                  {item.status || t('common.active', 'Active')}
                 </span>
               </div>
               <h2
@@ -115,7 +118,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
                   lineHeight: 1.3,
                 }}
               >
-                {item.title || `${item.emergencyType} Emergency`}
+                {item.title || `${item.emergencyType} ${t('common.emergency', 'Emergency')}`}
               </h2>
             </div>
           </div>
@@ -148,7 +151,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             }}
           >
             <span className="micro-label" style={{ color: accentColor }}>
-              TRIAGE PRIORITY SCORE
+              {t('crisis.triageScore', 'TRIAGE PRIORITY SCORE')}
             </span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
               <span
@@ -204,10 +207,10 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             }}
           >
             <div className="micro-label" style={{ marginBottom: '0.2rem' }}>
-              📍 LOCATION
+              📍 {t('common.location', 'LOCATION')}
             </div>
             <div style={{ fontSize: '0.86rem', color: '#ffffff', fontWeight: 600 }}>
-              {item.location || 'Reported on Campus Grid'}
+              {item.location || t('crisis.reportedOnCampusGrid', 'Reported on Campus Grid')}
             </div>
             {item.coordinates && (
               <div
@@ -232,13 +235,13 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             }}
           >
             <div className="micro-label" style={{ marginBottom: '0.2rem' }}>
-              👥 PEOPLE AFFECTED
+              👥 {t('crisis.peopleAffected', 'PEOPLE AFFECTED')}
             </div>
             <div style={{ fontSize: '0.86rem', color: '#ffffff', fontWeight: 700 }}>
-              {item.peopleAffected || 1} individuals
+              {item.peopleAffected || 1} {t('crisis.individuals', 'individuals')}
             </div>
             <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-              Severity Level: {item.severity}
+              {t('crisis.severityLevel', 'Severity Level')}: {item.severity}
             </div>
           </div>
         </div>
@@ -254,7 +257,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               fontWeight: 700,
             }}
           >
-            🔍 WHY: SCORING FACTORS & ANALYSIS
+            🔍 {t('crisis.whyScoringFactors', 'WHY: SCORING FACTORS & ANALYSIS')}
           </div>
           <div
             style={{
@@ -285,7 +288,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               ))
             ) : (
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Baseline emergency risk criteria evaluated.
+                {t('crisis.baselineEvaluated', 'Baseline emergency risk criteria evaluated.')}
               </div>
             )}
           </div>
@@ -302,7 +305,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               fontWeight: 700,
             }}
           >
-            ⚡ RECOMMENDED ACTIONS & PROTOCOLS
+            ⚡ {t('crisis.recommendedActionsProtocols', 'RECOMMENDED ACTIONS & PROTOCOLS')}
           </div>
           <div
             style={{
@@ -334,7 +337,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               ))
             ) : (
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Maintain nominal perimeter monitoring and report status changes.
+                {t('crisis.maintainPerimeter', 'Maintain nominal perimeter monitoring and report status changes.')}
               </div>
             )}
           </div>
@@ -354,7 +357,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               gap: '6px',
             }}
           >
-            <span>🏛️ RECOMMENDED SAFE HAVEN</span>
+            <span>🏛️ {t('crisis.recommendedSafeHaven', 'RECOMMENDED SAFE HAVEN')}</span>
             {item.recommendedShelter && (
               <span
                 style={{
@@ -366,7 +369,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
                   fontWeight: 800,
                 }}
               >
-                {item.recommendedShelter.matchScore}% MATCH
+                {item.recommendedShelter.matchScore}% {t('crisis.match', 'MATCH')}
               </span>
             )}
           </div>
@@ -390,7 +393,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
                     {item.recommendedShelter.name}
                   </div>
                   <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                    📍 {item.recommendedShelter.address || 'Civil Defense Facility'}
+                    📍 {item.recommendedShelter.address || t('crisis.civilDefenseFacility', 'Civil Defense Facility')}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -398,7 +401,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
                     className="badge badge-success"
                     style={{ fontSize: '0.7rem', fontWeight: 800 }}
                   >
-                    {item.recommendedShelter.distanceKm} km away
+                    {item.recommendedShelter.distanceKm} {t('crisis.kmAway', 'km away')}
                   </span>
                 </div>
               </div>
@@ -407,10 +410,10 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               <div style={{ background: 'rgba(5, 10, 20, 0.65)', padding: '0.5rem 0.65rem', borderRadius: '4px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#cbd5e1' }}>
                   <span>
-                    Available Beds: <strong style={{ color: 'var(--mint)' }}>{item.recommendedShelter.availableCapacity}</strong>
+                    {t('shelters.availableBeds', 'Available Beds')}: <strong style={{ color: 'var(--mint)' }}>{item.recommendedShelter.availableCapacity}</strong>
                   </span>
                   <span>
-                    Occupancy: {item.recommendedShelter.occupied} / {item.recommendedShelter.capacity} ({item.recommendedShelter.occupancyPercent}%)
+                    {t('shelters.occupancy', 'Occupancy')}: {item.recommendedShelter.occupied} / {item.recommendedShelter.capacity} ({item.recommendedShelter.occupancyPercent}%)
                   </span>
                 </div>
                 <div style={{ width: '100%', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', marginTop: '4px', overflow: 'hidden' }}>
@@ -450,7 +453,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               {item.recommendedShelter.reasons && item.recommendedShelter.reasons.length > 0 && (
                 <div style={{ fontSize: '0.74rem', color: '#cbd5e1', lineHeight: 1.35 }}>
                   <div style={{ fontWeight: 700, fontSize: '0.67rem', color: 'var(--text-muted)', marginBottom: '3px' }}>
-                    RECOMMENDATION REASONS:
+                    {t('crisis.recommendationReasons', 'RECOMMENDATION REASONS')}:
                   </div>
                   {item.recommendedShelter.reasons.map((r, rIdx) => (
                     <div key={rIdx} style={{ display: 'flex', gap: '4px' }}>
@@ -483,7 +486,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
                   style={{ flex: 1, padding: '4px 8px', fontSize: '0.72rem', borderColor: 'var(--safe)', color: 'var(--safe)', justifyContent: 'center' }}
                 >
                   <Icon name="map-pin" size={13} color="var(--safe)" />
-                  <span>VIEW SHELTER</span>
+                  <span>{t('crisis.viewShelter', 'VIEW SHELTER')}</span>
                 </button>
 
                 {(() => {
@@ -500,7 +503,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
                       style={{ flex: 1, padding: '4px 8px', fontSize: '0.72rem', background: 'var(--safe)', color: '#120B08', justifyContent: 'center', textDecoration: 'none' }}
                     >
                       <Icon name="navigation" size={13} color="#120B08" />
-                      <span>GET DIRECTIONS ↗</span>
+                      <span>{t('crisis.getDirections', 'GET DIRECTIONS ↗')}</span>
                     </a>
                   );
                 })()}
@@ -519,10 +522,10 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             >
               <div style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>🛡️</div>
               <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#ffffff' }}>
-                NO SUITABLE SHELTER FOUND
+                {t('crisis.noSuitableShelter', 'NO SUITABLE SHELTER FOUND')}
               </div>
               <div style={{ fontSize: '0.72rem', marginTop: '0.15rem' }}>
-                All monitored shelters are currently at full capacity or undergoing emergency triage.
+                {t('crisis.allSheltersFull', 'All monitored shelters are currently at full capacity or undergoing emergency triage.')}
               </div>
             </div>
           )}
@@ -548,20 +551,20 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
               }}
             >
               <span className="micro-label" style={{ color: 'var(--crimson)' }}>
-                OPERATIONAL RESPONDER INTELLIGENCE (PRIVILEGED)
+                {t('crisis.operationalIntelligence', 'OPERATIONAL RESPONDER INTELLIGENCE (PRIVILEGED)')}
               </span>
               <span className="badge badge-critical" style={{ fontSize: '0.65rem' }}>
-                Full Clearance
+                {t('crisis.fullClearance', 'Full Clearance')}
               </span>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', fontSize: '0.8rem' }}>
               <div>
-                <span style={{ color: 'var(--text-muted)' }}>Caller / Reporter: </span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('crisis.callerReporter', 'Caller / Reporter')}: </span>
                 <strong style={{ color: '#ffffff' }}>{item.reporterName || 'Anonymous'}</strong>
               </div>
               <div>
-                <span style={{ color: 'var(--text-muted)' }}>Direct Contact: </span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('crisis.directContact', 'Direct Contact')}: </span>
                 <strong style={{ color: 'var(--cyan)' }}>{item.contact || 'Radio / On-Site'}</strong>
               </div>
             </div>
@@ -569,17 +572,17 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             {item.spatialContext && (
               <div style={{ marginTop: '0.6rem', paddingTop: '0.6rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', fontSize: '0.78rem' }}>
                 <div className="micro-label" style={{ marginBottom: '0.3rem', color: 'var(--text-secondary)' }}>
-                  Nearest Resource Diagnostics
+                  {t('crisis.nearestResourceDiagnostics', 'Nearest Resource Diagnostics')}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', color: 'var(--text-muted)' }}>
                   {item.spatialContext.nearestShelter && (
                     <div>
-                      Shelter: <strong style={{ color: '#ffffff' }}>{item.spatialContext.nearestShelter.name}</strong> ({item.spatialContext.nearestShelter.distanceKm} km, {item.spatialContext.nearestShelter.status})
+                      {t('common.shelter', 'Shelter')}: <strong style={{ color: '#ffffff' }}>{item.spatialContext.nearestShelter.name}</strong> ({item.spatialContext.nearestShelter.distanceKm} km, {item.spatialContext.nearestShelter.status})
                     </div>
                   )}
                   {item.spatialContext.nearestMedical && (
                     <div>
-                      Medical: <strong style={{ color: '#ffffff' }}>{item.spatialContext.nearestMedical.name}</strong> ({item.spatialContext.nearestMedical.distanceKm} km)
+                      {t('common.medical', 'Medical')}: <strong style={{ color: '#ffffff' }}>{item.spatialContext.nearestMedical.name}</strong> ({item.spatialContext.nearestMedical.distanceKm} km)
                     </div>
                   )}
                 </div>
@@ -599,10 +602,10 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             }}
           >
             <div className="micro-label" style={{ color: 'var(--amber)', marginBottom: '0.3rem' }}>
-              FIELD VOLUNTEER & RELIEF TIER
+              {t('crisis.fieldVolunteerTier', 'FIELD VOLUNTEER & RELIEF TIER')}
             </div>
             <div style={{ fontSize: '0.8rem', color: '#ffffff' }}>
-              Contact: <code>{item.contact || 'Confidential'}</code> • Identity: {item.reporterName || 'Registered User'}
+              {t('crisis.contact', 'Contact')}: <code>{item.contact || t('crisis.confidential', 'Confidential')}</code> • {t('crisis.identity', 'Identity')}: {item.reporterName || t('crisis.registeredUser', 'Registered User')}
             </div>
           </div>
         )}
@@ -623,7 +626,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             }}
           >
             <Icon name="shield" size={16} color="var(--cyan)" />
-            <span>Public Safety Advisory View: Private victim contacts withheld per privacy protocols.</span>
+            <span>{t('crisis.publicSafetyView', 'Public Safety Advisory View: Private victim contacts withheld per privacy protocols.')}</span>
           </div>
         )}
 
@@ -636,7 +639,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             style={{ borderColor: 'var(--cyan)', color: 'var(--cyan)' }}
           >
             <Icon name="map-pin" size={14} color="var(--cyan)" />
-            <span>View on 3D Globe</span>
+            <span>{t('crisis.viewOn3dGlobe', 'View on 3D Globe')}</span>
           </button>
 
           <button
@@ -644,7 +647,7 @@ const CrisisIntelligenceModal = ({ isOpen, onClose, item, onFocusGlobe }) => {
             onClick={onClose}
             className="btn btn-primary btn-sm"
           >
-            <span>Close Details</span>
+            <span>{t('common.closeDetails', 'Close Details')}</span>
           </button>
         </div>
       </div>

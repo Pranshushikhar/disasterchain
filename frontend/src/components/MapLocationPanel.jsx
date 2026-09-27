@@ -110,13 +110,13 @@ const MapLocationPanel = ({
           }}
         >
           <div>
-            <div className="micro-label" style={{ color: 'var(--text-muted)' }}>LATITUDE</div>
+            <div className="micro-label" style={{ color: 'var(--text-muted)' }}>{t('map.latitude', 'LATITUDE')}</div>
             <div style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.84rem', color: '#ffffff' }}>
               {(entity.lat ?? entity.latitude)?.toFixed(4)}° N
             </div>
           </div>
           <div>
-            <div className="micro-label" style={{ color: 'var(--text-muted)' }}>LONGITUDE</div>
+            <div className="micro-label" style={{ color: 'var(--text-muted)' }}>{t('map.longitude', 'LONGITUDE')}</div>
             <div style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.84rem', color: '#ffffff' }}>
               {(entity.lon ?? entity.longitude)?.toFixed(4)}° E
             </div>

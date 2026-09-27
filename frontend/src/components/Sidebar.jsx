@@ -7,7 +7,7 @@ import Icon from './Icons';
 import LanguageSelector from './LanguageSelector';
 import NetworkStatusIndicator from './NetworkStatusIndicator';
 
-const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
+const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
   const { user, isAdmin, isAuthenticated, logout } = useAuth();
   const { t } = useTranslation();
   const { isInstallable, isInstalled, promptInstall } = usePWA();
@@ -39,46 +39,41 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
 
   const navSections = [
     {
-      title: 'MAIN',
+      title: t('nav.intelligence', 'INTELLIGENCE'),
       items: [
-        { label: 'Home', path: '/', icon: 'activity' },
-        { label: 'Dashboard', path: '/dashboard', icon: 'activity' },
-        { label: 'SOS', path: '/sos', icon: 'sos', badge: 'LIVE' },
-        { label: 'Map', path: '/affected-areas', icon: 'map' },
-        { label: 'Alerts', path: '/alerts', icon: 'bell' },
-        { label: 'Weather', path: '/weather', icon: 'cloud' },
+        { label: t('nav.weather', 'Weather'), path: '/weather', icon: 'cloud' },
         { label: 'WeatherGPT', path: '/weather-gpt', icon: 'weather-gpt' },
       ],
     },
     {
-      title: 'RESPONSE',
+      title: t('nav.response', 'RESPONSE'),
       items: [
-        { label: 'Shelters', path: '/shelters', icon: 'shelter' },
-        { label: 'Incidents', path: '/incidents', icon: 'warning' },
-        { label: 'Resources', path: '/resources', icon: 'hospital' },
+        { label: t('nav.shelters', 'Shelters'), path: '/shelters', icon: 'shelter' },
+        { label: t('nav.incidents', 'Incidents'), path: '/incidents', icon: 'warning' },
+        { label: t('nav.resources', 'Resources'), path: '/resources', icon: 'hospital' },
       ],
     },
     {
-      title: 'COMMUNITY',
+      title: t('nav.preparedness', 'COMMUNITY / PREPAREDNESS'),
       items: [
-        { label: 'Donations', path: '/donations', icon: 'donations' },
-        { label: 'Preparedness', path: '/guides', icon: 'guide' },
+        { label: t('nav.donations', 'Donations'), path: '/donations', icon: 'heart' },
+        { label: t('nav.preparedness', 'Preparedness'), path: '/guides', icon: 'guide' },
       ],
     },
     {
-      title: 'SYSTEM',
+      title: t('nav.system', 'SYSTEM'),
       items: [
-        { label: 'Offline Mode', path: '/offline', icon: 'offline' },
-        {
-          label: 'AI Assistant',
-          path: '#ai',
-          icon: 'bot',
-          isAction: true,
-          action: () => {
-            window.dispatchEvent(new CustomEvent('disasterchain:ai-assistant-open', { detail: { query: '' } }));
-          },
-        },
-        { label: 'Profile', path: '/profile', icon: 'profile' },
+        { label: t('nav.offlineMode', 'Offline'), path: '/offline', icon: 'offline' },
+        { label: t('nav.profile', 'Profile'), path: '/profile', icon: 'profile' },
+        ...(isAdmin
+          ? [
+              {
+                label: t('nav.adminCommand', 'Admin Command'),
+                path: '/admin',
+                icon: 'shield',
+              },
+            ]
+          : []),
       ],
     },
   ];
@@ -210,7 +205,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
                 DISASTERCHAIN
               </div>
               <div style={{ fontSize: '0.72rem', color: '#ff6b2c', fontWeight: 600 }}>
-                Emergency response, simplified
+                {t('nav.tagline', 'Emergency response, simplified')}
               </div>
             </div>
           </div>
@@ -219,7 +214,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
             type="button"
             className="mobile-drawer-close-btn"
             onClick={onClose}
-            aria-label="Close Navigation Drawer"
+            aria-label={t('common.close', 'Close Navigation Drawer')}
             style={{
               minWidth: '44px',
               minHeight: '44px',
@@ -250,7 +245,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
           }}
         >
           <Icon name="alert-circle" size={18} color="#ffffff" />
-          <span>EMERGENCY SOS</span>
+          <span>{t('nav.broadcastSos', 'EMERGENCY SOS')}</span>
         </button>
 
         {/* Mobile Drawer Auth Shortcuts */}
@@ -269,7 +264,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
               }}
             >
               <Icon name="login" size={16} />
-              <span>Sign In</span>
+              <span>{t('nav.signIn', 'Sign In')}</span>
             </NavLink>
             <NavLink
               to="/register"
@@ -282,7 +277,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
                 fontWeight: 700,
               }}
             >
-              <span>Register</span>
+              <span>{t('nav.register', 'Register')}</span>
             </NavLink>
           </div>
         ) : (
@@ -326,7 +321,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
               }}
             >
               <Icon name="logout" size={15} />
-              <span>Exit</span>
+              <span>{t('nav.logout', 'Logout')}</span>
             </button>
           </div>
         )}
@@ -428,7 +423,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
                 <span className="nav-icon-wrap" style={{ color: '#ff6b2c' }}>
                   <Icon name="download" size={18} />
                 </span>
-                <span>Install DisasterChain App</span>
+                <span>{t('nav.installApp', 'Install DisasterChain App')}</span>
               </button>
             </div>
           )}

@@ -453,11 +453,11 @@ const AdminDashboard = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Type & Severity</th>
+                <th>{t('admin.typeSeverity', 'Type & Severity')}</th>
                 <th>Location</th>
                 <th>Contact</th>
-                <th>Status</th>
-                <th>Change Status</th>
+                <th>{t('common.status', 'Status')}</th>
+                <th>{t('admin.changeStatus', 'Change Status')}</th>
               </tr>
             </thead>
             <tbody>
@@ -480,11 +480,11 @@ const AdminDashboard = () => {
                       value={sos.status}
                       onChange={(e) => handleUpdateSosStatus(sos._id, e.target.value)}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Assigned">Assigned</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Resolved">Resolved</option>
-                      <option value="Cancelled">Cancelled</option>
+                      <option value="Pending">{t('common.statusPending', 'Pending')}</option>
+                      <option value="Assigned">{t('admin.assigned', 'Assigned')}</option>
+                      <option value="In Progress">{t('admin.inProgress', 'In Progress')}</option>
+                      <option value="Resolved">{t('common.statusResolved', 'Resolved')}</option>
+                      <option value="Cancelled">{t('common.cancelled', 'Cancelled')}</option>
                     </select>
                   </td>
                 </tr>
@@ -501,11 +501,11 @@ const AdminDashboard = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Title & Category</th>
+                <th>{t('admin.titleCategory', 'Title & Category')}</th>
                 <th>Location</th>
-                <th>Reporter</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>{t('admin.reporter', 'Reporter')}</th>
+                <th>{t('common.status', 'Status')}</th>
+                <th>{t('admin.action', 'Action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -528,10 +528,10 @@ const AdminDashboard = () => {
                       value={inc.status}
                       onChange={(e) => handleUpdateIncidentStatus(inc._id, e.target.value)}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Under Review">Under Review</option>
-                      <option value="Resolved">Resolved</option>
-                      <option value="Rejected">Rejected</option>
+                      <option value="Pending">{t('common.statusPending', 'Pending')}</option>
+                      <option value="Under Review">{t('incidents.underReview', 'Under Review')}</option>
+                      <option value="Resolved">{t('common.statusResolved', 'Resolved')}</option>
+                      <option value="Rejected">{t('admin.rejected', 'Rejected')}</option>
                     </select>
                   </td>
                 </tr>
@@ -551,7 +551,7 @@ const AdminDashboard = () => {
             </h3>
             <form onSubmit={handleCreateShelter}>
               <div className="form-group">
-                <label className="form-label">Shelter Name</label>
+                <label className="form-label">{t('admin.shelterName', 'Shelter Name')}</label>
                 <input
                   type="text"
                   required
@@ -563,7 +563,7 @@ const AdminDashboard = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Address</label>
+                <label className="form-label">{t('shelters.address', 'Address')}</label>
                 <input
                   type="text"
                   required
@@ -576,7 +576,7 @@ const AdminDashboard = () => {
 
               <div className="grid-cols-2">
                 <div className="form-group">
-                  <label className="form-label">Capacity (Beds)</label>
+                  <label className="form-label">{t('admin.capacityBeds', 'Capacity (Beds)')}</label>
                   <input
                     type="number"
                     min={10}
@@ -586,7 +586,7 @@ const AdminDashboard = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Contact Phone</label>
+                  <label className="form-label">{t('shelters.phone', 'Contact Phone')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -598,7 +598,7 @@ const AdminDashboard = () => {
 
               <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
                 <Icon name="plus" size={16} />
-                <span>Register Shelter</span>
+                <span>{t('admin.registerShelter', 'Register Shelter')}</span>
               </button>
             </form>
           </div>
@@ -607,10 +607,10 @@ const AdminDashboard = () => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Shelter Name</th>
-                  <th>Occupancy</th>
-                  <th>Status</th>
-                  <th>Phone</th>
+                  <th>{t('admin.shelterName', 'Shelter Name')}</th>
+                  <th>{t('shelters.occupancy', 'Occupancy')}</th>
+                  <th>{t('common.status', 'Status')}</th>
+                  <th>{t('shelters.phone', 'Phone')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -637,11 +637,11 @@ const AdminDashboard = () => {
           <div className="glass-card">
             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Icon name="bell" size={18} color="#ff334b" />
-              <span>Broadcast Emergency Alert</span>
+              <span>{t('alerts.broadcastEmergencyAlert', 'Broadcast Emergency Alert')}</span>
             </h3>
             <form onSubmit={handleCreateAlert}>
               <div className="form-group">
-                <label className="form-label">Alert Headline</label>
+                <label className="form-label">{t('alerts.alertHeadline', 'Alert Headline')}</label>
                 <input
                   type="text"
                   required
@@ -654,7 +654,7 @@ const AdminDashboard = () => {
 
               <div className="grid-cols-2">
                 <div className="form-group">
-                  <label className="form-label">Severity Level</label>
+                  <label className="form-label">{t('crisis.severityLevel', 'Severity Level')}</label>
                   <select
                     className="form-select"
                     value={newAlert.severity}
@@ -667,16 +667,16 @@ const AdminDashboard = () => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Disaster Type</label>
+                  <label className="form-label">{t('admin.disasterType', 'Disaster Type')}</label>
                   <select
                     className="form-select"
                     value={newAlert.type}
                     onChange={(e) => setNewAlert({ ...newAlert, type: e.target.value })}
                   >
-                    <option value="Flood">Flood</option>
-                    <option value="Fire">Fire</option>
-                    <option value="Earthquake">Earthquake</option>
-                    <option value="Cyclone">Cyclone</option>
+                    <option value="Flood">{t('landing.floodTitle', 'Flood')}</option>
+                    <option value="Fire">{t('landing.fireTitle', 'Fire')}</option>
+                    <option value="Earthquake">{t('landing.earthquakeTitle', 'Earthquake')}</option>
+                    <option value="Cyclone">{t('landing.cycloneTitle', 'Cyclone')}</option>
                     <option value="Thunderstorm">Thunderstorm</option>
                     <option value="General">General Safety</option>
                   </select>
@@ -684,7 +684,7 @@ const AdminDashboard = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Location / Impact Sector</label>
+                <label className="form-label">{t('alerts.locationImpactSector', 'Location / Impact Sector')}</label>
                 <input
                   type="text"
                   required
@@ -696,7 +696,7 @@ const AdminDashboard = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Advisory Message</label>
+                <label className="form-label">{t('admin.advisoryMessage', 'Advisory Message')}</label>
                 <textarea
                   rows={3}
                   required
@@ -715,7 +715,7 @@ const AdminDashboard = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>Active Broadcasts</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>{t('admin.activeBroadcasts', 'Active Broadcasts')}</h3>
             {alerts.map((a) => (
               <div key={a._id} className="glass-card" style={{ padding: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
@@ -755,13 +755,13 @@ const AdminDashboard = () => {
 
               <div className="grid-cols-2">
                 <div className="form-group">
-                  <label className="form-label">Resource Type</label>
+                  <label className="form-label">{t('resources.itemCategory', 'Resource Type')}</label>
                   <select
                     className="form-select"
                     value={newDonation.type}
                     onChange={(e) => setNewDonation({ ...newDonation, type: e.target.value })}
                   >
-                    <option value="Medical Supplies">Medical Supplies</option>
+                    <option value="Medical Supplies">{t('admin.medicalSupplies', 'Medical Supplies')}</option>
                     <option value="Food">Food Rations</option>
                     <option value="Water">Clean Drinking Water</option>
                     <option value="Blankets">Blankets / Clothing</option>
@@ -818,9 +818,9 @@ const AdminDashboard = () => {
                 <tr>
                   <th>Txn ID</th>
                   <th>Donor</th>
-                  <th>Supply</th>
+                  <th>{t('resources.itemCategory', 'Supply')}</th>
                   <th>Destination</th>
-                  <th>Block Hash</th>
+                  <th>{t('transparency.blockHash', 'Block Hash')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -849,11 +849,11 @@ const AdminDashboard = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Block #</th>
+                <th>{t('blockchain.blockNumber', 'Block #')}</th>
                 <th>Txn ID</th>
                 <th>Entity</th>
-                <th>Resource</th>
-                <th>Block Hash (SHA-256)</th>
+                <th>{t('common.resource', 'Resource')}</th>
+                <th>{t('blockchain.blockHash', 'Block Hash (SHA-256)')}</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -873,7 +873,7 @@ const AdminDashboard = () => {
                       className="btn btn-outline btn-sm"
                     >
                       <Icon name="blockchain" size={13} color="#818cf8" />
-                      <span>Audit Proof</span>
+                      <span>{t('admin.auditProof', 'Audit Proof')}</span>
                     </button>
                   </td>
                 </tr>
@@ -959,10 +959,10 @@ const AdminDashboard = () => {
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Registered Date</th>
+                        <th>{t('common.fullName', 'Name')}</th>
+                        <th>{t('auth.email', 'Email')}</th>
+                        <th>{t('auth.role', 'Role')}</th>
+                        <th>{t('admin.registeredDate', 'Registered Date')}</th>
                         <th>Verification Status</th>
                         <th style={{ textAlign: 'center' }}>Action</th>
                       </tr>
@@ -1031,10 +1031,10 @@ const AdminDashboard = () => {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>User Name</th>
-                    <th>Email Address</th>
+                    <th>{t('common.fullName', 'User Name')}</th>
+                    <th>{t('auth.email', 'Email Address')}</th>
                     <th>Current Role</th>
-                    <th>Status</th>
+                    <th>{t('common.status', 'Status')}</th>
                     <th>Change Role</th>
                     <th>Approval Action</th>
                   </tr>
@@ -1094,7 +1094,7 @@ const AdminDashboard = () => {
                               Verify Account
                             </button>
                           ) : (
-                            <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>✓ Active</span>
+                            <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>✓ {t('common.active', 'Active')}</span>
                           )}
                         </td>
                       </tr>
@@ -1135,7 +1135,7 @@ const AdminDashboard = () => {
                 title="Refresh Recovery Requests"
               >
                 <Icon name="refresh" size={15} />
-                <span>Refresh</span>
+                <span>{t('common.retry', 'Refresh')}</span>
               </button>
             </div>
           </div>
@@ -1187,12 +1187,12 @@ const AdminDashboard = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                 <thead>
                   <tr style={{ background: 'rgba(255, 255, 255, 0.02)', borderBottom: '1px solid var(--border-subtle)' }}>
-                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>OPERATOR</th>
-                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>ROLE</th>
-                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>REQUESTED AT</th>
-                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>STATUS</th>
-                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>REVIEW DETAILS</th>
-                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700, textAlign: 'right' }}>ACTIONS</th>
+                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>{t('admin.operator', 'OPERATOR')}</th>
+                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>{t('auth.role', 'ROLE')}</th>
+                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>{t('admin.requestedAt', 'REQUESTED AT')}</th>
+                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>{t('common.status', 'STATUS')}</th>
+                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700 }}>{t('admin.reviewDetails', 'REVIEW DETAILS')}</th>
+                    <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: 700, textAlign: 'right' }}>{t('common.actions', 'ACTIONS')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1471,7 +1471,7 @@ const AdminDashboard = () => {
                 marginBottom: '1.5rem',
               }}
             >
-              ⚠️ <strong>SECURITY MANDATE:</strong> This single-use recovery code is shown <strong>only once</strong>. The plaintext code is never stored in the database (only a SHA-256 hash is retained). Provide this code directly to <strong>{recoveryCodeModal.email}</strong> via an authenticated communication channel.
+              ⚠️ <strong>{t('admin.securityMandate', 'SECURITY MANDATE:')}</strong> This single-use recovery code is shown <strong>only once</strong>. The plaintext code is never stored in the database (only a SHA-256 hash is retained). Provide this code directly to <strong>{recoveryCodeModal.email}</strong> via an authenticated communication channel.
             </div>
 
             {/* Code Display Box */}
@@ -1636,7 +1636,7 @@ const AdminDashboard = () => {
                 <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.15rem', fontWeight: 800 }}>
                   Administrator User Approval
                 </h3>
-                <span style={{ fontSize: '0.75rem', color: 'var(--cyan)' }}>MANUAL OPERATOR VERIFICATION</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--cyan)' }}>{t('admin.manualVerification', 'MANUAL OPERATOR VERIFICATION')}</span>
               </div>
             </div>
 
@@ -1655,13 +1655,13 @@ const AdminDashboard = () => {
               }}
             >
               <div style={{ marginBottom: '0.35rem' }}>
-                <strong style={{ color: '#ffffff' }}>Operator:</strong> {confirmVerifyUser.name}
+                <strong style={{ color: '#ffffff' }}>{t('admin.operator', 'Operator')}:</strong> {confirmVerifyUser.name}
               </div>
               <div style={{ marginBottom: '0.35rem' }}>
-                <strong style={{ color: '#ffffff' }}>Email:</strong> {confirmVerifyUser.email}
+                <strong style={{ color: '#ffffff' }}>{t('auth.email', 'Email')}:</strong> {confirmVerifyUser.email}
               </div>
               <div>
-                <strong style={{ color: '#ffffff' }}>Role:</strong>{' '}
+                <strong style={{ color: '#ffffff' }}>{t('auth.role', 'Role')}:</strong>{' '}
                 <span style={{ textTransform: 'capitalize', color: 'var(--cyan)', fontWeight: 700 }}>
                   {confirmVerifyUser.role}
                 </span>

@@ -284,6 +284,7 @@ export const sendWeatherGPTChat = async ({
   location,
   language,
   conversationId,
+  userMode,
 } = {}) => {
   const res = await api.post('/weather-gpt/chat', {
     message,
@@ -293,6 +294,7 @@ export const sendWeatherGPTChat = async ({
     location,
     language,
     conversationId,
+    userMode,
   });
   return res.data;
 };

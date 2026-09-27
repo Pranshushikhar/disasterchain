@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePWA } from '../context/PWAContext';
+import { useTranslation } from '../i18n';
 import Icon from './Icons';
 
 /**
@@ -9,6 +10,7 @@ import Icon from './Icons';
  */
 const PWAUpdateToast = () => {
   const { isUpdateAvailable, triggerUpdate } = usePWA();
+  const { t } = useTranslation();
 
   if (!isUpdateAvailable) {
     return null;
@@ -66,10 +68,10 @@ const PWAUpdateToast = () => {
               fontFamily: 'var(--font-heading, sans-serif)',
             }}
           >
-            NEW VERSION AVAILABLE
+            {t('pwa.updateTitle', 'NEW VERSION AVAILABLE')}
           </div>
           <div style={{ fontSize: '0.74rem', color: '#B0A099', marginTop: '1px' }}>
-            Refresh to update DisasterChain.
+            {t('pwa.updateDesc', 'Refresh to update DisasterChain.')}
           </div>
         </div>
       </div>
@@ -91,7 +93,7 @@ const PWAUpdateToast = () => {
           minHeight: '36px',
         }}
       >
-        Refresh
+        {t('common.retry', 'Refresh')}
       </button>
     </div>
   );

@@ -378,13 +378,13 @@ const SheltersPage = () => {
                   }}
                 >
                   <div>
-                    <div className="micro-label">AVAILABLE BEDS</div>
+                    <div className="micro-label">{t('shelters.availableBeds', 'AVAILABLE BEDS')}</div>
                     <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.15rem', color: avail > 0 ? 'var(--cyan)' : 'var(--crimson)' }}>
                       {avail} BEDS
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="micro-label">OCCUPANCY</div>
+                    <div className="micro-label">{t('shelters.occupancy', 'OCCUPANCY')}</div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
                       {occ} / {cap}
                     </div>

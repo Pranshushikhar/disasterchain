@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePWA } from '../context/PWAContext';
+import { useTranslation } from '../i18n';
 import Icon from './Icons';
 
 /**
@@ -12,6 +13,7 @@ import Icon from './Icons';
  */
 const PWAInstallPrompt = () => {
   const { isInstallable, isInstalled, isDismissed, promptInstall, dismissInstallPrompt } = usePWA();
+  const { t } = useTranslation();
 
   // If not installable, already installed, or previously dismissed by user, do not render
   if (!isInstallable || isInstalled || isDismissed) {
@@ -26,22 +28,21 @@ const PWAInstallPrompt = () => {
     <aside
       className="pwa-install-banner"
       role="region"
-      aria-label="Install DisasterChain Application"
+      aria-label={t('pwa.installTitle', 'Install DisasterChain Application')}
       style={{
         position: 'fixed',
-        bottom: 'calc(68px + env(safe-area-inset-bottom, 0px))',
-        left: '12px',
-        right: '12px',
-        maxWidth: 'calc(100% - 24px)',
+        bottom: 'calc(82px + env(safe-area-inset-bottom, 0px))',
+        right: '20px',
+        left: 'auto',
+        maxWidth: '400px',
+        width: 'calc(100% - 40px)',
         boxSizing: 'border-box',
         zIndex: 9990,
-        backgroundColor: 'rgba(28, 17, 13, 0.96)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 107, 44, 0.45)',
-        borderRadius: '14px',
+        backgroundColor: '#191714',
+        border: '1px solid rgba(242, 238, 231, 0.12)',
+        borderRadius: '8px',
         padding: '12px 14px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.65), 0 0 15px rgba(255, 107, 44, 0.25)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.65)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -55,10 +56,10 @@ const PWAInstallPrompt = () => {
           src="/icon-192.png"
           alt="DisasterChain Logo"
           style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '10px',
-            border: '1px solid rgba(255, 107, 44, 0.4)',
+            width: '36px',
+            height: '36px',
+            borderRadius: '6px',
+            border: '1px solid rgba(242, 238, 231, 0.12)',
             flexShrink: 0,
             objectFit: 'cover',
           }}
@@ -66,27 +67,26 @@ const PWAInstallPrompt = () => {
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: '0.85rem',
-              fontWeight: '800',
+              fontSize: '0.8rem',
+              fontWeight: '700',
               letterSpacing: '0.04em',
-              color: '#FFF',
-              fontFamily: 'var(--font-heading, sans-serif)',
+              color: '#F2EEE7',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
           >
-            INSTALL DISASTERCHAIN
+            {t('pwa.installTitle', 'INSTALL DISASTERCHAIN')}
           </div>
           <div
             style={{
-              fontSize: '0.74rem',
-              color: 'var(--text-secondary, #A08D85)',
+              fontSize: '0.72rem',
+              color: '#9B958B',
               lineHeight: 1.25,
-              marginTop: '2px',
+              marginTop: '1px',
             }}
           >
-            Install DisasterChain for faster emergency access.
+            {t('pwa.installDesc', 'Install for immediate emergency access.')}
           </div>
         </div>
       </div>
@@ -98,41 +98,38 @@ const PWAInstallPrompt = () => {
           onClick={dismissInstallPrompt}
           style={{
             background: 'transparent',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            color: '#B0A099',
-            fontSize: '0.74rem',
+            border: '1px solid rgba(242, 238, 231, 0.12)',
+            color: '#9B958B',
+            fontSize: '0.72rem',
             fontWeight: '600',
-            padding: '6px 10px',
-            borderRadius: '8px',
+            padding: '5px 9px',
+            borderRadius: '5px',
             cursor: 'pointer',
-            minHeight: '34px',
+            minHeight: '30px',
           }}
         >
-          Not now
+          {t('pwa.notNow', 'Dismiss')}
         </button>
 
         <button
           type="button"
           onClick={handleInstallClick}
           style={{
-            background: 'linear-gradient(135deg, #FF6B2C, #F59E0B)',
+            background: '#D96B35',
             border: 'none',
-            color: '#120B08',
-            fontSize: '0.78rem',
-            fontWeight: '800',
-            letterSpacing: '0.03em',
-            padding: '6px 14px',
-            borderRadius: '8px',
+            color: '#ffffff',
+            fontSize: '0.74rem',
+            fontWeight: '700',
+            padding: '5px 12px',
+            borderRadius: '5px',
             cursor: 'pointer',
-            minHeight: '34px',
+            minHeight: '30px',
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            boxShadow: '0 2px 10px rgba(255, 107, 44, 0.4)',
           }}
         >
-          <Icon name="download" size={14} color="#120B08" />
-          <span>Install</span>
+          <span>{t('nav.installApp', 'Install')}</span>
         </button>
       </div>
     </aside>

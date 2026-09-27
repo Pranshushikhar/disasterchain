@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { isNativePlatform, watchNetworkStatus } from '../services/nativeService';
 
 const PWAContext = createContext(null);
@@ -145,16 +145,22 @@ export const PWAProvider = ({ children }) => {
     };
   }, []);
 
-  // Service Worker controllerchange listener for smooth refresh
+  const isExplicitUpdateRequested = useRef(false);
+
+  // Service Worker controllerchange listener for smooth refresh (only when explicitly requested)
   useEffect(() => {
     let refreshing = false;
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
+      const handleControllerChange = () => {
+        if (isExplicitUpdateRequested.current && !refreshing) {
           refreshing = true;
           window.location.reload();
         }
-      });
+      };
+      navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+      return () => {
+        navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+      };
     }
   }, []);
 
@@ -189,8 +195,9 @@ export const PWAProvider = ({ children }) => {
     } catch (e) {}
   }, []);
 
-  // Trigger service worker update
+  // Trigger service worker update (user initiated)
   const triggerUpdate = useCallback(() => {
+    isExplicitUpdateRequested.current = true;
     if (waitingWorker) {
       waitingWorker.postMessage({ type: 'SKIP_WAITING' });
     } else {

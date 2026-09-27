@@ -2,26 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/i18n';
-import Icon from '../components/Icons';
 import { fetchShelters, fetchAlerts } from '../services/api';
 import { fetchCompleteWeather } from '../services/weatherApi';
 
+/**
+ * DISASTERCHAIN — LANDING & CIVIL DEFENSE PORTAL
+ * Calm, disciplined, authoritative crisis infrastructure.
+ */
 const LandingPage = ({ onOpenSos }) => {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
 
   const [shelterCount, setShelterCount] = useState(8);
-  const [nearestDistance, setNearestDistance] = useState('1.8 km');
   const [activeAlertsCount, setActiveAlertsCount] = useState(0);
   const [weatherInfo, setWeatherInfo] = useState({
-    temp: '28°C',
-    condition: 'Clear',
-    wind: '12 km/h',
-  });
-  const [riskStatus, setRiskStatus] = useState({
-    level: 'Moderate risk',
-    description: 'No critical threat detected nearby',
-    color: '#f59e0b',
+    city: 'New Delhi',
+    temp: '30°C',
+    condition: 'Mainly Clear',
   });
 
   useEffect(() => {
@@ -36,57 +33,30 @@ const LandingPage = ({ onOpenSos }) => {
         if (!isMounted) return;
 
         if (shRes.status === 'fulfilled' && Array.isArray(shRes.value)) {
-          const validShelters = shRes.value;
-          if (validShelters.length > 0) {
-            setShelterCount(validShelters.length);
-            const distances = validShelters
-              .map((s) => s.distanceKm || s.distance)
-              .filter((d) => typeof d === 'number' && d > 0);
-            if (distances.length > 0) {
-              setNearestDistance(`${Math.min(...distances).toFixed(1)} km`);
-            }
-          }
+          setShelterCount(shRes.value.length || 8);
         }
 
         if (altRes.status === 'fulfilled' && Array.isArray(altRes.value)) {
           const active = altRes.value.filter((a) => a.status === 'ACTIVE' || !a.status);
           setActiveAlertsCount(active.length);
-          const hasCritical = active.some((a) => a.severity === 'CRITICAL' || a.severity === 'EXTREME');
-          if (hasCritical) {
-            setRiskStatus({
-              level: 'High risk',
-              description: 'Critical weather or flood alert active in region',
-              color: '#ef4444',
-            });
-          } else if (active.length > 0) {
-            setRiskStatus({
-              level: 'Moderate risk',
-              description: `${active.length} active regional advisory`,
-              color: '#f59e0b',
-            });
-          } else {
-            setRiskStatus({
-              level: 'Low risk',
-              description: 'No critical threats detected in your area',
-              color: '#10b981',
-            });
-          }
         }
       } catch (err) {
         // Fallback gracefully
       }
 
-      // Fetch weather
       try {
         const wData = await fetchCompleteWeather(28.6139, 77.2090);
         if (isMounted && wData?.current) {
-          const temp = wData.current.temperature != null ? `${Math.round(wData.current.temperature)}°C` : '28°C';
-          const wind = wData.current.windSpeed != null ? `${Math.round(wData.current.windSpeed)} km/h` : '12 km/h';
-          const condition = wData.current.weatherCode <= 3 ? 'Clear' : 'Overcast';
-          setWeatherInfo({ temp, condition, wind });
+          const temp = wData.current.temperature != null ? `${Math.round(wData.current.temperature)}°C` : '30°C';
+          const condition = wData.current.weatherCode <= 1 ? 'Clear' : (wData.current.weatherCode <= 3 ? 'Mainly Clear' : 'Overcast');
+          setWeatherInfo({
+            city: wData.location?.city || 'New Delhi',
+            temp,
+            condition,
+          });
         }
       } catch (e) {
-        // Keep standard fallback
+        // Fallback
       }
     };
 
@@ -97,613 +67,222 @@ const LandingPage = ({ onOpenSos }) => {
   }, []);
 
   return (
-    <div style={{ minHeight: 'auto', height: 'auto', width: '100%', display: 'flex', flexDirection: 'column', background: '#0d0a08', color: '#f8fafc', touchAction: 'pan-y' }}>
-      {/* Top Quiet Helpline Banner */}
-      <div
-        style={{
-          background: 'rgba(239, 68, 68, 0.08)',
-          borderBottom: '1px solid rgba(239, 68, 68, 0.2)',
-          color: '#fca5a5',
-          textAlign: 'center',
-          padding: '0.4rem 1rem',
-          fontSize: '0.78rem',
-          letterSpacing: '0.02em',
-        }}
-      >
-        <span>Emergency Civil Defense Hotlines: </span>
-        <a href="tel:112" style={{ color: '#ef4444', fontWeight: 800, textDecoration: 'none', marginLeft: '0.25rem' }}>
-          Call 112 (National)
-        </a>
-        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>•</span>
-        <a href="tel:108" style={{ color: '#f8fafc', fontWeight: 700, textDecoration: 'none' }}>
-          Ambulance 108
-        </a>
-        <span style={{ margin: '0 0.5rem', opacity: 0.5 }}>•</span>
-        <a href="tel:101" style={{ color: '#f8fafc', fontWeight: 700, textDecoration: 'none' }}>
-          Fire 101
-        </a>
-      </div>
-
-      {/* Main Simplified Hero Container */}
+    <div
+      style={{
+        maxWidth: '1080px',
+        margin: '0 auto',
+        padding: '3rem 1.5rem 5rem',
+        boxSizing: 'border-box',
+        color: '#F2EEE7',
+      }}
+    >
+      {/* 1. HERO MISSION STATEMENT */}
       <section
-        aria-label="Emergency Home Content"
         style={{
-          flex: 1,
-          maxWidth: '1080px',
-          width: '100%',
-          margin: '0 auto',
-          padding: '2rem 1.25rem 3.5rem',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          boxSizing: 'border-box',
-          textAlign: 'center',
+          borderBottom: '1px solid rgba(242, 238, 231, 0.08)',
+          paddingBottom: '2.75rem',
+          marginBottom: '2.75rem',
         }}
       >
-        {/* Title and Subtitle */}
-        <div style={{ marginBottom: '1.75rem', maxWidth: '640px' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.25rem 0.75rem',
-              borderRadius: '9999px',
-              background: 'rgba(255, 107, 44, 0.12)',
-              border: '1px solid rgba(255, 107, 44, 0.3)',
-              color: '#ff6b2c',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              letterSpacing: '0.05em',
-              marginBottom: '0.85rem',
-            }}
-          >
-            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-            <span>CRISIS READY SYSTEM</span>
-          </div>
-
-          <h1
-            style={{
-              fontSize: 'clamp(2.2rem, 5vw, 3.4rem)',
-              fontWeight: 900,
-              letterSpacing: '-0.03em',
-              lineHeight: 1.15,
-              margin: '0 0 0.65rem',
-              color: '#ffffff',
-            }}
-          >
-            DISASTERCHAIN
-          </h1>
-
-          <p
-            style={{
-              fontSize: 'clamp(1.1rem, 2.5vw, 1.35rem)',
-              color: '#cbd5e1',
-              margin: 0,
-              fontWeight: 400,
-              lineHeight: 1.4,
-            }}
-          >
-            Emergency response, simplified.
-          </p>
+        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#D96B35', marginBottom: '0.65rem' }}>
+          DISASTERCHAIN
         </div>
 
-        {/* Primary CTA: EMERGENCY SOS */}
-        <div style={{ width: '100%', maxWidth: '440px', marginBottom: '0.75rem' }}>
-          <button
-            type="button"
-            onClick={onOpenSos}
-            id="landing-primary-sos-btn"
-            aria-label="Send Emergency SOS"
-            style={{
-              width: '100%',
-              minHeight: '56px',
-              background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
-              color: '#ffffff',
-              border: '2px solid rgba(255, 255, 255, 0.35)',
-              borderRadius: '14px',
-              fontSize: '1.15rem',
-              fontWeight: 900,
-              letterSpacing: '0.04em',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.65rem',
-              boxShadow: '0 10px 30px rgba(239, 68, 68, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5)',
-              touchAction: 'manipulation',
-              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
-              e.currentTarget.style.boxShadow = '0 14px 36px rgba(239, 68, 68, 0.6)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.boxShadow = '0 10px 30px rgba(239, 68, 68, 0.45)';
-            }}
-          >
-            <span style={{ fontSize: '1.35rem' }}>🚨</span>
-            <span>EMERGENCY SOS</span>
-          </button>
-        </div>
-
-        {/* Public Login Button (Immediately Discoverable Before Auth) */}
-        {!isAuthenticated && (
-          <div style={{ width: '100%', maxWidth: '440px', marginBottom: '1.25rem' }}>
-            <Link
-              to="/login"
-              id="landing-hero-login-btn"
-              className="landing-hero-login-btn"
-              aria-label="Sign In or Log In to DisasterChain"
-              style={{
-                width: '100%',
-                minHeight: '46px',
-                background: 'rgba(255, 255, 255, 0.07)',
-                border: '1px solid rgba(255, 255, 255, 0.22)',
-                borderRadius: '12px',
-                color: '#ffffff',
-                fontSize: '0.96rem',
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                textDecoration: 'none',
-                cursor: 'pointer',
-                touchAction: 'manipulation',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
-                e.currentTarget.style.borderColor = 'var(--primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.07)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.22)';
-              }}
-            >
-              <span>🔐</span>
-              <span>Sign In / Log In</span>
-            </Link>
-          </div>
-        )}
-
-        {/* Secondary Actions */}
-        <div
+        <h1
           style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: '0.75rem',
-            width: '100%',
-            maxWidth: '520px',
-            marginBottom: '2.5rem',
+            fontFamily: 'var(--font-serif)',
+            fontSize: 'clamp(2.4rem, 5.2vw, 3.8rem)',
+            fontWeight: 400,
+            lineHeight: 1.1,
+            letterSpacing: '-0.025em',
+            margin: '0 0 1.25rem 0',
+            color: '#F2EEE7',
+            maxWidth: '820px',
           }}
         >
-          <Link
-            to="/shelters"
-            className="landing-secondary-btn"
-            style={{
-              flex: '1 1 140px',
-              minHeight: '44px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '10px',
-              color: '#f1f5f9',
-              fontSize: '0.92rem',
-              fontWeight: 600,
-              textDecoration: 'none',
-              padding: '0.6rem 1rem',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <span>🏠</span>
-            <span>Find Shelter</span>
-          </Link>
+          Know what is changing.<br />
+          Act before it becomes critical.
+        </h1>
 
+        <p
+          style={{
+            fontSize: '1.08rem',
+            color: '#D4CDC3',
+            lineHeight: 1.55,
+            maxWidth: '680px',
+            margin: '0 0 2rem 0',
+          }}
+        >
+          A disciplined emergency intelligence network providing real-time atmospheric tracking, verified evacuation shelters, and decentralized crisis response.
+        </p>
+
+        {/* Primary Action Row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
           <Link
-            to="/alerts"
-            className="landing-secondary-btn"
+            to="/dashboard"
+            id="landing-primary-explore-btn"
             style={{
-              flex: '1 1 140px',
-              minHeight: '44px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '10px',
-              color: '#f1f5f9',
-              fontSize: '0.92rem',
+              background: '#211E1A',
+              border: '1px solid rgba(242, 238, 231, 0.16)',
+              color: '#F2EEE7',
+              padding: '0.85rem 1.65rem',
+              borderRadius: '6px',
+              fontSize: '0.96rem',
               fontWeight: 600,
               textDecoration: 'none',
-              padding: '0.6rem 1rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
               transition: 'all 0.15s ease',
             }}
           >
-            <span>⚠️</span>
-            <span>View Alerts</span>
-            {activeAlertsCount > 0 && (
-              <span
-                style={{
-                  background: '#ef4444',
-                  color: '#fff',
-                  fontSize: '0.7rem',
-                  padding: '0.1rem 0.4rem',
-                  borderRadius: '9999px',
-                  fontWeight: 800,
-                }}
-              >
-                {activeAlertsCount}
-              </span>
-            )}
+            <span>Explore current situation</span>
+            <span style={{ color: '#D96B35' }}>→</span>
           </Link>
 
           <Link
             to="/weather"
-            className="landing-secondary-btn"
+            id="landing-secondary-weather-btn"
             style={{
-              flex: '1 1 140px',
-              minHeight: '44px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '10px',
-              color: '#f1f5f9',
-              fontSize: '0.92rem',
+              background: 'transparent',
+              border: '1px solid rgba(242, 238, 231, 0.12)',
+              color: '#F2EEE7',
+              padding: '0.85rem 1.5rem',
+              borderRadius: '6px',
+              fontSize: '0.95rem',
               fontWeight: 600,
               textDecoration: 'none',
-              padding: '0.6rem 1rem',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            <span>🌦️</span>
-            <span>{t('weather.weather', 'Weather')}</span>
-          </Link>
-
-          <Link
-            to="/weather-gpt"
-            className="landing-secondary-btn"
-            style={{
-              flex: '1 1 140px',
-              minHeight: '44px',
               display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
               gap: '0.45rem',
-              background: 'rgba(255, 107, 44, 0.1)',
-              border: '1px solid rgba(255, 107, 44, 0.35)',
-              borderRadius: '10px',
-              color: '#ff6b2c',
-              fontSize: '0.92rem',
-              fontWeight: 700,
-              textDecoration: 'none',
-              padding: '0.6rem 1rem',
               transition: 'all 0.15s ease',
             }}
           >
-            <span>🌦️</span>
-            <span>{t('weatherGpt.title', 'WeatherGPT')}</span>
+            <span>Weather Intelligence</span>
           </Link>
+
+          <button
+            type="button"
+            onClick={onOpenSos}
+            id="landing-sos-trigger-btn"
+            style={{
+              background: '#C94235',
+              border: 'none',
+              color: '#ffffff',
+              padding: '0.85rem 1.5rem',
+              borderRadius: '6px',
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              letterSpacing: '0.02em',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            <span>🚨</span>
+            <span>Broadcast SOS</span>
+          </button>
         </div>
 
-        {/* THREE COMPACT INFORMATION BLOCKS */}
-        <div
-          className="landing-compact-blocks"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '1rem',
-            width: '100%',
-            maxWidth: '920px',
-            marginBottom: '3rem',
-            textAlign: 'left',
-          }}
-        >
-          {/* 1. LOCAL RISK */}
-          <div
-            style={{
-              background: '#15100c',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderTop: `3px solid ${riskStatus.color}`,
-              borderRadius: '12px',
-              padding: '1.25rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: '#94a3b8',
-                  marginBottom: '0.4rem',
-                }}
-              >
-                LOCAL RISK
-              </div>
-              <div
-                style={{
-                  fontSize: '1.25rem',
-                  fontWeight: 800,
-                  color: riskStatus.color,
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {riskStatus.level}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.4 }}>
-                {riskStatus.description}
-              </div>
-            </div>
-            <Link
-              to="/alerts"
-              style={{
-                fontSize: '0.78rem',
-                color: '#ff6b2c',
-                fontWeight: 700,
-                textDecoration: 'none',
-                marginTop: '1rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.3rem',
-              }}
-            >
-              <span>View local hazards</span>
-              <span>→</span>
-            </Link>
-          </div>
-
-          {/* 2. NEARBY HELP */}
-          <div
-            style={{
-              background: '#15100c',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderTop: '3px solid #ff6b2c',
-              borderRadius: '12px',
-              padding: '1.25rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: '#94a3b8',
-                  marginBottom: '0.4rem',
-                }}
-              >
-                NEARBY HELP
-              </div>
-              <div
-                style={{
-                  fontSize: '1.25rem',
-                  fontWeight: 800,
-                  color: '#ffffff',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {shelterCount} shelters nearby
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.4 }}>
-                {nearestDistance} closest shelter with available beds
-              </div>
-            </div>
-            <Link
-              to="/shelters"
-              style={{
-                fontSize: '0.78rem',
-                color: '#ff6b2c',
-                fontWeight: 700,
-                textDecoration: 'none',
-                marginTop: '1rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.3rem',
-              }}
-            >
-              <span>Locate closest shelter</span>
-              <span>→</span>
-            </Link>
-          </div>
-
-          {/* 3. WEATHER */}
-          <div
-            style={{
-              background: '#15100c',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderTop: '3px solid #38bdf8',
-              borderRadius: '12px',
-              padding: '1.25rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: '#94a3b8',
-                  marginBottom: '0.4rem',
-                }}
-              >
-                WEATHER
-              </div>
-              <div
-                style={{
-                  fontSize: '1.25rem',
-                  fontWeight: 800,
-                  color: '#ffffff',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {weatherInfo.temp}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.4 }}>
-                {weatherInfo.condition} • Wind {weatherInfo.wind}
-              </div>
-            </div>
-            <Link
-              to="/weather"
-              style={{
-                fontSize: '0.78rem',
-                color: '#ff6b2c',
-                fontWeight: 700,
-                textDecoration: 'none',
-                marginTop: '1rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.3rem',
-              }}
-            >
-              <span>View full forecast</span>
-              <span>→</span>
-            </Link>
-          </div>
-
-          {/* 4. WEATHERGPT CAPABILITY CARD */}
-          <div
-            style={{
-              background: '#15100c',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderTop: '3px solid #ff6b2c',
-              borderRadius: '12px',
-              padding: '1.25rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: '#ff6b2c',
-                  marginBottom: '0.4rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                }}
-              >
-                <span>🌦️</span>
-                <span>{t('weatherGpt.title', 'WEATHERGPT')}</span>
-              </div>
-              <div
-                style={{
-                  fontSize: '1.15rem',
-                  fontWeight: 800,
-                  color: '#ffffff',
-                  marginBottom: '0.25rem',
-                }}
-              >
-                {t('weatherGpt.tagline', 'Conversational AI for Weather Forecasting, Alerts, and Climate Information')}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.4 }}>
-                {t('weatherGpt.subtitle', 'Ask about weather, forecasts, air quality, and severe conditions.')}
-              </div>
-            </div>
-            <Link
-              to="/weather-gpt"
-              className="btn btn-primary"
-              style={{
-                fontSize: '0.8rem',
-                color: '#ffffff',
-                fontWeight: 700,
-                textDecoration: 'none',
-                marginTop: '1rem',
-                minHeight: '44px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.4rem',
-                background: 'linear-gradient(135deg, #ff6b2c, #f97316)',
-                borderRadius: '8px',
-              }}
-            >
-              <span>🌦️</span>
-              <span>{t('weatherGpt.welcomeTitle', 'ASK WEATHERGPT')}</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Secondary Links to Operational Command */}
+        {/* Quiet Live Telemetry Strip */}
         <div
           style={{
             display: 'flex',
+            alignItems: 'center',
+            gap: '1.25rem',
             flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: '1rem',
-            paddingTop: '0.5rem',
+            fontSize: '0.82rem',
+            color: '#9B958B',
+            fontFamily: 'var(--font-mono)',
           }}
         >
-          <Link
-            to={isAuthenticated ? '/dashboard' : '/login'}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.7rem 1.4rem',
-              borderRadius: '10px',
-              background: '#ff6b2c',
-              color: '#ffffff',
-              fontSize: '0.9rem',
-              fontWeight: 700,
-              textDecoration: 'none',
-              minHeight: '44px',
-            }}
-          >
-            <Icon name="activity" size={17} color="#ffffff" />
-            <span>View Command Center</span>
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#628B63' }} />
+            <span>SYSTEM STABLE</span>
+          </div>
+          <span>·</span>
+          <span>{weatherInfo.city.toUpperCase()}: {weatherInfo.temp} {weatherInfo.condition.toUpperCase()}</span>
+          <span>·</span>
+          <span>{shelterCount} SHELTERS CONFIRMED</span>
+          <span>·</span>
+          <span>{activeAlertsCount} ACTIVE ADVISORIES</span>
+        </div>
+      </section>
 
-          <Link
-            to="/affected-areas"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.7rem 1.4rem',
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              color: '#cbd5e1',
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              textDecoration: 'none',
-              minHeight: '44px',
-            }}
-          >
-            <Icon name="map" size={17} color="#cbd5e1" />
-            <span>View All Emergency Data</span>
-          </Link>
+      {/* 2. THREE PILLARS OF DISASTERCHAIN (EDITORIAL COLUMNS) */}
+      <section style={{ marginBottom: '3.5rem' }}>
+        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9B958B', marginBottom: '1.25rem' }}>
+          CORE CAPABILITIES
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+          <div>
+            <div style={{ fontSize: '1.15rem', fontWeight: 600, color: '#F2EEE7', marginBottom: '0.45rem' }}>
+              Atmospheric Intelligence
+            </div>
+            <p style={{ fontSize: '0.9rem', color: '#9B958B', lineHeight: 1.55, margin: '0 0 0.85rem 0' }}>
+              Live high-resolution telemetry, WMO code classification, precipitation probability timelines, and integrated air quality monitoring backed by Open-Meteo and Copernicus CAMS.
+            </p>
+            <Link
+              to="/weather"
+              style={{ fontSize: '0.84rem', fontWeight: 600, color: '#D96B35', textDecoration: 'none' }}
+            >
+              Examine Weather Feed →
+            </Link>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '1.15rem', fontWeight: 600, color: '#F2EEE7', marginBottom: '0.45rem' }}>
+              Civil Protection & Shelters
+            </div>
+            <p style={{ fontSize: '0.9rem', color: '#9B958B', lineHeight: 1.55, margin: '0 0 0.85rem 0' }}>
+              Real-time directory of verified emergency evacuation facilities, live capacity telemetry, medical station provisions, and offline navigation pathways.
+            </p>
+            <Link
+              to="/shelters"
+              style={{ fontSize: '0.84rem', fontWeight: 600, color: '#D96B35', textDecoration: 'none' }}
+            >
+              Locate Active Shelters →
+            </Link>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '1.15rem', fontWeight: 600, color: '#F2EEE7', marginBottom: '0.45rem' }}>
+              WeatherGPT Reasoning Desk
+            </div>
+            <p style={{ fontSize: '0.9rem', color: '#9B958B', lineHeight: 1.55, margin: '0 0 0.85rem 0' }}>
+              Context-grounded assistant for civilian travel planning, severe weather risk analysis, and outdoor activity advisories structured with source-verified meteorological data.
+            </p>
+            <Link
+              to="/weather-gpt"
+              style={{ fontSize: '0.84rem', fontWeight: 600, color: '#D96B35', textDecoration: 'none' }}
+            >
+              Consult WeatherGPT →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. QUICK CIVILIAN DIRECTORY */}
+      <section
+        style={{
+          borderTop: '1px solid rgba(242, 238, 231, 0.08)',
+          paddingTop: '2rem',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ fontSize: '0.84rem', color: '#9B958B' }}>
+            Emergency Communications Protocol v2.6 · Indian National Disaster Management Architecture
+          </div>
+
+          <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.84rem' }}>
+            <Link to="/alerts" style={{ color: '#D4CDC3', textDecoration: 'none' }}>Alerts</Link>
+            <Link to="/affected-areas" style={{ color: '#D4CDC3', textDecoration: 'none' }}>Crisis Map</Link>
+            <Link to="/guides" style={{ color: '#D4CDC3', textDecoration: 'none' }}>Preparedness</Link>
+            <Link to="/offline" style={{ color: '#D4CDC3', textDecoration: 'none' }}>Offline Mode</Link>
+          </div>
         </div>
       </section>
     </div>

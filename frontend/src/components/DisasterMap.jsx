@@ -10,6 +10,7 @@ import {
   fetchRiskHeatmap,
 } from '../services/api';
 import Icon from './Icons';
+import { useTranslation } from '../i18n';
 
 // Realistic base center for campus/metropolitan region (Delhi NCR coordinate baseline)
 const DEFAULT_CENTER = [28.6139, 77.2090];
@@ -196,6 +197,7 @@ const DisasterMap = ({
   showLegend = true,
   onOpenSos,
 }) => {
+  const { t } = useTranslation();
   const [sosList, setSosList] = useState([]);
   const [shelters, setShelters] = useState([]);
   const [affectedAreas, setAffectedAreas] = useState([]);
@@ -462,7 +464,7 @@ const DisasterMap = ({
               className={`btn ${activeFilter === 'ALL' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
               style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}
             >
-              <span>All Layers</span>
+              <span>{t('map.allLayers', 'All Layers')}</span>
               <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>
                 {processedMarkers.length}
               </span>
@@ -474,7 +476,7 @@ const DisasterMap = ({
               className={`btn ${activeFilter === 'SOS' ? 'btn-danger' : 'btn-secondary'} btn-sm`}
               style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}
             >
-              <span>🚨 SOS Distress</span>
+              <span>{t('map.sosDistress', '🚨 SOS Distress')}</span>
               <span className="badge badge-critical" style={{ fontSize: '0.65rem' }}>
                 {sosCount}
               </span>
@@ -486,7 +488,7 @@ const DisasterMap = ({
               className={`btn ${activeFilter === 'SHELTERS' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
               style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}
             >
-              <span>🏠 Shelters</span>
+              <span>{t('map.sheltersLayer', '🏠 Shelters')}</span>
               <span className="badge badge-success" style={{ fontSize: '0.65rem' }}>
                 {shelterCount}
               </span>
@@ -503,7 +505,7 @@ const DisasterMap = ({
                 color: activeFilter === 'AREAS' ? '#fbbf24' : 'var(--text-secondary)',
               }}
             >
-              <span>⚠️ Impact Zones</span>
+              <span>{t('map.impactZones', '⚠️ Impact Zones')}</span>
               <span className="badge badge-warning" style={{ fontSize: '0.65rem' }}>
                 {areaCount}
               </span>
@@ -520,7 +522,7 @@ const DisasterMap = ({
                 color: activeFilter === 'RESOURCES' ? '#F59E0B' : 'var(--text-secondary)',
               }}
             >
-              <span>🏥 Facilities</span>
+              <span>{t('map.facilities', '🏥 Facilities')}</span>
               <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>
                 {resourceCount}
               </span>
@@ -537,7 +539,7 @@ const DisasterMap = ({
                 color: activeFilter === 'INCIDENTS' ? '#fb923c' : 'var(--text-secondary)',
               }}
             >
-              <span>⚡ Hazards</span>
+              <span>{t('map.hazards', '⚡ Hazards')}</span>
               <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>
                 {incidentCount}
               </span>
@@ -555,7 +557,7 @@ const DisasterMap = ({
                 fontWeight: 700,
               }}
             >
-              <span>⚡ Risk Zones</span>
+              <span>{t('map.riskZones', '⚡ Risk Zones')}</span>
               <span className="badge badge-critical" style={{ fontSize: '0.65rem', background: 'rgba(229, 57, 53, 0.2)' }}>
                 {riskZones.length}
               </span>
@@ -569,7 +571,7 @@ const DisasterMap = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search map markers..."
+                placeholder={t('map.searchMarkers', 'Search map markers...')}
                 style={{
                   background: 'rgba(11, 18, 34, 0.9)',
                   border: '1px solid var(--border-subtle)',
@@ -596,9 +598,9 @@ const DisasterMap = ({
                 color: is3DMode ? 'var(--cyan)' : 'var(--text-secondary)',
                 boxShadow: is3DMode ? 'var(--glow-cyan)' : 'none',
               }}
-              title="Toggle 3D Crisis Globe Overview"
+              title={t('map.toggle3dGlobe', 'Toggle 3D Crisis Globe Overview')}
             >
-              <span>{is3DMode ? '🌐 2D Map' : '🌍 3D Globe'}</span>
+              <span>{is3DMode ? t('map.map2d', '🌐 2D Map') : t('map.globe3d', '🌍 3D Globe')}</span>
             </button>
 
             <button
@@ -606,10 +608,10 @@ const DisasterMap = ({
               onClick={handleRecenter}
               className="btn btn-secondary btn-sm"
               style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem' }}
-              title="Auto-Fit and Center Map to Markers"
+              title={t('map.autoFit', 'Auto-Fit and Center Map to Markers')}
             >
               <Icon name="compass" size={14} />
-              <span>Center</span>
+              <span>{t('map.center', 'Center')}</span>
             </button>
           </div>
         </div>
@@ -652,7 +654,7 @@ const DisasterMap = ({
                 animation: 'spin 1s linear infinite',
               }}
             />
-            <span>Loading Live Geo-Spatial Grid...</span>
+            <span>{t('map.loadingGrid', 'Loading Live Geo-Spatial Grid...')}</span>
           </div>
         )}
 
@@ -723,18 +725,18 @@ const DisasterMap = ({
                       </div>
 
                       <h4 style={{ margin: '0 0 0.35rem 0', fontSize: '0.95rem', color: '#ffffff', fontWeight: 800 }}>
-                        {zone.dominantHazard} CONVERGENCE
+                        {zone.dominantHazard} {t('map.convergence', 'CONVERGENCE')}
                       </h4>
 
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', lineHeight: 1.4 }}>
-                        <div>• Active SOS Signals: <strong style={{ color: '#E53935' }}>{zone.activeSOSCount}</strong></div>
-                        <div>• Active Incidents: <strong style={{ color: '#F97316' }}>{zone.activeIncidentCount}</strong></div>
-                        <div>• Nearby Shelter Strain: <strong style={{ color: zone.nearbyShelterStrain === 'High' ? '#E53935' : '#84CC16' }}>{zone.nearbyShelterStrain}</strong></div>
+                        <div>• {t('map.activeSosSignals', 'Active SOS Signals')}: <strong style={{ color: '#E53935' }}>{zone.activeSOSCount}</strong></div>
+                        <div>• {t('map.activeIncidents', 'Active Incidents')}: <strong style={{ color: '#F97316' }}>{zone.activeIncidentCount}</strong></div>
+                        <div>• {t('map.nearbyShelterStrain', 'Nearby Shelter Strain')}: <strong style={{ color: zone.nearbyShelterStrain === 'High' ? '#E53935' : '#84CC16' }}>{zone.nearbyShelterStrain}</strong></div>
                       </div>
 
                       {zone.reasons && zone.reasons[0] && (
                         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.35rem' }}>
-                          Key Driver: {zone.reasons[0]}
+                          {t('map.keyDriver', 'Key Driver')}: {zone.reasons[0]}
                         </div>
                       )}
                     </div>
@@ -761,15 +763,15 @@ const DisasterMap = ({
                 <div style={{ padding: '0.25rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                     <span className={`badge badge-${area.severity?.toLowerCase()}`} style={{ fontSize: '0.65rem' }}>
-                      {area.severity} Zone
+                      {area.severity} {t('map.zone', 'Zone')}
                     </span>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Status: {area.status}</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('common.status', 'Status')}: {area.status}</span>
                   </div>
                   <strong style={{ fontSize: '0.95rem', color: '#ffffff', display: 'block', marginBottom: '0.2rem' }}>
                     {area.name}
                   </strong>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                    Disaster: <strong>{area.disasterType}</strong> &bull; Affected: <strong>{area.affectedPeople?.toLocaleString()}</strong>
+                    {t('common.disaster', 'Disaster')}: <strong>{area.disasterType}</strong> &bull; {t('affectedAreas.affectedPeople', 'Affected')}: <strong>{area.affectedPeople?.toLocaleString()}</strong>
                   </div>
                   <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
                     {area.description}
@@ -829,16 +831,16 @@ const DisasterMap = ({
                     {/* Metadata details based on type */}
                     {marker.type === 'sos' && (
                       <div style={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.3)', padding: '0.4rem 0.6rem', borderRadius: '4px', marginBottom: '0.5rem' }}>
-                        <div>👥 Affected: <strong>{marker.people} Person(s)</strong></div>
-                        <div>📞 Contact: <strong>{marker.contact}</strong></div>
+                        <div>👥 {t('affectedAreas.affectedPeople', 'Affected')}: <strong>{marker.people} {t('crisis.individuals', 'Person(s)')}</strong></div>
+                        <div>📞 {t('crisis.contact', 'Contact')}: <strong>{marker.contact}</strong></div>
                       </div>
                     )}
 
                     {marker.type === 'shelter' && (
                       <div style={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.3)', padding: '0.4rem 0.6rem', borderRadius: '4px', marginBottom: '0.5rem' }}>
-                        <div>🛏️ Occupancy: <strong>{marker.occupancy} / {marker.capacity}</strong></div>
+                        <div>🛏️ {t('shelters.occupancy', 'Occupancy')}: <strong>{marker.occupancy} / {marker.capacity}</strong></div>
                         <div style={{ color: marker.available > 0 ? '#34d399' : '#ff6b7e' }}>
-                          Available Beds: <strong>{marker.available}</strong>
+                          {t('shelters.availableBeds', 'Available Beds')}: <strong>{marker.available}</strong>
                         </div>
                       </div>
                     )}
@@ -852,14 +854,14 @@ const DisasterMap = ({
 
                     {marker.type === 'incident' && (
                       <div style={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.3)', padding: '0.4rem 0.6rem', borderRadius: '4px', marginBottom: '0.5rem' }}>
-                        <div>📍 Location: <strong>{marker.locationText}</strong></div>
-                        <div>Severity: <strong>{marker.severity}</strong></div>
+                        <div>📍 {t('common.location', 'Location')}: <strong>{marker.locationText}</strong></div>
+                        <div>{t('crisis.severityLevel', 'Severity')}: <strong>{marker.severity}</strong></div>
                       </div>
                     )}
 
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.35rem', marginTop: '0.35rem', display: 'flex', justifyContent: 'space-between' }}>
                       <span>Lat: {marker.coords.lat.toFixed(4)}, Lng: {marker.coords.lng.toFixed(4)}</span>
-                      <span>Verified Location</span>
+                      <span>{t('map.verifiedLocation', 'Verified Location')}</span>
                     </div>
                   </div>
                 </Popup>
@@ -889,27 +891,27 @@ const DisasterMap = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <span style={{ fontSize: '0.9rem' }}>🚨</span>
-              <strong>Active SOS Distress Signal</strong>
+              <strong>{t('map.sosDistress', 'Active SOS Distress Signal')}</strong>
             </span>
 
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <span style={{ fontSize: '0.9rem' }}>🏠</span>
-              <strong>Safe Relief Shelter</strong>
+              <strong>{t('map.sheltersLayer', 'Safe Relief Shelter')}</strong>
             </span>
 
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <span style={{ fontSize: '0.9rem' }}>⚠️</span>
-              <strong>Monitored Impact Zone</strong>
+              <strong>{t('map.impactZones', 'Monitored Impact Zone')}</strong>
             </span>
 
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <span style={{ fontSize: '0.9rem' }}>🏥</span>
-              <strong>Emergency Facility</strong>
+              <strong>{t('map.facilities', 'Emergency Facility')}</strong>
             </span>
 
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <span style={{ fontSize: '0.9rem' }}>⚡</span>
-              <strong>Hazard Ticket</strong>
+              <strong>{t('map.hazards', 'Hazard Ticket')}</strong>
             </span>
           </div>
 
@@ -920,7 +922,7 @@ const DisasterMap = ({
               className="btn btn-sos btn-sm"
               style={{ fontSize: '0.74rem', padding: '0.25rem 0.75rem' }}
             >
-              <span>+ Tag SOS on Map</span>
+              <span>{t('map.tagSos', '+ Tag SOS on Map')}</span>
             </button>
           )}
         </div>

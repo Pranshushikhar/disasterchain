@@ -577,7 +577,7 @@ export default function WeatherMap({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          <span><strong>LEGEND:</strong></span>
+          <span><strong>{t('map.legend', 'LEGEND')}:</strong></span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF2E4D' }} />
             {t('weather.severeStorm', 'Severe Cyclone (Red/Orange)')}
