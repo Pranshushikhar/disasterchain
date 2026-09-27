@@ -5,6 +5,7 @@ import { useTranslation } from '../i18n/i18n';
 import { usePWA } from '../context/PWAContext';
 import { fetchSosRequests, fetchIncidents, updateUserProfile, updateNotificationPreferences } from '../services/api';
 import Icon from '../components/Icons';
+import PersonalSafetyPanel from '../components/PersonalSafetyPanel';
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -15,7 +16,7 @@ const ProfilePage = () => {
   const [sosList, setSosList] = useState([]);
   const [incidents, setIncidents] = useState([]);
   const [loadingActivity, setLoadingActivity] = useState(true);
-  const [activeTab, setActiveTab] = useState('sos'); // 'sos' | 'incidents' | 'settings'
+  const [activeTab, setActiveTab] = useState('safety'); // 'safety' | 'sos' | 'incidents' | 'settings'
 
   const [editName, setEditName] = useState(user?.name || '');
   const [savingName, setSavingName] = useState(false);
@@ -253,7 +254,14 @@ const ProfilePage = () => {
         {/* Right Column: Profile Management & History */}
         <div className="spatial-panel" style={{ padding: '1.75rem', background: 'rgba(11, 17, 30, 0.92)' }}>
           {/* Tabs Header */}
-          <div style={{ display: 'flex', gap: '0.65rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.85rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.65rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.85rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setActiveTab('safety')}
+              className={`btn ${activeTab === 'safety' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+            >
+              🛡️ {t('profile.mySafety', 'My Safety Guardian')}
+            </button>
             <button
               type="button"
               onClick={() => setActiveTab('sos')}
@@ -276,6 +284,13 @@ const ProfilePage = () => {
               {t('profile.personalDetails', 'Dossier Settings')}
             </button>
           </div>
+
+          {/* Tab 0: Personal Safety Guardian */}
+          {activeTab === 'safety' && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              <PersonalSafetyPanel onOpenSos={() => navigate('/sos')} />
+            </div>
+          )}
 
           {/* Tab 1: SOS Activity */}
           {activeTab === 'sos' && (

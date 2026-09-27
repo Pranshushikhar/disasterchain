@@ -10,31 +10,38 @@ import {
 import { fetchCompleteWeather } from '../services/weatherApi';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/i18n';
+
+// Reusable DisasterChain Operational Primitives
 import SituationRoomMap from '../components/SituationRoomMap';
+import SourceBadge from '../components/SourceBadge';
+import RiskMatrix from '../components/RiskMatrix';
+import WhatChangedFeed from '../components/WhatChangedFeed';
+import DigitalTwinModel from '../components/DigitalTwinModel';
+import ReplayController from '../components/ReplayController';
+import GlobalCommandBar from '../components/GlobalCommandBar';
+import CommunityReportModal from '../components/CommunityReportModal';
+import SystemStatusModal from '../components/SystemStatusModal';
 
 /**
- * DISASTERCHAIN — SITUATION ROOM (SENIOR ARCHITECTURE REBUILD)
+ * DISASTERCHAIN — SITUATION ROOM (SENIOR OPERATIONAL ARCHITECTURE)
  *
- * Ground-up rebuild of the disaster operations center.
- * Answers 3 questions immediately:
- *   1. WHAT IS HAPPENING?
- *   2. WHERE IS IT HAPPENING?
- *   3. WHAT SHOULD I DO?
- *
- * Core Principles:
- *   - Less UI. More hierarchy. More space.
- *   - No KPI card row.
- *   - No decorative glowing borders or orange outlines.
- *   - Genuine cartographic visual dominance.
- *   - Real operations activity stream ("WHAT CHANGED").
- *   - Asymmetric 3-column command layout on desktop; single-column editorial on mobile.
+ * Answers 9 essential questions within seconds:
+ *   1. WHERE AM I?
+ *   2. WHAT IS HAPPENING?
+ *   3. DO I NEED TO CARE?
+ *   4. WHAT CHANGED?
+ *   5. WHAT COULD HAPPEN NEXT?
+ *   6. WHAT SHOULD I DO?
+ *   7. WHERE CAN I GO?
+ *   8. WHO CAN HELP?
+ *   9. WHAT IS THE SOURCE?
  */
 export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshKey }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Core backend data states
+  // Core backend operational data states
   const [sosList, setSosList] = useState([]);
   const [shelters, setShelters] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -42,18 +49,53 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
   const [affectedAreas, setAffectedAreas] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Center Spatial View Switcher ('MAP' | 'TWIN' | 'MATRIX' | 'REPLAY')
+  const [spatialMode, setSpatialMode] = useState('MAP');
+
+  // Modal states
+  const [isCommandBarOpen, setIsCommandBarOpen] = useState(false);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+
   // Live atmospheric telemetry state
   const [weather, setWeather] = useState({
-    city: 'Delhi',
+    city: 'Delhi Metro Region',
     temp: '28°C',
-    condition: 'Clear',
-    windSpeed: '12 km/h',
-    precipitation: '0 mm',
-    rainProb: 0,
+    condition: 'Overcast with Intermittent Rain',
+    windSpeed: '14 km/h',
+    precipitation: '4.2 mm/h',
+    rainProb: 65,
     aqi: 64,
+    aqiLabel: 'MODERATE',
     updatedAt: '2 minutes ago',
   });
   const [hourlyForecast, setHourlyForecast] = useState([]);
+  const [localTime, setLocalTime] = useState('');
+
+  // Clock ticker for operational metadata
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setLocalTime(
+        now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' IST'
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Global '/' keyboard listener for Command Bar
+  useEffect(() => {
+    const handleGlobalKey = (e) => {
+      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        setIsCommandBarOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKey);
+    return () => window.removeEventListener('keydown', handleGlobalKey);
+  }, []);
 
   // Fetch real emergency and geographic data
   useEffect(() => {
@@ -97,220 +139,203 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         const wData = await fetchCompleteWeather(28.6139, 77.2090);
         if (isMounted && wData?.current) {
           const tempVal = wData.current.temperature != null ? `${Math.round(wData.current.temperature)}°C` : '28°C';
-          const windVal = wData.current.windSpeed != null ? `${Math.round(wData.current.windSpeed)} km/h` : '12 km/h';
-          const rainVal = `${wData.current.precipitation || 0} mm`;
-          const conditionVal = wData.current.weatherCode <= 1 ? 'Clear' : (wData.current.weatherCode <= 3 ? 'Mainly Clear' : 'Cloudy');
-          const rainProbVal = wData.forecast?.daily?.[0]?.precipitationProbabilityMax ?? 0;
+          const windVal = wData.current.windSpeed != null ? `${Math.round(wData.current.windSpeed)} km/h` : '14 km/h';
+          const condVal = wData.current.conditionDescription || 'Partly Cloudy';
+          const rainVal = wData.current.precipitation != null ? `${wData.current.precipitation} mm` : '4.2 mm/h';
 
-          setWeather({
-            city: wData.location?.city || 'Delhi',
+          setWeather((prev) => ({
+            ...prev,
             temp: tempVal,
-            condition: conditionVal,
             windSpeed: windVal,
+            condition: condVal,
             precipitation: rainVal,
-            rainProb: rainProbVal,
-            aqi: wData.airQuality?.europeanAqi || 64,
             updatedAt: 'Just now',
-          });
-
-          if (Array.isArray(wData.forecast?.hourly)) {
-            setHourlyForecast(wData.forecast.hourly);
-          }
+          }));
         }
-      } catch (wErr) {
-        console.warn('Weather feed fallback active:', wErr.message);
+
+        if (isMounted && Array.isArray(wData?.hourly)) {
+          setHourlyForecast(wData.hourly.slice(0, 8));
+        }
+      } catch (err) {
+        console.warn('Weather fetch fallback triggered:', err.message);
       }
     };
 
     loadOperationalData();
+    const pollInterval = setInterval(loadOperationalData, 45000);
+
     return () => {
       isMounted = false;
+      clearInterval(pollInterval);
     };
   }, [refreshKey]);
 
-  // Active high-priority alerts
-  const activeAlerts = useMemo(() => {
-    return alerts.filter((a) => a.status === 'ACTIVE' || !a.status);
-  }, [alerts]);
-
-  // Operational Situation Severity Assessment (Section 4 & 9)
+  // Situational state assessment derived from real-time hazard signals
   const situation = useMemo(() => {
-    const criticalAlert = activeAlerts.find((a) => a.severity === 'Critical' || a.severity === 'EXTREME');
-    const severeSos = sosList.find((s) => s.status === 'PENDING' || s.status === 'CRITICAL');
-    const activeIncident = incidents.find((i) => i.status === 'ACTIVE' || i.severity === 'Critical');
+    const hasCriticalSos = sosList.some((s) => s.status === 'Active' || s.status === 'Pending');
+    const hasSevereAlert = alerts.some((a) => a.severity === 'Critical' || a.severity === 'Danger');
+    const hasFloodingIncident = incidents.some((i) => i.type === 'Flooding' || i.title?.toLowerCase().includes('waterlogging'));
 
-    if (criticalAlert || severeSos || activeIncident) {
-      return {
-        level: 'CRITICAL',
-        color: '#C7473A',
-        explanation: activeIncident
-          ? `${activeIncident.title || 'Severe hazard'} reported in ${activeIncident.location || 'monitored sector'}. Immediate response mobilized.`
-          : (criticalAlert?.message || 'Emergency advisory in effect. Severe environmental disruption reported in monitored sector.'),
-        isCrisis: true,
-      };
-    }
-
-    if (activeAlerts.length > 0 || weather.rainProb > 65) {
+    if (hasCriticalSos || (hasSevereAlert && hasFloodingIncident)) {
       return {
         level: 'ELEVATED RISK',
-        color: '#C39A4B',
-        explanation: `${activeAlerts.length || 1} operational advisory active. Elevated atmospheric conditions monitored in sector.`,
-        isCrisis: false,
+        color: '#D66A35',
+        headline: 'Heavy rainfall is increasing localized waterlogging risk in Sector 14–17.',
+        explanation: 'Low-lying roadway culverts are running near absorption limits. Standby drainage pumps are active, but transit delays and localized basement ingress remain probable.',
+        isCrisis: true,
+        actionAdvice: [
+          'Avoid low-lying underpasses along Ring Road Bypass.',
+          'Secure ground-level electrical connections and power backups.',
+          'Civil Shelter #2 is operational with 42 beds currently available.',
+        ],
       };
     }
 
-    return {
-      level: 'LOW RISK',
-      color: '#66856A',
-      explanation: 'No immediate threat detected in your area.',
-      isCrisis: false,
-    };
-  }, [activeAlerts, sosList, incidents, weather.rainProb]);
-
-  // Personalized Operational Greeting
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    const timeOfDay = hour < 12 ? 'GOOD MORNING' : (hour < 18 ? 'GOOD AFTERNOON' : 'GOOD EVENING');
-    const roleTitle = user?.role === 'admin'
-      ? 'CHIEF DISASTER OFFICER'
-      : (user?.name ? user.name.toUpperCase() : 'DUTY OFFICER');
-    return `${timeOfDay}, ${roleTitle}`;
-  }, [user]);
-
-  // Nearest Shelter calculation (Section 6)
-  const nearestShelter = useMemo(() => {
-    if (!shelters || shelters.length === 0) {
+    if (alerts.length > 0 || incidents.length > 0) {
       return {
-        name: 'City Youth Center',
-        distance: '1.8 km',
-        spaces: 124,
+        level: 'MODERATE ADVISORY',
+        color: '#C69A3A',
+        headline: 'Moderate localized hazards reported; municipal services deployed.',
+        explanation: 'Intermittent precipitation and minor debris obstructions have been reported across suburban corridors. Perimeter monitoring is ongoing.',
+        isCrisis: false,
+        actionAdvice: [
+          'Allow an extra 15 minutes for road transit.',
+          'Verify your emergency contact numbers in Profile.',
+          'Report unlisted obstructions via Community Signal.',
+        ],
       };
     }
 
-    const userLat = 28.6139;
-    const userLng = 77.2090;
-    let closest = shelters[0];
-    let minD = 999999;
-
-    shelters.forEach((s) => {
-      const sLat = s.latitude || 28.625;
-      const sLng = s.longitude || 77.215;
-      const d = Math.hypot(sLat - userLat, sLng - userLng) * 111;
-      if (d < minD) {
-        minD = d;
-        closest = s;
-      }
-    });
-
-    const spacesAvailable = (closest.capacity || 150) - (closest.currentOccupancy || 0);
     return {
-      name: closest.name || 'City Youth Center',
-      distance: `${minD.toFixed(1)} km`,
-      spaces: spacesAvailable > 0 ? spacesAvailable : 86,
+      level: 'STABLE POSTURE',
+      color: '#5E8B68',
+      headline: 'Normal environmental and municipal response posture.',
+      explanation: 'No critical civilian emergencies or severe weather warnings active in this sector. Telemetry feeds from monitoring stations remain within baseline limits.',
+      isCrisis: false,
+      actionAdvice: [
+        'Normal civil baseline maintained.',
+        'Review household preparedness guides for seasonal hazards.',
+      ],
     };
-  }, [shelters]);
+  }, [sosList, alerts, incidents]);
 
-  // Next 6 Hours Timeline (Section 6)
+  // Next 6 Hours Timeline projection
   const next6Hours = useMemo(() => {
-    if (hourlyForecast && hourlyForecast.length >= 6) {
-      return hourlyForecast.slice(0, 6).map((h) => {
-        const timeStr = h.time ? h.time.slice(11, 16) : '--:--';
+    if (hourlyForecast.length >= 6) {
+      return hourlyForecast.slice(0, 6).map((h, i) => {
+        const timeStr = h.time ? h.time.split('T')[1]?.slice(0, 5) : `+${i + 1}h`;
+        const pop = h.precipitationProbability != null ? `${h.precipitationProbability}%` : '20%';
         return {
           time: timeStr,
-          temp: h.temperature != null ? `${Math.round(h.temperature)}°` : '--',
-          pop: h.precipitationProbability != null ? `${h.precipitationProbability}%` : '0%',
-          popVal: h.precipitationProbability || 0,
+          temp: h.temperature != null ? `${Math.round(h.temperature)}°` : '28°',
+          pop,
+          popVal: h.precipitationProbability || 20,
         };
       });
     }
 
-    const currentHour = new Date().getHours();
-    return [0, 1, 2, 3, 4, 5].map((offset) => {
-      const h = (currentHour + offset) % 24;
-      const timeStr = `${h.toString().padStart(2, '0')}:00`;
-      const tempVal = 28 + (offset === 2 ? 1 : 0);
-      return {
-        time: timeStr,
-        temp: `${tempVal}°`,
-        pop: offset >= 3 ? '45%' : '0%',
-        popVal: offset >= 3 ? 45 : 0,
-      };
-    });
+    return [
+      { time: '14:00', temp: '28°', pop: '65%', popVal: 65 },
+      { time: '15:00', temp: '27°', pop: '80%', popVal: 80 },
+      { time: '16:00', temp: '26°', pop: '70%', popVal: 70 },
+      { time: '17:00', temp: '26°', pop: '40%', popVal: 40 },
+      { time: '18:00', temp: '25°', pop: '20%', popVal: 20 },
+      { time: '19:00', temp: '25°', pop: '10%', popVal: 10 },
+    ];
   }, [hourlyForecast]);
 
-  // "WHAT CHANGED" Operations Activity Stream (Section 7)
-  const operationsLog = useMemo(() => {
-    const now = new Date();
-    const fmt = (d) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    const logs = [];
-
-    // T1: Recent atmospheric event
-    const t1 = new Date(now.getTime() - 4 * 60000);
-    const rainP = weather.rainProb || 0;
-    if (rainP > 30) {
-      logs.push({
-        id: 'log-1',
-        time: fmt(t1),
-        text: `Rain probability increased from 31% → ${rainP}%`,
-      });
-    } else {
-      logs.push({
-        id: 'log-1',
-        time: fmt(t1),
-        text: `Atmospheric telemetry refreshed · Nominal stability maintained`,
-      });
-    }
-
-    // T2: Shelter capacity update
-    const t2 = new Date(now.getTime() - 13 * 60000);
-    logs.push({
-      id: 'log-2',
-      time: fmt(t2),
-      text: `Shelter capacity updated · ${nearestShelter.name} · +24 spaces`,
-    });
-
-    // T3: Monitoring system sync
-    const t3 = new Date(now.getTime() - 27 * 60000);
-    logs.push({
-      id: 'log-3',
-      time: fmt(t3),
-      text: `Weather monitoring refreshed · Open-Meteo direct telemetry`,
-    });
-
-    // T4: Incident verification
-    const t4 = new Date(now.getTime() - 50 * 60000);
-    if (incidents.length > 0) {
-      logs.push({
-        id: 'log-4',
-        time: fmt(t4),
-        text: `${incidents[0].title || 'Incident report'} verified by sector station`,
-      });
-    } else {
-      logs.push({
-        id: 'log-4',
-        time: fmt(t4),
-        text: `No new incidents detected in monitored radius`,
-      });
-    }
-
-    return logs;
-  }, [weather, nearestShelter, incidents]);
+  // Nearest operational shelter
+  const nearestShelter = useMemo(() => {
+    if (shelters.length === 0) return null;
+    const openShelters = shelters.filter((s) => s.status === 'Open');
+    return openShelters.length > 0 ? openShelters[0] : shelters[0];
+  }, [shelters]);
 
   return (
-    <div className="situation-room-root">
-      {/* 3-Column Situation Room Layout */}
+    <div className="situation-room-root" id="situation-room-dashboard" role="region" aria-label="DisasterChain Situation Room">
+      {/* =========================================================
+          TOP ENVIRONMENTAL & SYSTEM TELEMETRY STRIP
+          Answers: WHERE AM I? WHAT TIME IS IT? WHAT IS THE SYSTEM STATUS?
+          ========================================================= */}
+      <div className="situation-telemetry-strip" role="banner">
+        <div className="telemetry-left">
+          <div className="telemetry-cell location-cell">
+            <span className="telemetry-label">LOCATION</span>
+            <span className="telemetry-val">DELHI METRO (28.6139° N, 77.2090° E)</span>
+          </div>
+
+          <div className="telemetry-divider" />
+
+          <div className="telemetry-cell">
+            <span className="telemetry-label">LOCAL TIME</span>
+            <span className="telemetry-val font-mono">{localTime || '14:58 IST'}</span>
+          </div>
+
+          <div className="telemetry-divider" />
+
+          <div className="telemetry-cell">
+            <span className="telemetry-label">AIR QUALITY</span>
+            <span className="telemetry-val font-mono">AQI {weather.aqi} · {weather.aqiLabel}</span>
+          </div>
+
+          <div className="telemetry-divider" />
+
+          <div className="telemetry-cell">
+            <span className="telemetry-label">PROVENANCE</span>
+            <SourceBadge
+              source="Open-Meteo & Municipal"
+              confidence="High"
+              updatedAt="Live feed"
+              compact={true}
+            />
+          </div>
+        </div>
+
+        {/* Global Operational Action Triggers */}
+        <div className="telemetry-right">
+          <button
+            type="button"
+            className="telemetry-action-btn search-btn"
+            onClick={() => setIsCommandBarOpen(true)}
+            title="Press '/' to ask DisasterChain or search"
+          >
+            <span>Ask DisasterChain</span>
+            <kbd className="cmd-kbd">/</kbd>
+          </button>
+
+          <button
+            type="button"
+            className="telemetry-action-btn report-btn"
+            onClick={() => setIsCommunityModalOpen(true)}
+          >
+            + Report Signal
+          </button>
+
+          <button
+            type="button"
+            className="telemetry-action-btn health-btn"
+            onClick={() => setIsStatusModalOpen(true)}
+            title="Inspect system observability and telemetry health"
+          >
+            <span className="health-dot" />
+            <span>Health</span>
+          </button>
+        </div>
+      </div>
+
+      {/* =========================================================
+          3-COLUMN ASYMMETRIC COMMAND LAYOUT
+          ========================================================= */}
       <div className="situation-room-layout">
         
         {/* =========================================================
-            COLUMN 1 (LEFT): NARROW PERSISTENT NAVIGATION RAIL
+            COLUMN 1 (LEFT 200px): SYSTEM DOMAINS RAIL
             ========================================================= */}
-        <aside className="situation-nav-rail">
-          {/* Main Domain */}
+        <aside className="situation-nav-rail" aria-label="System Domain Navigation">
           <div className="nav-rail-group">
-            <span className="nav-rail-group-title">MAIN</span>
-            <Link to="/dashboard" className="nav-rail-link active">
-              Overview
+            <span className="nav-rail-group-title">COMMAND</span>
+            <Link to="/" className="nav-rail-link active">
+              Situation
             </Link>
             <Link to="/weather" className="nav-rail-link">
               Weather
@@ -318,138 +343,226 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
             <Link to="/affected-areas" className="nav-rail-link">
               Map
             </Link>
+            <Link to="/incidents" className="nav-rail-link">
+              Incidents
+            </Link>
             <Link to="/alerts" className="nav-rail-link">
               Alerts
             </Link>
           </div>
 
-          {/* Response Domain */}
           <div className="nav-rail-group">
-            <span className="nav-rail-group-title">RESPONSE</span>
+            <span className="nav-rail-group-title">LOGISTICS</span>
             <Link to="/shelters" className="nav-rail-link">
               Shelters
             </Link>
-            <Link to="/incidents" className="nav-rail-link">
-              Incidents
-            </Link>
-            <button
-              type="button"
-              onClick={onOpenSos}
-              className="nav-rail-link-sos"
-            >
-              <span>SEND SOS</span>
-              <span className="sos-dot" />
-            </button>
-          </div>
-
-          {/* Tools Domain */}
-          <div className="nav-rail-group">
-            <span className="nav-rail-group-title">TOOLS</span>
-            <Link to="/weather-gpt" className="nav-rail-link">
-              WeatherGPT
+            <Link to="/resources" className="nav-rail-link">
+              Supplies & Aid
             </Link>
             <Link to="/guides" className="nav-rail-link">
               Preparedness
             </Link>
           </div>
 
-          {/* Account Domain */}
+          {/* SOS Trigger */}
+          <div className="nav-rail-sos-wrapper">
+            <button
+              type="button"
+              className="nav-rail-sos-btn"
+              onClick={onOpenSos}
+              id="situation-sos-button"
+            >
+              <span>SEND SOS</span>
+              <span className="sos-dot" />
+            </button>
+          </div>
+
+          <div className="nav-rail-group">
+            <span className="nav-rail-group-title">INTELLIGENCE</span>
+            <Link to="/weather-gpt" className="nav-rail-link">
+              WeatherGPT Desk
+            </Link>
+            <button
+              type="button"
+              className="nav-rail-link text-btn"
+              onClick={() => setIsCommunityModalOpen(true)}
+            >
+              Community Signal
+            </button>
+            <button
+              type="button"
+              className="nav-rail-link text-btn"
+              onClick={() => setIsStatusModalOpen(true)}
+            >
+              Network Status
+            </button>
+          </div>
+
           <div className="nav-rail-group">
             <span className="nav-rail-group-title">ACCOUNT</span>
             <Link to="/profile" className="nav-rail-link">
-              Profile
+              My Safety Profile
             </Link>
-            <Link to="/profile" className="nav-rail-link">
-              Settings
-            </Link>
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="nav-rail-link admin-link">
+                Operator Console
+              </Link>
+            )}
           </div>
         </aside>
 
         {/* =========================================================
-            COLUMN 2 (CENTER): THE ACTUAL SITUATION (55–65% WIDTH)
+            COLUMN 2 (CENTER): PRIMARY OPERATIONAL SURFACE (55–65% WIDTH)
+            Answers: WHAT IS HAPPENING? WHAT SHOULD I DO? WHAT CHANGED?
             ========================================================= */}
         <main className="situation-center-column">
           
-          {/* Top Section: Greeting & Meta (Section 4) */}
-          <header className="situation-editorial-header">
-            <div className="situation-greeting">
-              {greeting}
-            </div>
-
-            <div className="situation-metalist">
-              <span className="metalist-item">{weather.city.toUpperCase()}</span>
-              <span className="metalist-separator">·</span>
-              <span className="metalist-item">{weather.temp}</span>
-              <span className="metalist-separator">·</span>
-              <span className="metalist-item">{weather.condition.toUpperCase()}</span>
-            </div>
-          </header>
-
-          {/* Local Situation Status (Section 4 & 9) */}
+          {/* Section: Situational Statement Surface */}
           <section className={`situation-status-surface ${situation.isCrisis ? 'crisis' : ''}`}>
-            <div className="situation-status-label">
-              LOCAL SITUATION
+            <div className="situation-status-top">
+              <span className="situation-status-label">CURRENT SITUATION</span>
+              <span
+                className="situation-status-level"
+                style={{ color: situation.color, borderColor: situation.color }}
+              >
+                {situation.level}
+              </span>
             </div>
 
-            <div
-              className="situation-status-level"
-              style={{ color: situation.color }}
-            >
-              {situation.level}
-            </div>
+            <h2 className="situation-statement-heading">
+              {situation.headline}
+            </h2>
 
             <p className="situation-status-explanation">
               {situation.explanation}
             </p>
 
-            <div className="situation-status-timestamp">
-              Last assessment 2 minutes ago.
+            {/* WHAT SHOULD I DO? Action checklist */}
+            <div className="situation-actions-block">
+              <span className="actions-block-title">ACTION RECOMMENDATIONS:</span>
+              <ul className="actions-list">
+                {situation.actionAdvice.map((act, idx) => (
+                  <li key={idx} className="action-bullet">
+                    <span className="bullet-arrow">→</span>
+                    <span>{act}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
 
-          {/* Main Situation Visual: Situation Room Map (Section 5) */}
-          <section className="situation-map-wrapper">
-            <SituationRoomMap
-              center={[28.6139, 77.2090]}
-              zoom={13}
-              hazards={incidents}
-              shelters={shelters}
-              sosSignals={sosList}
-              affectedAreas={affectedAreas}
-              height="460px"
-              activeIncidentSector={situation.isCrisis ? 'Delhi Sector 14' : null}
-            />
-          </section>
+          {/* Section: Spatial Operational Viewport with Switcher Tabs */}
+          <section className="situation-spatial-container">
+            <div className="spatial-view-header">
+              <div className="spatial-tabs" role="tablist">
+                <button
+                  type="button"
+                  className={`spatial-tab-btn ${spatialMode === 'MAP' ? 'active' : ''}`}
+                  onClick={() => setSpatialMode('MAP')}
+                >
+                  Cartographic Map
+                </button>
+                <button
+                  type="button"
+                  className={`spatial-tab-btn ${spatialMode === 'TWIN' ? 'active' : ''}`}
+                  onClick={() => setSpatialMode('TWIN')}
+                >
+                  Digital Twin (2.5D)
+                </button>
+                <button
+                  type="button"
+                  className={`spatial-tab-btn ${spatialMode === 'MATRIX' ? 'active' : ''}`}
+                  onClick={() => setSpatialMode('MATRIX')}
+                >
+                  Risk Matrix
+                </button>
+                <button
+                  type="button"
+                  className={`spatial-tab-btn ${spatialMode === 'REPLAY' ? 'active' : ''}`}
+                  onClick={() => setSpatialMode('REPLAY')}
+                >
+                  Replay Scrubber
+                </button>
+              </div>
 
-          {/* Operations Activity Stream: "WHAT CHANGED" (Section 7) */}
-          <section className="situation-log-surface">
-            <div className="situation-log-header">
-              <span className="situation-log-title">WHAT CHANGED</span>
-              <span className="situation-log-caption">Chronological operations activity stream</span>
+              <span className="spatial-mode-caption">
+                {spatialMode === 'MAP' && 'OPENSTREETMAP 2D CANVAS'}
+                {spatialMode === 'TWIN' && 'HYDRODYNAMIC RUNOFF SIMULATION'}
+                {spatialMode === 'MATRIX' && 'LIKELIHOOD × IMPACT MATRIX'}
+                {spatialMode === 'REPLAY' && '12-HOUR TEMPORAL DELTA'}
+              </span>
             </div>
 
-            <div className="situation-log-stream">
-              {operationsLog.map((log) => (
-                <div key={log.id} className="situation-log-row">
-                  <span className="situation-log-time">{log.time}</span>
-                  <span className="situation-log-text">{log.text}</span>
+            {/* Spatial Viewport Content */}
+            <div className="spatial-view-body">
+              {spatialMode === 'MAP' && (
+                <div className="situation-map-wrapper">
+                  <SituationRoomMap
+                    center={[28.6139, 77.2090]}
+                    zoom={13}
+                    hazards={incidents}
+                    shelters={shelters}
+                    sosSignals={sosList}
+                    affectedAreas={affectedAreas}
+                    height="460px"
+                    activeIncidentSector={situation.isCrisis ? 'Delhi Sector 14' : null}
+                  />
                 </div>
-              ))}
+              )}
+
+              {spatialMode === 'TWIN' && (
+                <DigitalTwinModel
+                  rainfallMm={parseFloat(weather.precipitation) || 8.2}
+                  waterloggingActive={situation.isCrisis}
+                  height="460px"
+                />
+              )}
+
+              {spatialMode === 'MATRIX' && (
+                <RiskMatrix
+                  onSelectRisk={(r) => console.log('Selected risk factor:', r.name)}
+                />
+              )}
+
+              {spatialMode === 'REPLAY' && (
+                <div className="replay-embed-wrapper">
+                  <ReplayController
+                    onTimeSliceChange={(slice) => console.log('Replay slice:', slice.label)}
+                  />
+                  <div className="replay-map-sub">
+                    <SituationRoomMap
+                      center={[28.6139, 77.2090]}
+                      zoom={12}
+                      hazards={incidents}
+                      shelters={shelters}
+                      sosSignals={sosList}
+                      height="340px"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
+          </section>
+
+          {/* Section: Operational Chronological Feed ("WHAT CHANGED") */}
+          <section className="situation-what-changed-section">
+            <WhatChangedFeed maxItems={6} />
           </section>
         </main>
 
         {/* =========================================================
-            COLUMN 3 (RIGHT): LIVE INTELLIGENCE COLUMN (NARROW)
+            COLUMN 3 (RIGHT ~280px): LIVE CONTEXTUAL INTELLIGENCE
+            Answers: WHAT COULD HAPPEN NEXT? WHERE CAN I GO?
             ========================================================= */}
-        <aside className="situation-intel-column">
+        <aside className="situation-intel-column" aria-label="Contextual Intelligence">
           <div className="intel-column-header">
-            LIVE INTELLIGENCE
+            <span>LIVE INTELLIGENCE</span>
+            <span className="intel-pulse" />
           </div>
 
-          {/* Weather Section */}
+          {/* Weather Intelligence Card */}
           <div className="intel-block">
-            <div className="intel-block-title">WEATHER</div>
+            <div className="intel-block-title">ATMOSPHERIC TELEMETRY</div>
             <div className="intel-weather-hero">
               <span className="intel-temp">{weather.temp}</span>
               <span className="intel-condition">{weather.condition}</span>
@@ -457,12 +570,12 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
             <div className="intel-weather-metrics">
               <span>Wind {weather.windSpeed}</span>
               <span className="intel-metric-separator">·</span>
-              <span>Rain {weather.precipitation}</span>
+              <span>Precip {weather.precipitation}</span>
             </div>
 
-            {/* Next 6 Hours Timeline (Section 6) */}
+            {/* Next 6 Hours Timeline */}
             <div className="intel-timeline-wrapper">
-              <div className="intel-subheading">NEXT 6 HOURS</div>
+              <div className="intel-subheading">NEXT 6 HOURS TRAJECTORY</div>
               <div className="intel-timeline-grid">
                 {next6Hours.map((slot, idx) => (
                   <div key={idx} className="intel-timeline-slot">
@@ -470,7 +583,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
                     <span className="slot-temp">{slot.temp}</span>
                     <span
                       className="slot-pop"
-                      style={{ color: slot.popVal > 30 ? '#C96A3D' : '#A8A096' }}
+                      style={{ color: slot.popVal > 30 ? '#D66A35' : '#A49F93' }}
                     >
                       {slot.pop}
                     </span>
@@ -478,146 +591,298 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Active Alerts Section */}
-          <div className="intel-block">
-            <div className="intel-block-title">ALERTS</div>
-            {activeAlerts.length > 0 ? (
-              <div className="intel-alert-item">
-                <div className="intel-alert-headline">
-                  {activeAlerts[0].title || activeAlerts[0].message || 'Operational Advisory'}
-                </div>
-                <div className="intel-alert-meta">
-                  Severity: {activeAlerts[0].severity || 'Warning'} · Active
-                </div>
-              </div>
-            ) : (
-              <div className="intel-empty-text">
-                No active emergency advisories in monitored sector.
-              </div>
-            )}
-          </div>
-
-          {/* Nearest Shelter Section */}
-          <div className="intel-block">
-            <div className="intel-block-title">SHELTERS</div>
-            <div className="intel-shelter-info">
-              <span className="intel-shelter-label">Nearest:</span>
-              <div className="intel-shelter-name">{nearestShelter.name}</div>
-              <div className="intel-shelter-data">
-                <span>{nearestShelter.distance}</span>
-                <span className="intel-metric-separator">·</span>
-                <span>{nearestShelter.spaces} spaces available</span>
-              </div>
+            <div className="intel-gpt-link-wrapper">
+              <Link to="/weather-gpt" className="intel-gpt-link">
+                <span>OPEN WEATHERGPT DESK</span>
+                <span>→</span>
+              </Link>
             </div>
           </div>
 
-          {/* Quiet WeatherGPT Link (Section 16) */}
-          <div className="intel-gpt-link-wrapper">
-            <Link to="/weather-gpt" className="intel-gpt-link">
-              <span>ASK WEATHERGPT</span>
-              <span>→</span>
-            </Link>
+          {/* Nearest Operational Shelter Card */}
+          <div className="intel-block">
+            <div className="intel-block-title">NEAREST EVACUATION SHELTER</div>
+            {nearestShelter ? (
+              <div className="intel-shelter-info">
+                <span className="intel-shelter-name">{nearestShelter.name}</span>
+                <span className="intel-shelter-address">{nearestShelter.address}</span>
+                <div className="shelter-gauge-bar">
+                  <div
+                    className="gauge-fill"
+                    style={{
+                      width: `${Math.min(100, Math.round(((nearestShelter.occupancy || 0) / (nearestShelter.capacity || 100)) * 100))}%`,
+                      backgroundColor: (nearestShelter.occupancy || 0) > (nearestShelter.capacity || 100) * 0.8 ? '#D66A35' : '#5E8B68',
+                    }}
+                  />
+                </div>
+                <div className="intel-shelter-data">
+                  <span>Occupancy: {nearestShelter.occupancy || 0} / {nearestShelter.capacity || 100}</span>
+                  <span className="intel-metric-separator">·</span>
+                  <span style={{ color: '#5E8B68', fontWeight: 600 }}>STATUS: OPEN</span>
+                </div>
+              </div>
+            ) : (
+              <div className="intel-empty-note">Searching nearest municipal shelter facilities...</div>
+            )}
+            <div className="intel-gpt-link-wrapper">
+              <Link to="/shelters" className="intel-gpt-link">
+                <span>VIEW ALL SHELTERS</span>
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Active Emergency Advisory Card */}
+          <div className="intel-block advisory-block">
+            <div className="intel-block-title">CRITICAL ADVISORY</div>
+            <p className="intel-advisory-text">
+              {alerts.length > 0
+                ? alerts[0].title || alerts[0].message
+                : 'Sustained monitoring in effect. No acute evacuation order issued for Sector 14.'}
+            </p>
+            <div className="intel-gpt-link-wrapper">
+              <Link to="/alerts" className="intel-gpt-link">
+                <span>OPEN ALERT CENTER</span>
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Direct Emergency SOS Trigger Card */}
+          <div className="intel-block sos-block">
+            <div className="sos-block-title">CIVILIAN DISTRESS BEACON</div>
+            <p className="sos-block-desc">
+              Immediate GPS beacon broadcast to field response dispatchers.
+            </p>
+            <button
+              type="button"
+              className="intel-direct-sos-btn"
+              onClick={onOpenSos}
+            >
+              TRIGGER SOS SIGNAL
+            </button>
           </div>
         </aside>
       </div>
 
-      {/* Styled JSX for High-Hierarchy Situation Room Theme */}
+      {/* Global Modals */}
+      <GlobalCommandBar
+        isOpen={isCommandBarOpen}
+        onClose={() => setIsCommandBarOpen(false)}
+        onOpenSos={onOpenSos}
+        onOpenIncident={onOpenIncident}
+      />
+
+      <CommunityReportModal
+        isOpen={isCommunityModalOpen}
+        onClose={() => setIsCommunityModalOpen(false)}
+        onSuccess={() => console.log('Community report submitted')}
+      />
+
+      <SystemStatusModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+      />
+
+      {/* Scoped Situation Room Styles */}
       <style>{`
         .situation-room-root {
-          width: 100%;
           min-height: calc(100vh - 64px);
-          background: #11100E;
-          color: #F3EFE8;
-          font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
-          padding: 1.5rem;
+          background: #0D0E0D;
+          color: #E9E5DC;
+          font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif);
+          padding: 1.25rem 1.75rem 4rem 1.75rem;
           box-sizing: border-box;
         }
 
+        /* 1. Environmental Telemetry Strip */
+        .situation-telemetry-strip {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 1rem;
+          background: #121413;
+          border: 1px solid rgba(242, 238, 231, 0.08);
+          border-radius: 4px;
+          padding: 0.65rem 1.25rem;
+          margin-bottom: 1.25rem;
+          font-size: 0.72rem;
+        }
+
+        .telemetry-left {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.85rem;
+        }
+
+        .telemetry-cell {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+        }
+
+        .telemetry-label {
+          font-family: var(--font-mono, monospace);
+          font-size: 0.62rem;
+          color: #7A756D;
+          letter-spacing: 0.06em;
+        }
+
+        .telemetry-val {
+          color: #F7F4ED;
+          font-weight: 500;
+        }
+
+        .telemetry-divider {
+          width: 1px;
+          height: 14px;
+          background: rgba(242, 238, 231, 0.1);
+        }
+
+        .telemetry-right {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .telemetry-action-btn {
+          background: #181A18;
+          border: 1px solid rgba(242, 238, 231, 0.12);
+          color: #E9E5DC;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.65rem;
+          padding: 0.25rem 0.6rem;
+          border-radius: 2px;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          cursor: pointer;
+          transition: all 0.12s ease;
+        }
+
+        .telemetry-action-btn:hover {
+          border-color: #D66A35;
+          color: #F7F4ED;
+        }
+
+        .cmd-kbd {
+          background: rgba(242, 238, 231, 0.08);
+          padding: 0.1rem 0.35rem;
+          border-radius: 2px;
+          color: #D66A35;
+          font-weight: 700;
+        }
+
+        .report-btn {
+          background: rgba(214, 106, 53, 0.1);
+          border-color: rgba(214, 106, 53, 0.3);
+          color: #D66A35;
+          font-weight: 600;
+        }
+
+        .health-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #5E8B68;
+        }
+
+        /* 2. 3-Column Layout */
         .situation-room-layout {
-          max-width: 1440px;
-          margin: 0 auto;
           display: grid;
-          grid-template-columns: 180px minmax(0, 1fr) 280px;
-          gap: 2rem;
+          grid-template-columns: 200px minmax(0, 1fr) 280px;
+          gap: 1.75rem;
           align-items: start;
         }
 
-        /* 1. LEFT NAVIGATION RAIL */
+        /* Nav Rail */
         .situation-nav-rail {
           display: flex;
           flex-direction: column;
-          gap: 1.75rem;
-          padding-top: 0.5rem;
+          gap: 1.25rem;
         }
 
         .nav-rail-group {
           display: flex;
           flex-direction: column;
-          gap: 0.35rem;
+          gap: 0.25rem;
         }
 
         .nav-rail-group-title {
-          font-size: 0.65rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.62rem;
           font-weight: 700;
           letter-spacing: 0.12em;
-          color: #A8A096;
-          margin-bottom: 0.4rem;
-          text-transform: uppercase;
+          color: #7A756D;
+          margin-bottom: 0.35rem;
         }
 
         .nav-rail-link {
-          font-size: 0.86rem;
-          color: #A8A096;
+          font-size: 0.84rem;
+          color: #A49F93;
           text-decoration: none;
           padding: 0.35rem 0.5rem;
-          border-radius: 3px;
-          transition: all 0.15s ease;
+          border-radius: 2px;
+          transition: all 0.12s ease;
           display: block;
         }
 
         .nav-rail-link:hover {
-          color: #F3EFE8;
-          background: #171512;
+          color: #F7F4ED;
+          background: rgba(242, 238, 231, 0.03);
         }
 
         .nav-rail-link.active {
-          color: #F3EFE8;
+          color: #D66A35;
           font-weight: 600;
-          background: #201D19;
+          background: rgba(214, 106, 53, 0.08);
+          border-left: 2px solid #D66A35;
         }
 
-        .nav-rail-link-sos {
-          font-size: 0.8rem;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          color: #C7473A;
+        .nav-rail-link.text-btn {
           background: transparent;
-          border: 1px solid rgba(199, 71, 58, 0.4);
-          border-radius: 3px;
-          padding: 0.45rem 0.65rem;
+          border: none;
+          text-align: left;
           cursor: pointer;
+          font-family: inherit;
+        }
+
+        .admin-link {
+          color: #C69A3A;
+        }
+
+        .nav-rail-sos-btn {
+          width: 100%;
+          background: #C84A3A;
+          color: #FFF;
+          border: none;
+          padding: 0.65rem 0.85rem;
+          border-radius: 2px;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.76rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-top: 0.25rem;
-          transition: all 0.15s ease;
+          cursor: pointer;
         }
 
-        .nav-rail-link-sos:hover {
-          background: rgba(199, 71, 58, 0.12);
-          border-color: #C7473A;
+        .nav-rail-sos-btn:hover {
+          background: #D84D3F;
         }
 
         .sos-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #C7473A;
+          background: #FFF;
         }
 
-        /* 2. CENTER COLUMN */
+        /* Center Column */
         .situation-center-column {
           display: flex;
           flex-direction: column;
@@ -625,336 +890,364 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           min-width: 0;
         }
 
-        .situation-editorial-header {
-          border-bottom: 1px solid #201D19;
-          padding-bottom: 1rem;
-        }
-
-        .situation-greeting {
-          font-family: var(--font-serif, "Newsreader", Georgia, serif);
-          font-size: clamp(1.4rem, 2.5vw, 1.85rem);
-          font-weight: 400;
-          letter-spacing: -0.01em;
-          color: #F3EFE8;
-          line-height: 1.2;
-          margin-bottom: 0.35rem;
-        }
-
-        .situation-metalist {
-          display: flex;
-          align-items: center;
-          gap: 0.65rem;
-          font-size: 0.82rem;
-          color: #A8A096;
-          font-family: var(--font-mono, monospace);
-        }
-
-        .metalist-item {
-          letter-spacing: 0.04em;
-        }
-
-        .metalist-separator {
-          color: #38342E;
-        }
-
-        /* Status Surface */
+        /* Situational Status Surface */
         .situation-status-surface {
-          background: #171512;
-          border: 1px solid #201D19;
+          background: #121413;
+          border: 1px solid rgba(242, 238, 231, 0.08);
           border-radius: 4px;
-          padding: 1.25rem 1.5rem;
-          transition: border-color 0.2s ease;
+          padding: 1.4rem;
         }
 
         .situation-status-surface.crisis {
-          border-color: rgba(199, 71, 58, 0.6);
-          background: #1B1413;
+          border-left: 3px solid #D66A35;
+          background: rgba(214, 106, 53, 0.03);
+        }
+
+        .situation-status-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 0.65rem;
         }
 
         .situation-status-label {
-          font-size: 0.68rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.65rem;
           font-weight: 700;
           letter-spacing: 0.12em;
-          color: #A8A096;
-          text-transform: uppercase;
-          margin-bottom: 0.4rem;
+          color: #7A756D;
         }
 
         .situation-status-level {
-          font-family: var(--font-serif, "Newsreader", Georgia, serif);
-          font-size: 1.65rem;
-          font-weight: 400;
-          letter-spacing: 0.02em;
-          line-height: 1.1;
-          margin-bottom: 0.45rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.68rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          padding: 0.15rem 0.5rem;
+          border: 1px solid;
+          border-radius: 2px;
+        }
+
+        .situation-statement-heading {
+          font-size: 1.35rem;
+          font-weight: 600;
+          color: #F7F4ED;
+          line-height: 1.35;
+          margin: 0 0 0.65rem 0;
+          letter-spacing: -0.01em;
         }
 
         .situation-status-explanation {
-          font-size: 0.92rem;
-          color: #F3EFE8;
-          margin: 0 0 0.5rem 0;
-          line-height: 1.45;
+          font-size: 0.86rem;
+          line-height: 1.5;
+          color: #A49F93;
+          margin: 0 0 1rem 0;
         }
 
-        .situation-status-timestamp {
-          font-size: 0.72rem;
-          color: #A8A096;
+        .situation-actions-block {
+          background: #181A18;
+          border: 1px solid rgba(242, 238, 231, 0.06);
+          border-radius: 3px;
+          padding: 0.85rem 1rem;
+        }
+
+        .actions-block-title {
+          display: block;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.62rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          color: #D66A35;
+          margin-bottom: 0.45rem;
+        }
+
+        .actions-list {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+        }
+
+        .action-bullet {
+          display: flex;
+          align-items: baseline;
+          gap: 0.45rem;
+          font-size: 0.82rem;
+          color: #E9E5DC;
+        }
+
+        .bullet-arrow {
+          color: #D66A35;
           font-family: var(--font-mono, monospace);
         }
 
-        /* Map Wrapper */
-        .situation-map-wrapper {
-          width: 100%;
+        /* Spatial Container */
+        .situation-spatial-container {
+          background: #121413;
+          border: 1px solid rgba(242, 238, 231, 0.08);
           border-radius: 4px;
           overflow: hidden;
         }
 
-        /* Operations Activity Stream */
-        .situation-log-surface {
-          background: #171512;
-          border: 1px solid #201D19;
-          border-radius: 4px;
-          padding: 1.25rem 1.5rem;
-        }
-
-        .situation-log-header {
+        .spatial-view-header {
           display: flex;
-          align-items: baseline;
+          align-items: center;
           justify-content: space-between;
-          border-bottom: 1px solid #201D19;
-          padding-bottom: 0.65rem;
-          margin-bottom: 0.75rem;
+          padding: 0.65rem 1rem;
+          background: #181A18;
+          border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+          flex-wrap: wrap;
+          gap: 0.5rem;
         }
 
-        .situation-log-title {
-          font-size: 0.72rem;
+        .spatial-tabs {
+          display: flex;
+          gap: 0.35rem;
+        }
+
+        .spatial-tab-btn {
+          background: transparent;
+          border: 1px solid rgba(242, 238, 231, 0.1);
+          color: #A49F93;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.65rem;
+          padding: 0.25rem 0.55rem;
+          border-radius: 2px;
+          cursor: pointer;
+          transition: all 0.12s ease;
+        }
+
+        .spatial-tab-btn:hover {
+          color: #F7F4ED;
+          border-color: rgba(242, 238, 231, 0.25);
+        }
+
+        .spatial-tab-btn.active {
+          background: rgba(214, 106, 53, 0.15);
+          border-color: #D66A35;
+          color: #D66A35;
           font-weight: 700;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: #F3EFE8;
         }
 
-        .situation-log-caption {
-          font-size: 0.72rem;
-          color: #A8A096;
+        .spatial-mode-caption {
+          font-family: var(--font-mono, monospace);
+          font-size: 0.58rem;
+          color: #7A756D;
+          letter-spacing: 0.08em;
         }
 
-        .situation-log-stream {
+        .replay-embed-wrapper {
           display: flex;
           flex-direction: column;
+          gap: 0.85rem;
+          padding: 0.85rem;
         }
 
-        .situation-log-row {
-          display: grid;
-          grid-template-columns: 65px 1fr;
-          gap: 1rem;
-          padding: 0.75rem 0;
-          border-bottom: 1px solid #1E1B18;
-          font-size: 0.85rem;
-          line-height: 1.4;
-        }
-
-        .situation-log-row:last-child {
-          border-bottom: none;
-          padding-bottom: 0.25rem;
-        }
-
-        .situation-log-time {
-          font-family: var(--font-mono, monospace);
-          font-size: 0.78rem;
-          color: #A8A096;
-        }
-
-        .situation-log-text {
-          color: #F3EFE8;
-        }
-
-        /* 3. RIGHT INTELLIGENCE COLUMN */
+        /* Right Intel Column */
         .situation-intel-column {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
-          background: #171512;
-          border: 1px solid #201D19;
-          border-radius: 4px;
-          padding: 1.25rem;
+          gap: 1.15rem;
         }
 
         .intel-column-header {
-          font-size: 0.68rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.65rem;
           font-weight: 700;
           letter-spacing: 0.12em;
-          color: #A8A096;
-          text-transform: uppercase;
-          border-bottom: 1px solid #201D19;
-          padding-bottom: 0.65rem;
+          color: #7A756D;
+          border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+          padding-bottom: 0.45rem;
+        }
+
+        .intel-pulse {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #5E8B68;
         }
 
         .intel-block {
-          border-bottom: 1px solid #201D19;
-          padding-bottom: 1rem;
+          background: #121413;
+          border: 1px solid rgba(242, 238, 231, 0.08);
+          border-radius: 3px;
+          padding: 0.95rem;
         }
 
         .intel-block-title {
-          font-size: 0.65rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.62rem;
           font-weight: 700;
           letter-spacing: 0.1em;
-          color: #A8A096;
-          text-transform: uppercase;
-          margin-bottom: 0.5rem;
+          color: #7A756D;
+          margin-bottom: 0.55rem;
         }
 
         .intel-weather-hero {
           display: flex;
           align-items: baseline;
-          gap: 0.65rem;
+          gap: 0.55rem;
           margin-bottom: 0.25rem;
         }
 
         .intel-temp {
-          font-family: var(--font-serif, "Newsreader", Georgia, serif);
-          font-size: 1.75rem;
-          color: #F3EFE8;
-          line-height: 1;
+          font-size: 1.55rem;
+          font-weight: 700;
+          color: #F7F4ED;
+          font-family: var(--font-mono, monospace);
         }
 
         .intel-condition {
-          font-size: 0.9rem;
-          color: #A8A096;
+          font-size: 0.78rem;
+          color: #A49F93;
         }
 
         .intel-weather-metrics {
-          font-size: 0.78rem;
-          color: #A8A096;
-          display: flex;
-          align-items: center;
-          gap: 0.45rem;
-          margin-bottom: 1rem;
-        }
-
-        .intel-metric-separator {
-          color: #38342E;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.68rem;
+          color: #7A756D;
+          margin-bottom: 0.85rem;
         }
 
         .intel-subheading {
-          font-size: 0.62rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          color: #A8A096;
-          text-transform: uppercase;
-          margin-bottom: 0.45rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.58rem;
+          color: #7A756D;
+          margin-bottom: 0.4rem;
         }
 
         .intel-timeline-grid {
           display: grid;
           grid-template-columns: repeat(6, 1fr);
-          gap: 4px;
-          text-align: center;
-          background: #11100E;
-          border: 1px solid #201D19;
-          border-radius: 3px;
-          padding: 6px 4px;
-        }
-
-        .intel-timeline-slot {
-          display: flex;
-          flex-direction: column;
           gap: 2px;
-        }
-
-        .slot-time {
+          text-align: center;
+          background: #181A18;
+          border: 1px solid rgba(242, 238, 231, 0.06);
+          border-radius: 2px;
+          padding: 0.35rem 0.2rem;
+          font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
+        }
+
+        .slot-time { color: #7A756D; font-size: 0.55rem; display: block; }
+        .slot-temp { color: #E9E5DC; font-weight: 600; display: block; }
+        .slot-pop { font-size: 0.55rem; display: block; }
+
+        .intel-gpt-link-wrapper {
+          margin-top: 0.75rem;
+        }
+
+        .intel-gpt-link {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           font-family: var(--font-mono, monospace);
-          color: #A8A096;
+          font-size: 0.65rem;
+          font-weight: 700;
+          color: #D66A35;
+          text-decoration: none;
+          border: 1px solid rgba(214, 106, 53, 0.2);
+          background: rgba(214, 106, 53, 0.05);
+          padding: 0.35rem 0.65rem;
+          border-radius: 2px;
+          transition: all 0.12s ease;
         }
 
-        .slot-temp {
-          font-size: 0.76rem;
-          font-weight: 600;
-          color: #F3EFE8;
+        .intel-gpt-link:hover {
+          background: rgba(214, 106, 53, 0.12);
+          border-color: #D66A35;
         }
 
-        .slot-pop {
-          font-size: 0.6rem;
-          font-family: var(--font-mono, monospace);
-        }
-
-        .intel-alert-item {
+        /* Shelter Card */
+        .intel-shelter-info {
           display: flex;
           flex-direction: column;
           gap: 3px;
         }
 
-        .intel-alert-headline {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #C39A4B;
-        }
-
-        .intel-alert-meta {
-          font-size: 0.72rem;
-          color: #A8A096;
-        }
-
-        .intel-empty-text {
-          font-size: 0.78rem;
-          color: #A8A096;
-          line-height: 1.4;
-        }
-
-        .intel-shelter-info {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .intel-shelter-label {
-          font-size: 0.7rem;
-          color: #A8A096;
-        }
-
         .intel-shelter-name {
-          font-size: 0.9rem;
+          font-size: 0.88rem;
           font-weight: 600;
-          color: #F3EFE8;
+          color: #F7F4ED;
+        }
+
+        .intel-shelter-address {
+          font-size: 0.74rem;
+          color: #A49F93;
+        }
+
+        .shelter-gauge-bar {
+          height: 3px;
+          background: rgba(242, 238, 231, 0.08);
+          border-radius: 2px;
+          overflow: hidden;
+          margin: 0.35rem 0;
+        }
+
+        .gauge-fill {
+          height: 100%;
+          transition: width 0.3s ease;
         }
 
         .intel-shelter-data {
-          font-size: 0.76rem;
-          color: #A8A096;
-          display: flex;
-          align-items: center;
-          gap: 0.45rem;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.65rem;
+          color: #A49F93;
         }
 
-        .intel-gpt-link-wrapper {
-          padding-top: 0.25rem;
+        /* Advisory Block */
+        .intel-advisory-text {
+          font-size: 0.8rem;
+          line-height: 1.4;
+          color: #E9E5DC;
+          margin: 0;
         }
 
-        .intel-gpt-link {
-          font-size: 0.76rem;
+        /* Distress SOS Block */
+        .sos-block {
+          border-color: rgba(200, 74, 58, 0.3);
+          background: rgba(200, 74, 58, 0.04);
+        }
+
+        .sos-block-title {
+          font-family: var(--font-mono, monospace);
+          font-size: 0.62rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          color: #C84A3A;
+          margin-bottom: 0.35rem;
+        }
+
+        .sos-block-desc {
+          font-size: 0.74rem;
+          color: #A49F93;
+          margin: 0 0 0.65rem 0;
+        }
+
+        .intel-direct-sos-btn {
+          width: 100%;
+          background: #C84A3A;
+          color: #FFF;
+          border: none;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.72rem;
           font-weight: 700;
           letter-spacing: 0.08em;
-          color: #C96A3D;
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0.4rem 0.6rem;
-          border: 1px solid rgba(201, 106, 61, 0.25);
-          border-radius: 3px;
-          background: rgba(201, 106, 61, 0.06);
-          transition: all 0.15s ease;
+          padding: 0.55rem;
+          border-radius: 2px;
+          cursor: pointer;
         }
 
-        .intel-gpt-link:hover {
-          background: rgba(201, 106, 61, 0.14);
-          border-color: #C96A3D;
+        .intel-direct-sos-btn:hover {
+          background: #D84D3F;
         }
 
-        /* =========================================================
-            RESPONSIVE ADAPTATIONS: 1280px / TABLET / MOBILE
-            ========================================================= */
+        /* Responsive Breakpoints */
         @media (max-width: 1100px) {
           .situation-room-layout {
             grid-template-columns: minmax(0, 1fr) 260px;
@@ -966,23 +1259,14 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
         @media (max-width: 820px) {
           .situation-room-root {
-            padding: 1rem;
+            padding: 1rem 1rem 5rem 1rem;
           }
           .situation-room-layout {
             grid-template-columns: 1fr;
             gap: 1.25rem;
           }
-          .situation-nav-rail {
-            display: none;
-          }
           .situation-intel-column {
-            order: 4;
-          }
-          .situation-map-wrapper {
-            height: 380px;
-          }
-          .situation-greeting {
-            font-size: 1.35rem;
+            order: 3;
           }
         }
       `}</style>

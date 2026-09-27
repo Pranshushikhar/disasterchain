@@ -2669,4 +2669,12 @@ body.drawer-open {
   }
 }
 
-
+@media (max-width: 768px) {
+  .pwa-install-banner-responsive {
+    left: 12px !important;
+    right: 12px !important;
+    max-width: calc(100% - 24px) !important;
+    width: auto !important;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

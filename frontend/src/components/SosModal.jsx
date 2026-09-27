@@ -350,6 +350,10 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
                     COORDINATES: <span style={{ color: '#ffffff' }}>{formData.latitude}, {formData.longitude}</span>
                   </div>
                 </div>
+
+                <div style={{ background: 'rgba(214, 106, 53, 0.08)', borderLeft: '2px solid #D66A35', padding: '0.55rem 0.85rem', borderRadius: '2px', marginBottom: '1.25rem', fontSize: '0.74rem', color: '#E9E5DC', lineHeight: 1.35, textAlign: 'left' }}>
+                  <strong>DIRECT EMERGENCY BACKUP:</strong> Logged to DisasterChain volunteer responder queue. For official government police, fire, or medical dispatch, dial <a href="tel:112" style={{ color: '#D66A35', fontWeight: 700, textDecoration: 'underline' }}>112</a> immediately.
+                </div>
               </>
             )}
 
@@ -377,6 +381,9 @@ const SosModal = ({ isOpen, onClose, onSosSubmitted }) => {
           <div>
             <div className="micro-label" style={{ color: 'var(--amber)', marginBottom: '0.5rem' }}>
               {t('sos.step2Confirm', 'STEP 2 OF 2: CONFIRM BROADCAST TELEMETRY')}
+            </div>
+            <div style={{ background: 'rgba(214, 106, 53, 0.08)', borderLeft: '2px solid #D66A35', padding: '0.55rem 0.85rem', borderRadius: '2px', marginBottom: '1.15rem', fontSize: '0.74rem', color: '#E9E5DC', lineHeight: 1.35 }}>
+              <strong>DISPATCH NOTICE:</strong> This beacon broadcasts to registered DisasterChain community responders and municipal relief volunteers. For official government police, fire, or ambulance dispatch, call <strong>112</strong> directly using the phone shortcut below.
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
               {t('sos.confirmDesc', 'Review the emergency parameters below. Once confirmed, this signal is immediately routed to active rescue responders.')}

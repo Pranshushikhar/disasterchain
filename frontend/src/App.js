@@ -42,14 +42,31 @@ import OfflineEmergencyPage from './pages/OfflineEmergencyPage';
 import WeatherPage from './pages/WeatherPage';
 import WeatherGPTPage from './pages/WeatherGPTPage';
 import AdminDashboard from './pages/AdminDashboard';
+import GlobalCommandBar from './components/GlobalCommandBar';
 
 const AppLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSosOpen, setIsSosOpen] = useState(false);
   const [isIncidentOpen, setIsIncidentOpen] = useState(false);
+  const [isCommandBarOpen, setIsCommandBarOpen] = useState(false);
   const [refreshCount, setRefreshCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Global hotkey: '/' or 'Ctrl+K' opens the DisasterChain Command Palette
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.key === '/' || ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K'))) &&
+        !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)
+      ) {
+        e.preventDefault();
+        setIsCommandBarOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Initialize native status bar and splash screen
   useEffect(() => {
@@ -203,6 +220,14 @@ const AppLayout = () => {
         isOpen={isIncidentOpen}
         onClose={() => setIsIncidentOpen(false)}
         onIncidentSubmitted={() => setRefreshCount((c) => c + 1)}
+      />
+
+      {/* Global Command Palette */}
+      <GlobalCommandBar
+        isOpen={isCommandBarOpen}
+        onClose={() => setIsCommandBarOpen(false)}
+        onOpenSos={() => setIsSosOpen(true)}
+        onOpenIncident={() => setIsIncidentOpen(true)}
       />
 
       {/* PWA Mobile Installation Prompt & Service Worker Update Alert */}

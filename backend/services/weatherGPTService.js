@@ -23,6 +23,17 @@ const memoryStore = require('../config/memoryStore');
 const { recommendBestShelter, sanitizeShelterForRole } = require('./shelterRecommendationService');
 const { calculateDistanceKm } = require('./crisisIntelligenceService');
 
+// WeatherGPT 2.0 Intelligence Architecture
+const { routeIntent, INTENTS } = require('./weatherGPT/intentRouter');
+const { buildWeatherContext } = require('./weatherGPT/contextBuilder');
+const { analyzeRisks } = require('./weatherGPT/riskEngine');
+const {
+  generateAnalyticalResponse,
+  generateContextualQuickActions,
+  generateFollowUpSuggestions,
+} = require('./weatherGPT/responseEngine');
+const { validateResponse } = require('./weatherGPT/validator');
+
 const isDbConnected = () => mongoose.connection.readyState === 1;
 
 // Supported 20 Indian Regional Languages + English
@@ -1153,6 +1164,7 @@ async function callExternalWeatherLLM({
   cyclones,
   operationalContext,
   language = 'en',
+  responseContract = null,
 }) {
   const apiKey = process.env.AI_API_KEY;
   if (!apiKey || apiKey.trim().length === 0) return null;
@@ -1163,24 +1175,37 @@ async function callExternalWeatherLLM({
   const systemPrompt = `You are WeatherGPT, a specialized conversational weather intelligence assistant inside DisasterChain.
 Your goal is to convert real atmospheric telemetry, forecasts, air quality, cyclone tracks, and DisasterChain emergency data into concise, actionable safety guidance.
 
+TIME-SCOPE & PRECIPITATION RESTRICTIONS:
+- Requested Time Scope: ${responseContract?.time_scope || 'CURRENT'}
+- Target Forecast Date: ${responseContract?.target_date || 'N/A'}
+- Target Hour / Window: ${responseContract?.target_hour != null ? responseContract.target_hour + ':00' : (responseContract?.target_window || 'N/A')}
+- Allowed Grounded Claims:
+${JSON.stringify(responseContract?.allowed_claims || [], null, 2)}
+
 STRICT RULES:
 1. NEVER invent or hallucinate weather data. Rely ONLY on the verified telemetry provided below.
-2. If weather data is unavailable for a metric, state clearly: "I can't verify that data right now."
-3. If condition is dangerous (high winds, flash flood, thunderstorm, cyclone, severe heat/cold, hazardous AQI):
+2. Under NO circumstances may you answer a forecast question (e.g. TOMORROW) using CURRENT weather conditions as the main answer.
+3. If the user asks about TOMORROW (time_scope === 'TOMORROW'):
+   - You MUST answer strictly about tomorrow.
+   - Do NOT say "carry an umbrella today" or "Current condition in ${locationName || 'location'} is clear sky".
+   - Use the Target Forecast data for tomorrow (${JSON.stringify(responseContract?.weather_data?.tomorrow_forecast || {})}).
+4. If weather data is unavailable for a metric, state clearly: "I don't have a reliable forecast value for that metric."
+5. If condition is dangerous (high winds, flash flood, thunderstorm, cyclone, severe heat/cold, hazardous AQI):
    Structure answer as:
    ⚠️ HIGH RISK
    What is happening: ...
    What it means: ...
    What to do: 1. ... 2. ... 3. ...
    Emergency: Call 112 if immediate danger.
-4. For normal conditions, start with: ✓ SAFE / NORMAL and keep answer concise.
-5. If user is in an immediate life-threatening emergency, show: 🚨 LIFE-SAFETY ALERT, state concise actions, and advise calling 112. WeatherGPT must NEVER claim to automatically submit an SOS.
-6. If user asks off-topic questions, politely deflect: "I’m WeatherGPT. I can help with weather, forecasts, air quality, severe-weather alerts, and weather-related safety."
-7. Provide the response in ${SUPPORTED_LANGUAGES[language]?.name || 'English'}.
-8. Distinguish LIVE TELEMETRY from AI interpretation.
+6. For normal conditions, start with: ✓ SAFE / NORMAL and keep answer concise.
+7. If user is in an immediate life-threatening emergency, show: 🚨 LIFE-SAFETY ALERT, state concise actions, and advise calling 112. WeatherGPT must NEVER claim to automatically submit an SOS.
+8. If user asks off-topic questions, politely deflect: "I’m WeatherGPT. I can help with weather, forecasts, air quality, severe-weather alerts, and weather-related safety."
+9. Provide the response in ${SUPPORTED_LANGUAGES[language]?.name || 'English'}.
+10. Distinguish LIVE TELEMETRY from AI interpretation.
 
 VERIFIED TELEMETRY FOR CONTEXT:
 Location: ${locationName || 'Unknown'}
+Target Forecast Data: ${JSON.stringify(responseContract?.weather_data?.target_forecast || {})}
 Current Weather: ${JSON.stringify(currentWeather || {})}
 Air Quality: ${JSON.stringify(airQuality || {})}
 Forecast Daily: ${JSON.stringify(forecast?.daily || [])}
@@ -1239,6 +1264,7 @@ async function processWeatherGPTChat({
   conversationId = null,
   conversation = [],
   userRole = 'citizen',
+  userMode = 'HOME',
 }) {
   if (!message || typeof message !== 'string' || message.trim().length === 0) {
     throw new Error('Message is required and cannot be empty.');
@@ -1250,11 +1276,34 @@ async function processWeatherGPTChat({
   const effectiveLat = latitude != null ? latitude : lat;
   const effectiveLon = longitude != null ? longitude : lon;
 
-  // 1. Analyze User Intent
-  const intent = analyzeWeatherIntent(cleanMessage);
+  // Retrieve active session memory
+  const session = getSession(conversationId);
+
+  // Intent classification with conversation context
+  const intentObj = routeIntent(cleanMessage, session || {});
+
+  // Check if user asked "Will it rain here?" or "weather here" without any location or coordinates
+  const asksForHere = /\b(here|my area|my city|around here|local|idhar|yahan)\b/i.test(cleanMessage);
+  const hasNoLocation = !location && !extractLocationName(cleanMessage) && effectiveLat == null && (!session || !session.locationName);
+  if (asksForHere && hasNoLocation) {
+    return {
+      reply: 'Which location should I check for you? Please select a location on the map or type your city name.',
+      riskLevel: 'LOW',
+      isEmergency: false,
+      actions: [{ label: '📍 Detect My Location', actionType: 'LOCATE_DEVICE' }],
+      location: null,
+      telemetry: {},
+      followUpSuggestions: ['What is the weather in Delhi?', 'What is the weather in Mumbai?', 'What is the weather in Chandigarh?'],
+      contextualQuickActions: [],
+      dataTrust: 'USER PROMPT',
+      feedStatus: 'AWAITING_LOCATION',
+      language: validatedLang,
+      isRtl: Boolean(SUPPORTED_LANGUAGES[validatedLang]?.rtl),
+      conversationId: conversationId || `conv_${Date.now()}`,
+    };
+  }
 
   // 2. Resolve Conversational Memory & Location
-  const session = getSession(conversationId);
   const extractedName = extractLocationName(cleanMessage);
 
   let resolvedLat = null;
@@ -1264,14 +1313,10 @@ async function processWeatherGPTChat({
   let resolvedCountry = '';
 
   if (extractedName) {
-    // User explicitly queried a place in the message text (e.g. "What is the weather in Delhi?")
     resolvedLocationName = extractedName;
-    // Coordinates must be geocoded afresh for this specific place, not inherited from device location
     resolvedLat = null;
     resolvedLon = null;
   } else {
-    // User did NOT specify a different place in the message text.
-    // Prioritize active coordinates and location sent in the request (e.g. device GPS / active location).
     if (effectiveLat != null && !isNaN(Number(effectiveLat)) && effectiveLon != null && !isNaN(Number(effectiveLon))) {
       resolvedLat = Number(effectiveLat);
       resolvedLon = Number(effectiveLon);
@@ -1282,7 +1327,6 @@ async function processWeatherGPTChat({
         }
       }
     } else if (session?.latitude != null && session?.longitude != null) {
-      // Fallback to active session coordinates only if request provided no coordinates
       resolvedLat = session.latitude;
       resolvedLon = session.longitude;
       if (session.locationName && !STOP_WORDS.has(session.locationName.toLowerCase()) && !isRawCoordinatesString(session.locationName)) {
@@ -1308,7 +1352,7 @@ async function processWeatherGPTChat({
     }
   }
 
-  // If we have coordinates but no location name (or name was a generic placeholder or raw coordinates), reverse-geocode
+  // If we have coordinates but no location name, reverse-geocode
   if (resolvedLat != null && resolvedLon != null && (!resolvedLocationName || STOP_WORDS.has(resolvedLocationName.toLowerCase()) || isRawCoordinatesString(resolvedLocationName))) {
     try {
       const rev = await weatherService.reverseGeocode(resolvedLat, resolvedLon);
@@ -1324,7 +1368,7 @@ async function processWeatherGPTChat({
     resolvedLocationName = 'Current Location';
   }
 
-  // 4. Default Fallback Location (New Delhi, India) if completely unsupplied
+  // Default Fallback Location (New Delhi, India) if completely unsupplied
   if (resolvedLat == null || resolvedLon == null) {
     resolvedLat = 28.6139;
     resolvedLon = 77.2090;
@@ -1335,17 +1379,7 @@ async function processWeatherGPTChat({
     }
   }
 
-  // 5. Update Conversational Session Memory
-  if (conversationId) {
-    updateSession(conversationId, {
-      latitude: resolvedLat,
-      longitude: resolvedLon,
-      locationName: resolvedLocationName,
-      lastMessage: cleanMessage,
-    });
-  }
-
-  // 6. Parallel Fetch of Weather Telemetry, Cyclones & Operational Context
+  // Parallel Fetch of Weather Telemetry, Cyclones & Operational Context
   let currentWeather = null;
   let forecast = null;
   let airQuality = null;
@@ -1404,49 +1438,179 @@ async function processWeatherGPTChat({
     console.error('[DIAGNOSTIC] unexpected exception during telemetry gathering:', e.message);
   }
 
-  // 7. Synthesize Response (LLM if configured, otherwise deterministic engine)
-  let replyText = null;
-  let dataTrust = currentWeather ? 'LIVE TELEMETRY' : 'UNVERIFIED';
+  // Synthesize effective current weather if current weather endpoint is unavailable but forecast exists
+  let effectiveCurrent = currentWeather;
+  if (!effectiveCurrent && forecast?.hourly?.length > 0) {
+    const h0 = forecast.hourly[0];
+    effectiveCurrent = {
+      latitude: forecast.latitude,
+      longitude: forecast.longitude,
+      timezone: forecast.timezone,
+      temperature: h0.temperature,
+      apparentTemperature: h0.apparentTemperature,
+      relativeHumidity: h0.humidity,
+      precipitation: h0.precipitation || 0,
+      weatherCode: h0.weatherCode,
+      windSpeed: h0.windSpeed || 0,
+      windGusts: h0.windGusts || 0,
+      visibilityKm: 10,
+      source: 'Open-Meteo Forecast Model',
+      fetchedAt: new Date().toISOString(),
+    };
+  }
 
+  // Resilience check when weather data is simulated unavailable
+  if (!effectiveCurrent && !forecast && (!airQuality || airQuality.europeanAqi == null) && !intentObj.isEmergency) {
+    return {
+      reply: `I can't verify the current weather data right now for ${resolvedLocationName}. Please verify that your location name is spelled correctly or enable device location services.`,
+      riskLevel: 'UNKNOWN',
+      isEmergency: false,
+      actions: [
+        { label: '📍 Retry My Location', actionType: 'LOCATE_DEVICE' },
+        { label: '🗺️ Open Weather Map', link: '/weather' },
+      ],
+      location: {
+        latitude: resolvedLat,
+        longitude: resolvedLon,
+        name: resolvedLocationName,
+        region: resolvedRegion || '',
+        country: resolvedCountry || '',
+        displayName: resolvedLocationName,
+      },
+      telemetry: {},
+      followUpSuggestions: [],
+      contextualQuickActions: [],
+      dataTrust: 'UNVERIFIED',
+      feedStatus: 'UNAVAILABLE',
+      language: validatedLang,
+      isRtl: Boolean(SUPPORTED_LANGUAGES[validatedLang]?.rtl),
+      conversationId: conversationId || `conv_${Date.now()}`,
+    };
+  }
+
+  // Build canonical WeatherContext
+  const weatherContext = buildWeatherContext({
+    locationName: resolvedLocationName,
+    latitude: resolvedLat,
+    longitude: resolvedLon,
+    region: resolvedRegion,
+    country: resolvedCountry,
+    currentWeather: effectiveCurrent,
+    forecast,
+    airQuality,
+    cyclones: cyclones?.cyclones || [],
+    disasters: disasterEvents?.events || [],
+    operationalContext,
+    feedStatus,
+    intentObj,
+  });
+
+  // Evaluate Risk Engine
+  const riskAnalysis = analyzeRisks(weatherContext);
+
+  // Generate Analytical Response
+  const analytical = generateAnalyticalResponse({
+    intentObj,
+    weatherContext,
+    riskAnalysis,
+    userMode: userMode || session?.userMode || 'HOME',
+    language: validatedLang,
+    sessionState: session || {},
+  });
+
+  let activeReply = analytical.content;
+  let dataTrust = effectiveCurrent ? 'LIVE TELEMETRY' : 'UNVERIFIED';
+
+  // Call External LLM if configured
   if (process.env.AI_API_KEY && process.env.AI_API_KEY.trim().length > 0) {
-    replyText = await callExternalWeatherLLM({
+    const aiText = await callExternalWeatherLLM({
       message: cleanMessage,
       locationName: resolvedLocationName,
-      currentWeather,
+      currentWeather: effectiveCurrent,
       forecast,
       airQuality,
       cyclones,
       operationalContext,
       language: validatedLang,
+      responseContract: weatherContext.responseContract,
     });
-    if (replyText) {
+    if (aiText) {
+      activeReply = aiText;
       dataTrust = 'AI INTERPRETATION';
     }
   }
 
-  // Deterministic engine fallback
-  const deterministic = generateWeatherGPTReply({
-    message: cleanMessage,
-    intent,
-    locationName: resolvedLocationName,
-    currentWeather,
-    forecast,
-    airQuality,
-    cyclones,
-    disasterEvents,
-    operationalContext,
-    language: validatedLang,
-  });
+  // Validate response
+  const rawResponse = {
+    ...analytical,
+    content: activeReply,
+  };
+  let validated = validateResponse(rawResponse, weatherContext, intentObj);
+  if (validated.needsFallback || !validated.validation?.isValid) {
+    validated = validateResponse(analytical, weatherContext, intentObj);
+    dataTrust = effectiveCurrent ? 'LIVE TELEMETRY' : 'VERIFIED_DETERMINISTIC';
+  }
 
-  if (!replyText) {
-    replyText = deterministic.reply;
+  // Update Conversational Session Memory
+  if (conversationId) {
+    updateSession(conversationId, {
+      latitude: resolvedLat,
+      longitude: resolvedLon,
+      locationName: resolvedLocationName,
+      lastIntent: intentObj.primaryIntent,
+      lastTimeframe: intentObj.timeframe,
+      lastTimeScope: intentObj.timeScope,
+      lastTargetDate: intentObj.targetDate,
+      lastTargetHour: intentObj.targetHour,
+      lastTargetWindow: intentObj.targetWindow,
+      lastResponseStrategy: validated.reasoningStrategy,
+      lastMessage: cleanMessage,
+      userMode: userMode || session?.userMode || 'HOME',
+    });
+  }
+
+  // Build appropriate actions
+  let actions = [];
+  if (intentObj.isEmergency) {
+    actions = [
+      { label: '🚨 CONFIRM & BROADCAST SOS', actionType: 'SOS_MODAL', isCritical: true },
+      { label: '🏠 VIEW NEARBY SHELTERS', link: '/shelters' },
+      { label: '🗺️ VIEW ON MAP', link: '/weather' },
+    ];
+  } else {
+    actions = [
+      { label: '🗺️ VIEW ON MAP', link: '/weather' },
+    ];
+    if (operationalContext.recommendedShelter) {
+      actions.push({
+        label: `🏠 SHELTER: ${operationalContext.recommendedShelter.name} (${operationalContext.recommendedShelter.distanceKm} km)`,
+        link: '/shelters',
+      });
+    }
+    if (operationalContext.alerts?.length > 0) {
+      actions.push({ label: '⚠️ VIEW ACTIVE ALERTS', link: '/alerts' });
+    }
+    actions.push(
+      { label: '🌡️ Current Weather', query: `What is the weather right now in ${resolvedLocationName}?` },
+      { label: '🌧️ Rain Forecast', query: `Will it rain today in ${resolvedLocationName}?` },
+      { label: '🌫️ Air Quality', query: `How is the air quality in ${resolvedLocationName}?` }
+    );
   }
 
   return {
-    reply: replyText,
-    riskLevel: deterministic.riskLevel || 'LOW',
-    isEmergency: Boolean(deterministic.isEmergency),
-    actions: deterministic.actions || [],
+    reply: validated.content,
+    intentCard: validated.intentCard || analytical.intentCard || null,
+    timeline: weatherContext.targetForecast?.timeline || [],
+    canonicalContext: weatherContext.canonicalContext || null,
+    riskLevel: validated.riskLevel || riskAnalysis.overallSeverity || 'LOW',
+    isEmergency: Boolean(intentObj.isEmergency),
+    actions,
+    metaBadge: validated.metaBadge,
+    followUpSuggestions: validated.followUpSuggestions || [],
+    contextualQuickActions: validated.contextualQuickActions || [],
+    primaryIntent: intentObj.primaryIntent,
+    timeframe: intentObj.timeframe,
+    format: validated.format,
     location: {
       latitude: resolvedLat,
       longitude: resolvedLon,
@@ -1456,18 +1620,50 @@ async function processWeatherGPTChat({
       displayName: resolvedLocationName,
     },
     telemetry: {
-      temperature: currentWeather?.temperature != null ? Math.round(currentWeather.temperature) : null,
-      apparentTemperature: currentWeather?.apparentTemperature != null ? Math.round(currentWeather.apparentTemperature) : null,
-      condition: currentWeather?.weatherCode != null ? getConditionDescription(currentWeather.weatherCode) : null,
-      windSpeed: currentWeather?.windSpeed != null ? Math.round(currentWeather.windSpeed) : null,
-      windGusts: currentWeather?.windGusts != null ? Math.round(currentWeather.windGusts) : null,
-      precipitation: currentWeather?.precipitation != null ? currentWeather.precipitation : 0,
+      temperature: effectiveCurrent?.temperature != null ? Math.round(effectiveCurrent.temperature) : null,
+      apparentTemperature: effectiveCurrent?.apparentTemperature != null ? Math.round(effectiveCurrent.apparentTemperature) : null,
+      condition: effectiveCurrent?.weatherCode != null ? getConditionDescription(effectiveCurrent.weatherCode) : null,
+      windSpeed: effectiveCurrent?.windSpeed != null ? Math.round(effectiveCurrent.windSpeed) : null,
+      windGusts: effectiveCurrent?.windGusts != null ? Math.round(effectiveCurrent.windGusts) : null,
+      precipitation: effectiveCurrent?.precipitation != null ? effectiveCurrent.precipitation : 0,
       aqi: airQuality?.europeanAqi != null ? airQuality.europeanAqi : null,
       aqiSeverity: airQuality?.severity || 'UNKNOWN',
-      humidity: currentWeather?.relativeHumidity != null ? currentWeather.relativeHumidity : null,
-      visibilityKm: currentWeather?.visibilityKm != null ? currentWeather.visibilityKm : null,
-      pressureMsl: currentWeather?.pressureMsl != null ? currentWeather.pressureMsl : null,
+      humidity: effectiveCurrent?.relativeHumidity != null ? effectiveCurrent.relativeHumidity : null,
+      visibilityKm: effectiveCurrent?.visibilityKm != null ? effectiveCurrent.visibilityKm : null,
+      pressureMsl: effectiveCurrent?.pressureMsl != null ? effectiveCurrent.pressureMsl : null,
     },
+    metaDebug: {
+      intent: intentObj.primaryIntent,
+      timeScope: intentObj.timeScope || 'CURRENT',
+      targetDate: intentObj.targetDate,
+      targetHour: intentObj.targetHour,
+      targetWindow: intentObj.targetWindow,
+      location: resolvedLocationName,
+      currentData: {
+        temp: weatherContext.currentWeather?.temperature,
+        condition: weatherContext.currentWeather?.conditionDescription,
+        precip: weatherContext.currentWeather?.precipitationNow,
+        wind: weatherContext.currentWeather?.windSpeed,
+      },
+      targetForecast: weatherContext.targetForecast ? {
+        date: weatherContext.targetForecast.date,
+        dayName: weatherContext.targetForecast.dayName,
+        tempMax: weatherContext.targetForecast.maxTemp ?? weatherContext.targetForecast.tempMax,
+        tempMin: weatherContext.targetForecast.minTemp ?? weatherContext.targetForecast.tempMin,
+        precipitationProbabilityMax: weatherContext.targetForecast.precipitationProbabilityMax,
+        precipitationSum: weatherContext.targetForecast.precipitationSum,
+        condition: weatherContext.targetForecast.conditionDescription || weatherContext.targetForecast.conditions,
+        targetHourData: weatherContext.targetForecast.targetHourData ? {
+          time: weatherContext.targetForecast.targetHourData.timeFormatted,
+          temp: weatherContext.targetForecast.targetHourData.temperature,
+          prob: weatherContext.targetForecast.targetHourData.precipitationProbability,
+        } : null,
+      } : null,
+      source: weatherContext.metadata?.source || 'Open-Meteo High-Resolution Model',
+      dataTrust,
+    },
+    allowedClaims: weatherContext.allowedClaims || [],
+    responseContract: weatherContext.responseContract || null,
     dataTrust,
     feedStatus,
     language: validatedLang,

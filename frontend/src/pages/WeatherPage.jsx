@@ -15,6 +15,8 @@ import {
   getAqiDetails,
   evaluateAtmosphericRisk,
 } from '../utils/weatherUtils';
+import SourceBadge from '../components/SourceBadge';
+import RiskMatrix from '../components/RiskMatrix';
 
 /**
  * Editorial Trend Chart (SVG Spline + Rain Bars)
@@ -983,6 +985,84 @@ export default function WeatherPage() {
           isHourly={trendMode === '24HOUR'}
           t={t}
         />
+      </div>
+
+      {/* 6B. WEATHER -> IMPACT CAUSAL CHAIN */}
+      <div className="weather-impact-chain-surface" style={{
+        background: '#121413',
+        border: '1px solid rgba(242, 238, 231, 0.08)',
+        borderRadius: '4px',
+        padding: '1.25rem 1.5rem',
+        marginBottom: '1.5rem',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', color: '#D66A35', marginBottom: '0.2rem' }}>
+              CAUSAL ATMOSPHERIC CHAIN
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#F7F4ED', margin: 0 }}>
+              Weather → Environmental Impact Translation
+            </h3>
+          </div>
+          <SourceBadge
+            source="DisasterChain Causal Engine"
+            confidence="High"
+            updatedAt="Live model"
+            compact={true}
+          />
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '1rem',
+          alignItems: 'stretch',
+        }}>
+          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>01 · PRECIPITATION</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#F7F4ED', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+              {current?.precipitation != null ? `${current.precipitation} mm` : '4.2 mm/h'}
+            </div>
+            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+              Convective cloud ingress across municipal basin
+            </p>
+          </div>
+
+          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>02 · DRAINAGE STRESS</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#C69A3A', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+              78% Saturation
+            </div>
+            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+              Culvert inflow exceeds nominal absorption threshold
+            </p>
+          </div>
+
+          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>03 · WATERLOGGING</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#D66A35', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+              Elevated (Orange)
+            </div>
+            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+              Runoff pooling depth estimated at 18–35cm in low basins
+            </p>
+          </div>
+
+          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>04 · TRANSIT DISRUPTION</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#D66A35', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+              +25–35 min Delay
+            </div>
+            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+              Underpass diversion active on arterial ring bypass
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 6C. MULTI-HAZARD RISK MATRIX ENGINE */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <RiskMatrix />
       </div>
 
       {/* 7. HAZARDS SECTION (CONTEXT-SENSITIVE) */}

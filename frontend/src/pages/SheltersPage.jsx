@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { fetchShelters } from '../services/api';
 import ShelterDetailModal from '../components/ShelterDetailModal';
+import SourceBadge from '../components/SourceBadge';
 import Icon from '../components/Icons';
 import { useTranslation } from '../i18n/i18n';
 
@@ -120,11 +121,15 @@ const SheltersPage = () => {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
             <span className="badge badge-info">{t('nav.reliefShelters').toUpperCase()}</span>
-            <span className="micro-label" style={{ color: 'var(--cyan)' }}>
-              {t('shelters.capacityRate').toUpperCase()}
-            </span>
+            <SourceBadge
+              source="Registered Civil Defense Registry (Operator Maintained)"
+              confidence="High"
+              updatedAt="Operator Updated"
+              isOfficial={false}
+              compact={true}
+            />
           </div>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.25rem' }}>
             {t('shelters.shelterTitle')}

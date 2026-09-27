@@ -52,7 +52,7 @@ async function resolveUserFromToken(req) {
  */
 exports.handleWeatherGPTChat = async (req, res) => {
   try {
-    const { message, latitude, longitude, location, language, conversationId, conversation } = req.body;
+    const { message, latitude, longitude, location, language, conversationId, conversation, userMode } = req.body;
 
     // 1. Validate Message
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -117,6 +117,7 @@ exports.handleWeatherGPTChat = async (req, res) => {
       conversationId: conversationId && typeof conversationId === 'string' ? conversationId.trim() : null,
       conversation: cleanHistory,
       userRole: role,
+      userMode: userMode && typeof userMode === 'string' ? userMode.trim().toUpperCase() : 'HOME',
     });
 
     return res.status(200).json({

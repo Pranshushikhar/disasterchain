@@ -26,28 +26,28 @@ const PWAInstallPrompt = () => {
 
   return (
     <aside
-      className="pwa-install-banner"
       role="region"
       aria-label={t('pwa.installTitle', 'Install DisasterChain Application')}
+      className="pwa-install-banner-responsive"
       style={{
         position: 'fixed',
-        bottom: 'calc(82px + env(safe-area-inset-bottom, 0px))',
-        right: '20px',
-        left: 'auto',
-        maxWidth: '400px',
+        bottom: '20px',
+        left: '20px',
+        right: 'auto',
+        maxWidth: '360px',
         width: 'calc(100% - 40px)',
         boxSizing: 'border-box',
         zIndex: 9990,
-        backgroundColor: '#191714',
-        border: '1px solid rgba(242, 238, 231, 0.12)',
-        borderRadius: '8px',
-        padding: '12px 14px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.65)',
+        backgroundColor: '#181A18',
+        border: '1px solid rgba(242, 238, 231, 0.16)',
+        borderRadius: '4px',
+        padding: '10px 14px',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.75)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: '12px',
-        animation: 'slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+        animation: 'slideUp 0.25s ease-out',
       }}
     >
       {/* Icon + Information */}
