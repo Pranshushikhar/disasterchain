@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useWeatherGPT } from '../context/WeatherGPTContext';
 
 /**
  * DISASTERCHAIN GLOBAL COMMAND PALETTE ("Ask DisasterChain")
@@ -10,6 +11,7 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
   const navigate = useNavigate();
+  const { openWeatherGPT } = useWeatherGPT();
 
   // Core system commands and route destinations
   const COMMANDS = [
@@ -31,11 +33,14 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
     },
     {
       id: 'cmd-weather-gpt',
-      category: 'WEATHER',
-      title: 'Ask WeatherGPT Desk',
-      subtitle: 'Atmospheric natural language conversational synthesis',
-      action: () => navigate('/weather-gpt'),
-      keywords: ['weathergpt', 'gpt', 'ai', 'ask', 'tomorrow', 'rain 8pm', 'chat'],
+      category: 'INTELLIGENCE',
+      title: 'Ask WeatherGPT Copilot',
+      subtitle: 'Persistent atmospheric intelligence and emergency synthesis',
+      action: () => {
+        onClose();
+        openWeatherGPT();
+      },
+      keywords: ['weathergpt', 'gpt', 'ai', 'ask', 'tomorrow', 'rain 8pm', 'chat', 'copilot'],
     },
     {
       id: 'cmd-map',
@@ -245,12 +250,12 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
         .dc-command-modal {
           width: 100%;
           max-width: 620px;
-          background: #181A18;
-          border: 1px solid rgba(242, 238, 231, 0.16);
-          border-radius: 6px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+          background: #111A23;
+          border: 1px solid #202D38;
+          border-radius: 12px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
           overflow: hidden;
-          font-family: var(--font-sans, -apple-system, sans-serif);
+          font-family: var(--font-sans);
           animation: modalSlide 0.15s ease-out;
         }
 
@@ -259,12 +264,12 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           align-items: center;
           gap: 0.75rem;
           padding: 1rem 1.25rem;
-          border-bottom: 1px solid rgba(242, 238, 231, 0.08);
-          background: #121413;
+          border-bottom: 1px solid #202D38;
+          background: #16212B;
         }
 
         .dc-search-icon {
-          color: #D66A35;
+          color: #42D9C8;
           flex-shrink: 0;
         }
 
@@ -272,30 +277,31 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           flex: 1;
           background: transparent;
           border: none;
-          color: #F7F4ED;
+          color: #F4F7F8;
           font-size: 0.95rem;
           outline: none;
         }
 
         .dc-command-input::placeholder {
-          color: #7A756D;
+          color: #64727D;
           font-size: 0.85rem;
         }
 
         .dc-esc-key {
           font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
-          color: #7A756D;
-          background: rgba(242, 238, 231, 0.06);
-          border: 1px solid rgba(242, 238, 231, 0.1);
-          padding: 0.2rem 0.4rem;
-          border-radius: 2px;
+          color: #A8B5BE;
+          background: #202D38;
+          border: 1px solid #263541;
+          padding: 0.2rem 0.45rem;
+          border-radius: 6px;
         }
 
         .dc-command-results {
           max-height: 380px;
           overflow-y: auto;
-          padding: 0.4rem;
+          padding: 0.5rem;
+          background: #111A23;
         }
 
         .dc-command-item {
@@ -303,18 +309,18 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           align-items: center;
           justify-content: space-between;
           padding: 0.65rem 0.85rem;
-          border-radius: 3px;
+          border-radius: 8px;
           cursor: pointer;
-          transition: background 0.1s ease;
+          transition: all 0.12s ease;
         }
 
         .dc-command-item:hover,
         .dc-command-item.selected {
-          background: rgba(214, 106, 53, 0.12);
+          background: rgba(66, 217, 200, 0.1);
         }
 
         .dc-command-item.selected .item-title {
-          color: #D66A35;
+          color: #42D9C8;
         }
 
         .dc-command-item.selected .item-enter-hint {
@@ -336,8 +342,8 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
 
         .item-title {
           font-size: 0.88rem;
-          font-weight: 500;
-          color: #F7F4ED;
+          font-weight: 600;
+          color: #F4F7F8;
         }
 
         .item-category {
@@ -345,43 +351,44 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           font-size: 0.58rem;
           font-weight: 700;
           letter-spacing: 0.08em;
-          color: #7A756D;
-          background: rgba(242, 238, 231, 0.04);
-          padding: 0.1rem 0.35rem;
-          border-radius: 2px;
+          color: #64727D;
+          background: #16212B;
+          border: 1px solid #263541;
+          padding: 0.1rem 0.4rem;
+          border-radius: 6px;
         }
 
         .item-subtitle {
           font-size: 0.74rem;
-          color: #A49F93;
+          color: #A8B5BE;
         }
 
         .item-enter-hint {
           font-family: var(--font-mono, monospace);
           font-size: 0.72rem;
-          color: #D66A35;
+          color: #42D9C8;
           opacity: 0;
           transition: opacity 0.1s ease;
         }
 
         .dc-command-empty {
-          padding: 2rem 1.5rem;
+          padding: 2.5rem 1.5rem;
           text-align: center;
         }
 
         .dc-command-empty span {
           display: block;
           font-family: var(--font-mono, monospace);
-          font-size: 0.7rem;
+          font-size: 0.72rem;
           font-weight: 700;
-          color: #7A756D;
+          color: #42D9C8;
           letter-spacing: 0.1em;
           margin-bottom: 0.35rem;
         }
 
         .dc-command-empty p {
           font-size: 0.78rem;
-          color: #A49F93;
+          color: #A8B5BE;
           margin: 0;
         }
 
@@ -390,12 +397,12 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           align-items: center;
           justify-content: flex-end;
           gap: 1rem;
-          padding: 0.45rem 1rem;
-          background: #121413;
-          border-top: 1px solid rgba(242, 238, 231, 0.06);
+          padding: 0.5rem 1.25rem;
+          background: #16212B;
+          border-top: 1px solid #202D38;
           font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
-          color: #7A756D;
+          color: #64727D;
         }
 
         @keyframes overlayFade {

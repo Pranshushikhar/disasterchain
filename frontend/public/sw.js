@@ -8,8 +8,8 @@
  * 4. Cache application shell & static bundles for offline interface resilience.
  */
 
-const SHELL_CACHE_VERSION = 'disasterchain-shell-v2.3.0';
-const API_CACHE_VERSION = 'disasterchain-api-v2.3.0';
+const SHELL_CACHE_VERSION = 'disasterchain-shell-v3.0.0-earth-intel';
+const API_CACHE_VERSION = 'disasterchain-api-v3.0.0-earth-intel';
 
 // Core Application Shell assets to precache
 const PRECACHE_ASSETS = [

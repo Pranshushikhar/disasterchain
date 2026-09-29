@@ -539,7 +539,7 @@ const ProfilePage = () => {
               <div className="spatial-panel" style={{ padding: '1.5rem', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                   <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Icon name="download" size={18} color="var(--primary, #FF6B2C)" />
+                    <Icon name="download" size={18} color="var(--primary, #42D9C8)" />
                     <span>DisasterChain Application (PWA)</span>
                   </div>
                   {isInstalled && (

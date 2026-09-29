@@ -36,3 +36,5 @@ frontend/android/gradle.properties
 # Test artifacts
 edge_temp_profile/
 frontend/scripts/edge_temp_profile/
+.edge_*
+

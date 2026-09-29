@@ -3,14 +3,16 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/i18n';
 import { usePWA } from '../context/PWAContext';
+import { useWeatherGPT } from '../context/WeatherGPTContext';
 import Icon from './Icons';
 import LanguageSelector from './LanguageSelector';
 import NetworkStatusIndicator from './NetworkStatusIndicator';
 
-const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
+const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = false }) => {
   const { user, isAdmin, isAuthenticated, logout } = useAuth();
   const { t } = useTranslation();
   const { isInstallable, isInstalled, promptInstall } = usePWA();
+  const { openWeatherGPT } = useWeatherGPT();
   const role = user?.role || 'citizen';
   const isPrivileged = role === 'responder' || role === 'ngo' || role === 'volunteer';
 
@@ -37,38 +39,47 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  // Earth Intelligence Navigation Sections
   const navSections = [
     {
-      title: t('nav.intelligence', 'INTELLIGENCE'),
+      title: 'OVERVIEW',
       items: [
-        { label: t('nav.weather', 'Weather'), path: '/weather', icon: 'cloud' },
-        { label: 'WeatherGPT', path: '/weather-gpt', icon: 'weather-gpt' },
+        { label: 'SITUATION', path: '/', icon: 'activity' },
+        { label: 'WEATHER', path: '/weather', icon: 'cloud' },
+        { label: 'MAP', path: '/affected-areas', icon: 'map' },
+        { label: 'INCIDENTS', path: '/incidents', icon: 'warning' },
+        { label: 'ALERTS', path: '/alerts', icon: 'alert-circle' },
+        { label: 'SHELTERS', path: '/shelters', icon: 'shelter' },
+        { label: 'RESPONSE', path: '/resources', icon: 'hospital' },
       ],
     },
     {
-      title: t('nav.response', 'RESPONSE'),
+      title: 'INTELLIGENCE',
       items: [
-        { label: t('nav.shelters', 'Shelters'), path: '/shelters', icon: 'shelter' },
-        { label: t('nav.incidents', 'Incidents'), path: '/incidents', icon: 'warning' },
-        { label: t('nav.resources', 'Resources'), path: '/resources', icon: 'hospital' },
+        {
+          label: 'WEATHERGPT',
+          icon: 'weather-gpt',
+          isAction: true,
+          action: () => {
+            if (isOpen && onClose) onClose();
+            openWeatherGPT();
+          },
+          badge: 'COPILOT',
+        },
+        { label: 'REPLAY', path: '/dashboard?view=REPLAY', icon: 'clock' },
+        { label: 'DIGITAL TWIN', path: '/dashboard?view=TWIN', icon: 'cpu' },
+        { label: 'COMMUNITY', path: '/donations', icon: 'heart' },
       ],
     },
     {
-      title: t('nav.preparedness', 'COMMUNITY / PREPAREDNESS'),
+      title: 'PERSONAL',
       items: [
-        { label: t('nav.donations', 'Donations'), path: '/donations', icon: 'heart' },
-        { label: t('nav.preparedness', 'Preparedness'), path: '/guides', icon: 'guide' },
-      ],
-    },
-    {
-      title: t('nav.system', 'SYSTEM'),
-      items: [
-        { label: t('nav.offlineMode', 'Offline'), path: '/offline', icon: 'offline' },
-        { label: t('nav.profile', 'Profile'), path: '/profile', icon: 'profile' },
+        { label: 'MY SAFETY', path: '/sos', icon: 'shield-check' },
+        { label: 'PROFILE', path: '/profile', icon: 'profile' },
         ...(isAdmin
           ? [
               {
-                label: t('nav.adminCommand', 'Admin Command'),
+                label: 'ADMIN COMMAND',
                 path: '/admin',
                 icon: 'shield',
               },
@@ -82,10 +93,10 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
     <>
       {/* Desktop Spatial Command Rail */}
       {!hideDesktopRail && (
-        <aside className="command-rail">
+        <aside className="command-rail" aria-label="Command Rail Navigation">
           {/* Admin Quick Terminal Access */}
           {isAdmin && (
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '0.85rem' }}>
               <NavLink
                 to="/admin"
                 className={({ isActive }) =>
@@ -94,31 +105,22 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
                 style={{
                   width: '100%',
                   justifyContent: 'flex-start',
-                  padding: '0.65rem 0.85rem',
-                  fontSize: '0.8rem',
+                  padding: '0.55rem 0.75rem',
+                  fontSize: '0.75rem',
                   border: '1px solid var(--border-highlight)',
                 }}
               >
-                <Icon name="shield" size={16} color="var(--cyan)" />
-                <span>{t('nav.adminCommand', 'ADMIN COMMAND')}</span>
+                <Icon name="shield" size={15} color="var(--primary)" />
+                <span>ADMIN COMMAND</span>
               </NavLink>
             </div>
           )}
 
           {/* Grouped Navigation Links */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', overflowY: 'auto' }}>
             {navSections.map((sec) => (
               <div key={sec.title} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <div
-                  style={{
-                    fontSize: '0.68rem',
-                    fontWeight: 800,
-                    color: '#94a3b8',
-                    letterSpacing: '0.08em',
-                    padding: '0.2rem 0.75rem',
-                    textTransform: 'uppercase',
-                  }}
-                >
+                <div className="rail-section-title">
                   {sec.title}
                 </div>
                 {sec.items.map((item) => {
@@ -137,10 +139,27 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
                           cursor: 'pointer',
                         }}
                       >
-                        <span className="nav-icon-wrap">
-                          <Icon name={item.icon} size={17} />
+                        <span className="nav-icon-wrap" style={{ color: 'var(--primary)' }}>
+                          <Icon name={item.icon} size={16} />
                         </span>
                         <span>{item.label}</span>
+                        {item.badge && (
+                          <span
+                            className="rail-nav-badge"
+                            style={{
+                              marginLeft: 'auto',
+                              fontSize: '0.60rem',
+                              fontFamily: 'var(--font-mono)',
+                              background: 'rgba(66, 217, 200, 0.15)',
+                              color: '#42D9C8',
+                              border: '1px solid rgba(66, 217, 200, 0.3)',
+                              padding: '1px 5px',
+                              borderRadius: '4px',
+                            }}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
                       </button>
                     );
                   }
@@ -154,7 +173,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
                       }
                     >
                       <span className="nav-icon-wrap">
-                        <Icon name={item.icon} size={17} />
+                        <Icon name={item.icon} size={16} />
                       </span>
                       <span>{item.label}</span>
                       {item.badge && (
@@ -167,6 +186,43 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
                 })}
               </div>
             ))}
+          </div>
+
+          {/* Quick Operational Reassurance Footer in Rail */}
+          <div
+            style={{
+              marginTop: 'auto',
+              paddingTop: '0.85rem',
+              borderTop: '1px solid var(--border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.62rem',
+                color: 'var(--text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: '#42D9C8',
+                  boxShadow: '0 0 6px #42D9C8',
+                }}
+              />
+              <span>NETWORK ONLINE</span>
+            </div>
+            <div style={{ fontSize: '0.60rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+              112 Emergency Dispatch
+            </div>
           </div>
         </aside>
       )}
@@ -190,22 +246,22 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
                 width: '34px',
                 height: '34px',
                 borderRadius: '8px',
-                background: 'rgba(255, 107, 44, 0.15)',
-                border: '1px solid rgba(255, 107, 44, 0.4)',
+                background: 'rgba(66, 217, 200, 0.15)',
+                border: '1px solid rgba(66, 217, 200, 0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ff6b2c',
+                color: '#42D9C8',
               }}
             >
               <Icon name="shield-check" size={18} />
             </div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#ffffff' }}>
+              <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#F4F7F8', fontFamily: 'var(--font-display)' }}>
                 DISASTERCHAIN
               </div>
-              <div style={{ fontSize: '0.72rem', color: '#ff6b2c', fontWeight: 600 }}>
-                {t('nav.tagline', 'Emergency response, simplified')}
+              <div style={{ fontSize: '0.68rem', color: '#42D9C8', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>
+                Earth Intelligence
               </div>
             </div>
           </div>
@@ -411,16 +467,17 @@ const Sidebar = ({ isOpen, onClose, onOpenSos, hideDesktopRail = true }) => {
                   gap: '10px',
                   padding: '11px 14px',
                   borderRadius: '8px',
-                  background: 'rgba(255, 107, 44, 0.15)',
-                  border: '1px solid rgba(255, 107, 44, 0.5)',
-                  color: '#FFF',
+                  background: 'rgba(66, 217, 200, 0.12)',
+                  border: '1px solid rgba(66, 217, 200, 0.35)',
+                  color: '#F4F7F8',
                   fontWeight: '700',
                   fontSize: '0.88rem',
                   cursor: 'pointer',
                   minHeight: '44px',
+                  borderRadius: '8px',
                 }}
               >
-                <span className="nav-icon-wrap" style={{ color: '#ff6b2c' }}>
+                <span className="nav-icon-wrap" style={{ color: '#42D9C8' }}>
                   <Icon name="download" size={18} />
                 </span>
                 <span>{t('nav.installApp', 'Install DisasterChain App')}</span>

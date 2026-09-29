@@ -28,13 +28,13 @@ const PWAUpdateToast = () => {
         zIndex: 99999,
         maxWidth: '92vw',
         width: '440px',
-        backgroundColor: 'rgba(28, 17, 13, 0.98)',
+        backgroundColor: '#111A23',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid #FF6B2C',
+        border: '1px solid #42D9C8',
         borderRadius: '12px',
         padding: '12px 16px',
-        boxShadow: '0 10px 35px rgba(0,0,0,0.8), 0 0 20px rgba(255, 107, 44, 0.3)',
+        boxShadow: '0 10px 35px rgba(0,0,0,0.8), 0 0 20px rgba(66, 217, 200, 0.25)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -48,15 +48,15 @@ const PWAUpdateToast = () => {
             width: '32px',
             height: '32px',
             borderRadius: '8px',
-            background: 'rgba(255, 107, 44, 0.15)',
-            border: '1px solid rgba(255, 107, 44, 0.4)',
+            background: 'rgba(66, 217, 200, 0.15)',
+            border: '1px solid rgba(66, 217, 200, 0.4)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}
         >
-          <Icon name="refresh" size={16} color="#FF6B2C" />
+          <Icon name="refresh" size={16} color="#42D9C8" />
         </div>
         <div>
           <div
@@ -64,13 +64,13 @@ const PWAUpdateToast = () => {
               fontSize: '0.80rem',
               fontWeight: '800',
               letterSpacing: '0.05em',
-              color: '#FF8A3D',
+              color: '#42D9C8',
               fontFamily: 'var(--font-heading, sans-serif)',
             }}
           >
             {t('pwa.updateTitle', 'NEW VERSION AVAILABLE')}
           </div>
-          <div style={{ fontSize: '0.74rem', color: '#B0A099', marginTop: '1px' }}>
+          <div style={{ fontSize: '0.74rem', color: '#A8B5BE', marginTop: '1px' }}>
             {t('pwa.updateDesc', 'Refresh to update DisasterChain.')}
           </div>
         </div>
@@ -80,9 +80,9 @@ const PWAUpdateToast = () => {
         type="button"
         onClick={triggerUpdate}
         style={{
-          background: 'linear-gradient(135deg, #FF6B2C, #F59E0B)',
+          background: '#42D9C8',
           border: 'none',
-          color: '#120B08',
+          color: '#070B10',
           fontSize: '0.76rem',
           fontWeight: '800',
           padding: '7px 14px',

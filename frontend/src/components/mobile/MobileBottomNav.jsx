@@ -75,7 +75,7 @@ export default function MobileBottomNav({
         className={`mobile-nav-item ${isSituationActive ? 'active' : ''}`}
         aria-label="Situation Room"
       >
-        <Icon name="activity" size={20} color={isSituationActive ? '#D96B35' : '#8C877D'} />
+        <Icon name="activity" size={20} color={isSituationActive ? '#42D9C8' : '#64727D'} />
         <span>SITUATION</span>
       </NavLink>
 
@@ -85,7 +85,7 @@ export default function MobileBottomNav({
         className={`mobile-nav-item ${isMapActive ? 'active' : ''}`}
         aria-label="Full-Screen Crisis Map"
       >
-        <Icon name="map-pin" size={20} color={isMapActive ? '#D96B35' : '#8C877D'} />
+        <Icon name="map-pin" size={20} color={isMapActive ? '#42D9C8' : '#64727D'} />
         <span>MAP</span>
       </NavLink>
 
@@ -140,7 +140,7 @@ export default function MobileBottomNav({
         className={`mobile-nav-item ${isAlertsActive ? 'active' : ''}`}
         aria-label={`Emergency Alerts (${alertCount} active)`}
       >
-        <Icon name="bell" size={20} color={isAlertsActive ? '#D96B35' : '#8C877D'} />
+        <Icon name="bell" size={20} color={isAlertsActive ? '#42D9C8' : '#64727D'} />
         <span>ALERTS</span>
         {alertCount > 0 && (
           <span className="mobile-nav-badge" aria-hidden="true">
@@ -156,7 +156,7 @@ export default function MobileBottomNav({
         className={`mobile-nav-item ${isMoreActive ? 'active' : ''}`}
         aria-label="More operational tools and options"
       >
-        <Icon name="menu" size={20} color={isMoreActive ? '#D96B35' : '#8C877D'} />
+        <Icon name="menu" size={20} color={isMoreActive ? '#42D9C8' : '#64727D'} />
         <span>MORE</span>
       </button>
     </nav>

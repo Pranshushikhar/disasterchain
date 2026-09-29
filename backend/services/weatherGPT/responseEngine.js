@@ -348,6 +348,7 @@ function generateAnalyticalResponse({
   let content = '';
   let format = 'ANALYSIS';
   let reasoningStrategy = primaryIntent;
+  let intentCard = null;
 
   // Anti-repetition check: if the user asks a follow-up or says "tell me more" after the same intent
   const isRepetitivePrompt = sessionState.lastIntent === primaryIntent &&

@@ -29,23 +29,26 @@ L.Icon.Default.mergeOptions({
 
 // Custom SVG-based Tactical Map Markers
 const createTacticalDivIcon = (type, severity = 'High', label = '') => {
-  let bgColor = '#FF6B2C';
-  let iconSvg = '🚨';
+  let bgColor = '#42D9C8';
+  let iconSvg = '📍';
   let pulseClass = '';
 
   if (type === 'sos') {
-    bgColor = severity === 'Critical' ? '#E53935' : '#FF6B2C';
+    bgColor = severity === 'Critical' ? '#FF5C5C' : '#F4B942';
     iconSvg = '🚨';
     pulseClass = severity === 'Critical' ? 'marker-pulse-critical' : '';
   } else if (type === 'shelter') {
-    bgColor = '#84CC16';
+    bgColor = '#52D273';
     iconSvg = '🏛️';
   } else if (type === 'incident') {
-    bgColor = '#F59E0B';
+    bgColor = severity === 'Critical' ? '#FF5C5C' : '#F4B942';
     iconSvg = '⚠️';
   } else if (type === 'user') {
-    bgColor = '#3B82F6';
+    bgColor = '#42D9C8';
     iconSvg = '📍';
+  } else if (type === 'weather') {
+    bgColor = '#4DA3FF';
+    iconSvg = '🌧️';
   }
 
   const html = `
@@ -858,8 +861,8 @@ const DisasterCommandMapContent = ({
                 center={[area.latitude, area.longitude]}
                 radius={radiusMeters}
                 pathOptions={{
-                  color: isCritical ? '#E53935' : '#FF6B2C',
-                  fillColor: isCritical ? '#E53935' : '#FF6B2C',
+                  color: isCritical ? '#FF5C5C' : '#F4B942',
+                  fillColor: isCritical ? '#FF5C5C' : '#F4B942',
                   fillOpacity: 0.18,
                   weight: 2,
                 }}
@@ -877,10 +880,10 @@ const DisasterCommandMapContent = ({
             const key = `risk-${idx}`;
             const riskColor =
               rz.riskLevel === 'CRITICAL'
-                ? '#E53935'
+                ? '#FF5C5C'
                 : rz.riskLevel === 'HIGH'
-                ? '#FF6B2C'
-                : '#F59E0B';
+                ? '#F4B942'
+                : '#4DA3FF';
             return (
               <Circle
                 key={key}

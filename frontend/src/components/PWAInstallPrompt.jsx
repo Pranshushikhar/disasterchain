@@ -38,9 +38,9 @@ const PWAInstallPrompt = () => {
         width: 'calc(100% - 40px)',
         boxSizing: 'border-box',
         zIndex: 9990,
-        backgroundColor: '#181A18',
-        border: '1px solid rgba(242, 238, 231, 0.16)',
-        borderRadius: '4px',
+        backgroundColor: '#111A23',
+        border: '1px solid #202D38',
+        borderRadius: '8px',
         padding: '10px 14px',
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.75)',
         display: 'flex',
@@ -59,7 +59,7 @@ const PWAInstallPrompt = () => {
             width: '36px',
             height: '36px',
             borderRadius: '6px',
-            border: '1px solid rgba(242, 238, 231, 0.12)',
+            border: '1px solid #202D38',
             flexShrink: 0,
             objectFit: 'cover',
           }}
@@ -70,7 +70,7 @@ const PWAInstallPrompt = () => {
               fontSize: '0.8rem',
               fontWeight: '700',
               letterSpacing: '0.04em',
-              color: '#F2EEE7',
+              color: '#F4F7F8',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -81,7 +81,7 @@ const PWAInstallPrompt = () => {
           <div
             style={{
               fontSize: '0.72rem',
-              color: '#9B958B',
+              color: '#A8B5BE',
               lineHeight: 1.25,
               marginTop: '1px',
             }}
@@ -98,8 +98,8 @@ const PWAInstallPrompt = () => {
           onClick={dismissInstallPrompt}
           style={{
             background: 'transparent',
-            border: '1px solid rgba(242, 238, 231, 0.12)',
-            color: '#9B958B',
+            border: '1px solid #202D38',
+            color: '#A8B5BE',
             fontSize: '0.72rem',
             fontWeight: '600',
             padding: '5px 9px',
@@ -115,11 +115,11 @@ const PWAInstallPrompt = () => {
           type="button"
           onClick={handleInstallClick}
           style={{
-            background: '#D96B35',
+            background: '#42D9C8',
             border: 'none',
-            color: '#ffffff',
+            color: '#070B10',
             fontSize: '0.74rem',
-            fontWeight: '700',
+            fontWeight: '800',
             padding: '5px 12px',
             borderRadius: '5px',
             cursor: 'pointer',

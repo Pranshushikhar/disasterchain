@@ -43,14 +43,16 @@ export default function AlertsPage() {
       case 'critical':
       case 'danger':
       case 'emergency':
-        return { label: 'CRITICAL WARNING', color: '#C84A3A', bg: 'rgba(200, 74, 58, 0.1)', border: '#C84A3A' };
+        return { label: 'CRITICAL', color: '#FF5C5C', bg: 'rgba(255, 92, 92, 0.12)', border: '#FF5C5C' };
       case 'high':
+      case 'severe':
+        return { label: 'HIGH', color: '#F4B942', bg: 'rgba(244, 185, 66, 0.12)', border: '#F4B942' };
+      case 'elevated':
       case 'warning':
-        return { label: 'ELEVATED ADVISORY', color: '#D66A35', bg: 'rgba(214, 106, 53, 0.1)', border: '#D66A35' };
       case 'medium':
-        return { label: 'MODERATE WATCH', color: '#C69A3A', bg: 'rgba(198, 154, 58, 0.08)', border: '#C69A3A' };
+        return { label: 'ELEVATED', color: '#4DA3FF', bg: 'rgba(77, 163, 255, 0.12)', border: '#4DA3FF' };
       default:
-        return { label: 'CIVIL NOTICE', color: '#5E8B68', bg: 'rgba(94, 139, 104, 0.08)', border: '#5E8B68' };
+        return { label: 'INFORMATION', color: '#52D273', bg: 'rgba(82, 210, 115, 0.12)', border: '#52D273' };
     }
   };
 
@@ -59,8 +61,9 @@ export default function AlertsPage() {
       if (filterSeverity !== 'ALL') {
         const sev = (a.severity || '').toLowerCase();
         if (filterSeverity === 'CRITICAL' && !['critical', 'danger', 'emergency'].includes(sev)) return false;
-        if (filterSeverity === 'WARNING' && !['high', 'warning'].includes(sev)) return false;
-        if (filterSeverity === 'MODERATE' && !['medium', 'advisory'].includes(sev)) return false;
+        if (filterSeverity === 'HIGH' && !['high', 'severe'].includes(sev)) return false;
+        if (filterSeverity === 'ELEVATED' && !['elevated', 'warning', 'medium'].includes(sev)) return false;
+        if (filterSeverity === 'INFORMATION' && !['low', 'info', 'notice'].includes(sev) && !['critical', 'high', 'severe', 'elevated', 'warning', 'medium'].includes(sev)) return false;
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -79,7 +82,7 @@ export default function AlertsPage() {
       <div className="dc-alerts-header">
         <div>
           <div className="alerts-super-row">
-            <span className="alerts-super">EMERGENCY BROADCAST DISPATCH</span>
+            <span className="alerts-super" style={{ color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>EMERGENCY BROADCAST DISPATCH</span>
             <SourceBadge
               source="DisasterChain Dispatch · Threshold Reference (IMD/NDMA)"
               confidence="High"
@@ -88,8 +91,8 @@ export default function AlertsPage() {
               compact={true}
             />
           </div>
-          <h1 className="alerts-title">Public Warning & Advisory Center</h1>
-          <p className="alerts-desc">
+          <h1 className="alerts-title" style={{ fontFamily: 'var(--font-display)', color: '#F4F7F8' }}>Public Warning & Advisory Center</h1>
+          <p className="alerts-desc" style={{ color: 'var(--text-secondary)' }}>
             Direct dissemination of urgent civilian advisories, localized meteorological watches, and evacuation bulletins.
           </p>
         </div>
@@ -107,10 +110,10 @@ export default function AlertsPage() {
         </div>
       </div>
 
-      {/* Filter Track */}
+      {/* Filter Track with Stronger Severity Hierarchy */}
       <div className="dc-alerts-filter-bar">
         <div className="sev-filter-pills" role="tablist">
-          {['ALL', 'CRITICAL', 'WARNING', 'MODERATE'].map((sev) => (
+          {['ALL', 'CRITICAL', 'HIGH', 'ELEVATED', 'INFORMATION'].map((sev) => (
             <button
               key={sev}
               type="button"
@@ -135,12 +138,12 @@ export default function AlertsPage() {
       <div className="dc-alerts-stream">
         {loading ? (
           <div className="alerts-empty-state">
-            <span>SYNCING EMERGENCY BROADCASTS...</span>
+            <span style={{ color: 'var(--primary)' }}>CALIBRATING RISK MODEL & ADVISORIES...</span>
           </div>
         ) : filteredAlerts.length === 0 ? (
           <div className="alerts-empty-state">
-            <span style={{ color: '#5E8B68' }}>✓ NO ACTIVE EMERGENCY ADVISORIES</span>
-            <p>All regional warning sectors are currently operating under baseline conditions.</p>
+            <span style={{ color: '#52D273' }}>✓ NO ACTIVE EMERGENCY ADVISORIES</span>
+            <p style={{ color: 'var(--text-muted)' }}>Network is currently clear in this area. All regional warning sectors operating under baseline posture.</p>
           </div>
         ) : (
           filteredAlerts.map((alt) => {

@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#120B08",
-  "background_color": "#120B08",
+  "theme_color": "#070B10",
+  "background_color": "#070B10",
   "categories": [
     "utilities",
     "emergency",

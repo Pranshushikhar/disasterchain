@@ -9,12 +9,12 @@ export default function Footer() {
       className="app-footer"
       role="contentinfo"
       style={{
-        background: 'var(--bg-secondary, #1C110D)',
-        borderTop: '1px solid var(--border-subtle, rgba(255, 138, 61, 0.14))',
+        background: 'var(--bg-secondary, #0E151D)',
+        borderTop: '1px solid var(--border-subtle, #202D38)',
         padding: '1.5rem 2rem',
         marginTop: 'auto',
-        color: 'var(--text-secondary, #D6C7BE)',
-        fontFamily: 'var(--font-sans, system-ui, sans-serif)',
+        color: 'var(--text-secondary, #A8B5BE)',
+        fontFamily: 'var(--font-sans)',
         position: 'relative',
         zIndex: 10,
       }}
@@ -37,15 +37,15 @@ export default function Footer() {
               fontWeight: 800,
               fontSize: '0.85rem',
               letterSpacing: '0.08em',
-              color: 'var(--primary, #FF6B2C)',
+              color: 'var(--primary, #42D9C8)',
               fontFamily: 'var(--font-display, inherit)',
             }}
           >
-            DISASTERCHAIN
+            DISASTERCHAIN / EARTH INTELLIGENCE
           </span>
-          <span style={{ color: 'var(--border-medium, rgba(255, 138, 61, 0.28))' }}>•</span>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted, #A39186)' }}>
-            {t('landing.footerText', 'DisasterChain Emergency Network v2.6 • Cryptographic Crisis Response Platform')}
+          <span style={{ color: 'var(--border-medium, #263541)' }}>•</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64727D)' }}>
+            {t('landing.footerText', 'DisasterChain Emergency Network v2.6 • Global Disaster Intelligence & Mission Control')}
           </span>
         </div>
 
@@ -62,7 +62,7 @@ export default function Footer() {
           <span
             className="developer-credit-text"
             style={{
-              color: 'var(--text-muted, #A39186)',
+              color: 'var(--text-muted, #64727D)',
               fontWeight: 500,
               letterSpacing: '0.02em',
               transition: 'color 0.2s ease, transform 0.2s ease',
@@ -76,7 +76,7 @@ export default function Footer() {
 
       <style>{`
         .developer-credit-text:hover {
-          color: var(--primary-bright, #FF8A3D) !important;
+          color: var(--primary, #42D9C8) !important;
         }
         @media (max-width: 768px) {
           .app-footer {

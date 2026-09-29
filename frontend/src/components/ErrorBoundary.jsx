@@ -77,11 +77,11 @@ const ErrorFallbackView = ({ inline, onReset }) => {
             onClick={onReset}
             className="btn btn-primary"
             style={{
-              background: 'var(--orange-primary, #FF6B2C)',
-              color: '#ffffff',
+              background: 'var(--primary, #42D9C8)',
+              color: '#070B10',
               border: 'none',
               padding: '0.65rem 1.25rem',
-              borderRadius: '4px',
+              borderRadius: '8px',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',

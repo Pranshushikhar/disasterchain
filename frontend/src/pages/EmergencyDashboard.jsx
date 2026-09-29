@@ -10,6 +10,7 @@ import {
 import { fetchCompleteWeather } from '../services/weatherApi';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/i18n';
+import { useWeatherGPT } from '../context/WeatherGPTContext';
 
 // Reusable DisasterChain Operational Primitives
 import SituationRoomMap from '../components/SituationRoomMap';
@@ -40,6 +41,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { openWeatherGPT } = useWeatherGPT();
 
   // Core backend operational data states
   const [sosList, setSosList] = useState([]);
@@ -178,8 +180,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
     if (hasCriticalSos || (hasSevereAlert && hasFloodingIncident)) {
       return {
-        level: 'ELEVATED RISK',
-        color: '#D66A35',
+        level: 'CRITICAL RISK',
+        color: '#FF5C5C',
         headline: 'Heavy rainfall is increasing localized waterlogging risk in Sector 14–17.',
         explanation: 'Low-lying roadway culverts are running near absorption limits. Standby drainage pumps are active, but transit delays and localized basement ingress remain probable.',
         isCrisis: true,
@@ -193,8 +195,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
     if (alerts.length > 0 || incidents.length > 0) {
       return {
-        level: 'MODERATE ADVISORY',
-        color: '#C69A3A',
+        level: 'ELEVATED ADVISORY',
+        color: '#F4B942',
         headline: 'Moderate localized hazards reported; municipal services deployed.',
         explanation: 'Intermittent precipitation and minor debris obstructions have been reported across suburban corridors. Perimeter monitoring is ongoing.',
         isCrisis: false,
@@ -208,7 +210,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
     return {
       level: 'STABLE POSTURE',
-      color: '#5E8B68',
+      color: '#52D273',
       headline: 'Normal environmental and municipal response posture.',
       explanation: 'No critical civilian emergencies or severe weather warnings active in this sector. Telemetry feeds from monitoring stations remain within baseline limits.',
       isCrisis: false,
@@ -379,9 +381,14 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
           <div className="nav-rail-group">
             <span className="nav-rail-group-title">INTELLIGENCE</span>
-            <Link to="/weather-gpt" className="nav-rail-link">
-              WeatherGPT Desk
-            </Link>
+            <button
+              type="button"
+              className="nav-rail-link text-btn"
+              onClick={() => openWeatherGPT()}
+              style={{ color: '#42D9C8', fontWeight: 600 }}
+            >
+              WeatherGPT Copilot
+            </button>
             <button
               type="button"
               className="nav-rail-link text-btn"
@@ -583,7 +590,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
                     <span className="slot-temp">{slot.temp}</span>
                     <span
                       className="slot-pop"
-                      style={{ color: slot.popVal > 30 ? '#D66A35' : '#A49F93' }}
+                      style={{ color: slot.popVal > 30 ? '#42D9C8' : '#A8B5BE' }}
                     >
                       {slot.pop}
                     </span>
@@ -593,10 +600,15 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
             </div>
 
             <div className="intel-gpt-link-wrapper">
-              <Link to="/weather-gpt" className="intel-gpt-link">
-                <span>OPEN WEATHERGPT DESK</span>
+              <button
+                type="button"
+                onClick={() => openWeatherGPT()}
+                className="intel-gpt-link"
+                style={{ width: '100%', cursor: 'pointer', textAlign: 'left', background: 'rgba(66, 217, 200, 0.08)', border: '1px solid #42D9C8', color: '#42D9C8', borderRadius: '8px', padding: '0.45rem 0.75rem' }}
+              >
+                <span>OPEN WEATHERGPT COPILOT</span>
                 <span>→</span>
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -612,7 +624,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
                     className="gauge-fill"
                     style={{
                       width: `${Math.min(100, Math.round(((nearestShelter.occupancy || 0) / (nearestShelter.capacity || 100)) * 100))}%`,
-                      backgroundColor: (nearestShelter.occupancy || 0) > (nearestShelter.capacity || 100) * 0.8 ? '#D66A35' : '#5E8B68',
+                      backgroundColor: (nearestShelter.occupancy || 0) > (nearestShelter.capacity || 100) * 0.8 ? '#FF5C5C' : '#52D273',
                     }}
                   />
                 </div>
@@ -689,9 +701,9 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
       <style>{`
         .situation-room-root {
           min-height: calc(100vh - 64px);
-          background: #0D0E0D;
-          color: #E9E5DC;
-          font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif);
+          background: #070B10;
+          color: #F4F7F8;
+          font-family: var(--font-sans);
           padding: 1.25rem 1.75rem 4rem 1.75rem;
           box-sizing: border-box;
         }
@@ -703,9 +715,9 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           justify-content: space-between;
           flex-wrap: wrap;
           gap: 1rem;
-          background: #121413;
-          border: 1px solid rgba(242, 238, 231, 0.08);
-          border-radius: 4px;
+          background: #111A23;
+          border: 1px solid #202D38;
+          border-radius: 12px;
           padding: 0.65rem 1.25rem;
           margin-bottom: 1.25rem;
           font-size: 0.72rem;
@@ -727,19 +739,19 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         .telemetry-label {
           font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
-          color: #7A756D;
+          color: #64727D;
           letter-spacing: 0.06em;
         }
 
         .telemetry-val {
-          color: #F7F4ED;
-          font-weight: 500;
+          color: #F4F7F8;
+          font-weight: 600;
         }
 
         .telemetry-divider {
           width: 1px;
           height: 14px;
-          background: rgba(242, 238, 231, 0.1);
+          background: #202D38;
         }
 
         .telemetry-right {
@@ -749,45 +761,45 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .telemetry-action-btn {
-          background: #181A18;
-          border: 1px solid rgba(242, 238, 231, 0.12);
-          color: #E9E5DC;
+          background: #16212B;
+          border: 1px solid #263541;
+          color: #F4F7F8;
           font-family: var(--font-mono, monospace);
           font-size: 0.65rem;
-          padding: 0.25rem 0.6rem;
-          border-radius: 2px;
+          padding: 0.3rem 0.65rem;
+          border-radius: 8px;
           display: inline-flex;
           align-items: center;
           gap: 0.4rem;
           cursor: pointer;
-          transition: all 0.12s ease;
+          transition: all 0.15s ease;
         }
 
         .telemetry-action-btn:hover {
-          border-color: #D66A35;
-          color: #F7F4ED;
+          border-color: #42D9C8;
+          color: #42D9C8;
         }
 
         .cmd-kbd {
-          background: rgba(242, 238, 231, 0.08);
+          background: #202D38;
           padding: 0.1rem 0.35rem;
-          border-radius: 2px;
-          color: #D66A35;
+          border-radius: 4px;
+          color: #42D9C8;
           font-weight: 700;
         }
 
         .report-btn {
-          background: rgba(214, 106, 53, 0.1);
-          border-color: rgba(214, 106, 53, 0.3);
-          color: #D66A35;
+          background: rgba(66, 217, 200, 0.1);
+          border-color: rgba(66, 217, 200, 0.3);
+          color: #42D9C8;
           font-weight: 600;
         }
 
         .health-dot {
-          width: 6px;
-          height: 6px;
+          width: 7px;
+          height: 7px;
           border-radius: 50%;
-          background: #5E8B68;
+          background: #52D273;
         }
 
         /* 2. 3-Column Layout */
@@ -816,30 +828,30 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-size: 0.62rem;
           font-weight: 700;
           letter-spacing: 0.12em;
-          color: #7A756D;
+          color: #64727D;
           margin-bottom: 0.35rem;
         }
 
         .nav-rail-link {
           font-size: 0.84rem;
-          color: #A49F93;
+          color: #A8B5BE;
           text-decoration: none;
-          padding: 0.35rem 0.5rem;
-          border-radius: 2px;
-          transition: all 0.12s ease;
+          padding: 0.4rem 0.6rem;
+          border-radius: 8px;
+          transition: all 0.15s ease;
           display: block;
         }
 
         .nav-rail-link:hover {
-          color: #F7F4ED;
-          background: rgba(242, 238, 231, 0.03);
+          color: #F4F7F8;
+          background: #16212B;
         }
 
         .nav-rail-link.active {
-          color: #D66A35;
-          font-weight: 600;
-          background: rgba(214, 106, 53, 0.08);
-          border-left: 2px solid #D66A35;
+          color: #42D9C8;
+          font-weight: 700;
+          background: rgba(66, 217, 200, 0.1);
+          border-left: 2px solid #42D9C8;
         }
 
         .nav-rail-link.text-btn {
@@ -851,28 +863,31 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .admin-link {
-          color: #C69A3A;
+          color: #F4B942;
         }
 
         .nav-rail-sos-btn {
           width: 100%;
-          background: #C84A3A;
+          background: #FF5C5C;
           color: #FFF;
           border: none;
-          padding: 0.65rem 0.85rem;
-          border-radius: 2px;
+          padding: 0.7rem 0.95rem;
+          border-radius: 10px;
           font-family: var(--font-mono, monospace);
           font-size: 0.76rem;
-          font-weight: 700;
+          font-weight: 800;
           letter-spacing: 0.08em;
           display: flex;
           align-items: center;
           justify-content: space-between;
           cursor: pointer;
+          transition: all 0.15s ease;
+          box-shadow: 0 4px 14px rgba(255, 92, 92, 0.25);
         }
 
         .nav-rail-sos-btn:hover {
-          background: #D84D3F;
+          background: #E04848;
+          box-shadow: 0 4px 20px rgba(255, 92, 92, 0.4);
         }
 
         .sos-dot {
@@ -892,15 +907,15 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
         /* Situational Status Surface */
         .situation-status-surface {
-          background: #121413;
-          border: 1px solid rgba(242, 238, 231, 0.08);
-          border-radius: 4px;
-          padding: 1.4rem;
+          background: #111A23;
+          border: 1px solid #202D38;
+          border-radius: 12px;
+          padding: 1.5rem;
         }
 
         .situation-status-surface.crisis {
-          border-left: 3px solid #D66A35;
-          background: rgba(214, 106, 53, 0.03);
+          border-left: 4px solid #FF5C5C;
+          background: rgba(255, 92, 92, 0.04);
         }
 
         .situation-status-top {
@@ -915,7 +930,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-size: 0.65rem;
           font-weight: 700;
           letter-spacing: 0.12em;
-          color: #7A756D;
+          color: #64727D;
         }
 
         .situation-status-level {
@@ -925,30 +940,31 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           letter-spacing: 0.08em;
           padding: 0.15rem 0.5rem;
           border: 1px solid;
-          border-radius: 2px;
+          border-radius: 6px;
         }
 
         .situation-statement-heading {
           font-size: 1.35rem;
-          font-weight: 600;
-          color: #F7F4ED;
+          font-weight: 700;
+          color: #F4F7F8;
           line-height: 1.35;
           margin: 0 0 0.65rem 0;
           letter-spacing: -0.01em;
+          font-family: var(--font-display);
         }
 
         .situation-status-explanation {
           font-size: 0.86rem;
           line-height: 1.5;
-          color: #A49F93;
+          color: #A8B5BE;
           margin: 0 0 1rem 0;
         }
 
         .situation-actions-block {
-          background: #181A18;
-          border: 1px solid rgba(242, 238, 231, 0.06);
-          border-radius: 3px;
-          padding: 0.85rem 1rem;
+          background: #16212B;
+          border: 1px solid #202D38;
+          border-radius: 10px;
+          padding: 0.95rem 1.15rem;
         }
 
         .actions-block-title {
@@ -957,7 +973,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-size: 0.62rem;
           font-weight: 700;
           letter-spacing: 0.08em;
-          color: #D66A35;
+          color: #42D9C8;
           margin-bottom: 0.45rem;
         }
 
@@ -975,19 +991,19 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           align-items: baseline;
           gap: 0.45rem;
           font-size: 0.82rem;
-          color: #E9E5DC;
+          color: #F4F7F8;
         }
 
         .bullet-arrow {
-          color: #D66A35;
+          color: #42D9C8;
           font-family: var(--font-mono, monospace);
         }
 
         /* Spatial Container */
         .situation-spatial-container {
-          background: #121413;
-          border: 1px solid rgba(242, 238, 231, 0.08);
-          border-radius: 4px;
+          background: #111A23;
+          border: 1px solid #202D38;
+          border-radius: 12px;
           overflow: hidden;
         }
 
@@ -995,9 +1011,9 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.65rem 1rem;
-          background: #181A18;
-          border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+          padding: 0.75rem 1.25rem;
+          background: #16212B;
+          border-bottom: 1px solid #202D38;
           flex-wrap: wrap;
           gap: 0.5rem;
         }
@@ -1008,33 +1024,33 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .spatial-tab-btn {
-          background: transparent;
-          border: 1px solid rgba(242, 238, 231, 0.1);
-          color: #A49F93;
+          background: #111A23;
+          border: 1px solid #263541;
+          color: #A8B5BE;
           font-family: var(--font-mono, monospace);
           font-size: 0.65rem;
-          padding: 0.25rem 0.55rem;
-          border-radius: 2px;
+          padding: 0.3rem 0.65rem;
+          border-radius: 8px;
           cursor: pointer;
-          transition: all 0.12s ease;
+          transition: all 0.15s ease;
         }
 
         .spatial-tab-btn:hover {
-          color: #F7F4ED;
-          border-color: rgba(242, 238, 231, 0.25);
+          color: #F4F7F8;
+          border-color: #42D9C8;
         }
 
         .spatial-tab-btn.active {
-          background: rgba(214, 106, 53, 0.15);
-          border-color: #D66A35;
-          color: #D66A35;
+          background: rgba(66, 217, 200, 0.12);
+          border-color: #42D9C8;
+          color: #42D9C8;
           font-weight: 700;
         }
 
         .spatial-mode-caption {
           font-family: var(--font-mono, monospace);
           font-size: 0.58rem;
-          color: #7A756D;
+          color: #64727D;
           letter-spacing: 0.08em;
         }
 
@@ -1060,23 +1076,23 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-size: 0.65rem;
           font-weight: 700;
           letter-spacing: 0.12em;
-          color: #7A756D;
-          border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+          color: #64727D;
+          border-bottom: 1px solid #202D38;
           padding-bottom: 0.45rem;
         }
 
         .intel-pulse {
-          width: 6px;
-          height: 6px;
+          width: 7px;
+          height: 7px;
           border-radius: 50%;
-          background: #5E8B68;
+          background: #52D273;
         }
 
         .intel-block {
-          background: #121413;
-          border: 1px solid rgba(242, 238, 231, 0.08);
-          border-radius: 3px;
-          padding: 0.95rem;
+          background: #111A23;
+          border: 1px solid #202D38;
+          border-radius: 12px;
+          padding: 1.1rem;
         }
 
         .intel-block-title {
@@ -1084,7 +1100,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-size: 0.62rem;
           font-weight: 700;
           letter-spacing: 0.1em;
-          color: #7A756D;
+          color: #64727D;
           margin-bottom: 0.55rem;
         }
 
@@ -1096,46 +1112,46 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .intel-temp {
-          font-size: 1.55rem;
-          font-weight: 700;
-          color: #F7F4ED;
-          font-family: var(--font-mono, monospace);
+          font-size: 1.65rem;
+          font-weight: 800;
+          color: #F4F7F8;
+          font-family: var(--font-display);
         }
 
         .intel-condition {
           font-size: 0.78rem;
-          color: #A49F93;
+          color: #A8B5BE;
         }
 
         .intel-weather-metrics {
           font-family: var(--font-mono, monospace);
           font-size: 0.68rem;
-          color: #7A756D;
+          color: #64727D;
           margin-bottom: 0.85rem;
         }
 
         .intel-subheading {
           font-family: var(--font-mono, monospace);
           font-size: 0.58rem;
-          color: #7A756D;
+          color: #64727D;
           margin-bottom: 0.4rem;
         }
 
         .intel-timeline-grid {
           display: grid;
           grid-template-columns: repeat(6, 1fr);
-          gap: 2px;
+          gap: 3px;
           text-align: center;
-          background: #181A18;
-          border: 1px solid rgba(242, 238, 231, 0.06);
-          border-radius: 2px;
-          padding: 0.35rem 0.2rem;
+          background: #16212B;
+          border: 1px solid #202D38;
+          border-radius: 8px;
+          padding: 0.45rem 0.25rem;
           font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
         }
 
-        .slot-time { color: #7A756D; font-size: 0.55rem; display: block; }
-        .slot-temp { color: #E9E5DC; font-weight: 600; display: block; }
+        .slot-time { color: #64727D; font-size: 0.55rem; display: block; }
+        .slot-temp { color: #F4F7F8; font-weight: 600; display: block; }
         .slot-pop { font-size: 0.55rem; display: block; }
 
         .intel-gpt-link-wrapper {
@@ -1149,18 +1165,18 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-family: var(--font-mono, monospace);
           font-size: 0.65rem;
           font-weight: 700;
-          color: #D66A35;
+          color: #42D9C8;
           text-decoration: none;
-          border: 1px solid rgba(214, 106, 53, 0.2);
-          background: rgba(214, 106, 53, 0.05);
-          padding: 0.35rem 0.65rem;
-          border-radius: 2px;
-          transition: all 0.12s ease;
+          border: 1px solid #42D9C8;
+          background: rgba(66, 217, 200, 0.08);
+          padding: 0.45rem 0.75rem;
+          border-radius: 8px;
+          transition: all 0.15s ease;
         }
 
         .intel-gpt-link:hover {
-          background: rgba(214, 106, 53, 0.12);
-          border-color: #D66A35;
+          background: rgba(66, 217, 200, 0.16);
+          border-color: #42D9C8;
         }
 
         /* Shelter Card */
@@ -1173,20 +1189,20 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         .intel-shelter-name {
           font-size: 0.88rem;
           font-weight: 600;
-          color: #F7F4ED;
+          color: #F4F7F8;
         }
 
         .intel-shelter-address {
           font-size: 0.74rem;
-          color: #A49F93;
+          color: #A8B5BE;
         }
 
         .shelter-gauge-bar {
-          height: 3px;
-          background: rgba(242, 238, 231, 0.08);
+          height: 4px;
+          background: #202D38;
           border-radius: 2px;
           overflow: hidden;
-          margin: 0.35rem 0;
+          margin: 0.45rem 0;
         }
 
         .gauge-fill {
@@ -1197,21 +1213,22 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         .intel-shelter-data {
           font-family: var(--font-mono, monospace);
           font-size: 0.65rem;
-          color: #A49F93;
+          color: #A8B5BE;
         }
 
         /* Advisory Block */
         .intel-advisory-text {
           font-size: 0.8rem;
           line-height: 1.4;
-          color: #E9E5DC;
+          color: #F4F7F8;
           margin: 0;
         }
 
         /* Distress SOS Block */
         .sos-block {
-          border-color: rgba(200, 74, 58, 0.3);
-          background: rgba(200, 74, 58, 0.04);
+          border-color: rgba(255, 92, 92, 0.3);
+          background: rgba(255, 92, 92, 0.05);
+          border-radius: 12px;
         }
 
         .sos-block-title {
@@ -1219,32 +1236,35 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-size: 0.62rem;
           font-weight: 700;
           letter-spacing: 0.1em;
-          color: #C84A3A;
+          color: #FF5C5C;
           margin-bottom: 0.35rem;
         }
 
         .sos-block-desc {
           font-size: 0.74rem;
-          color: #A49F93;
+          color: #A8B5BE;
           margin: 0 0 0.65rem 0;
         }
 
         .intel-direct-sos-btn {
           width: 100%;
-          background: #C84A3A;
+          background: #FF5C5C;
           color: #FFF;
           border: none;
           font-family: var(--font-mono, monospace);
           font-size: 0.72rem;
-          font-weight: 700;
+          font-weight: 800;
           letter-spacing: 0.08em;
-          padding: 0.55rem;
-          border-radius: 2px;
+          padding: 0.65rem;
+          border-radius: 8px;
           cursor: pointer;
+          transition: all 0.15s ease;
+          box-shadow: 0 4px 14px rgba(255, 92, 92, 0.3);
         }
 
         .intel-direct-sos-btn:hover {
-          background: #D84D3F;
+          background: #E04848;
+          box-shadow: 0 4px 20px rgba(255, 92, 92, 0.45);
         }
 
         /* Responsive Breakpoints */

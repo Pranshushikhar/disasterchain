@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from '../i18n/i18n';
+import { useWeatherGPT } from '../context/WeatherGPTContext';
 import WeatherMap from '../components/WeatherMap';
 import {
   fetchCompleteWeather,
@@ -69,8 +70,8 @@ const WeatherEditorialChart = ({ data, isHourly = false, t }) => {
       >
         <defs>
           <linearGradient id="warmTempGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#FF6B2C" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#FF6B2C" stopOpacity="0.0" />
+            <stop offset="0%" stopColor="#42D9C8" stopOpacity="0.28" />
+            <stop offset="100%" stopColor="#42D9C8" stopOpacity="0.0" />
           </linearGradient>
         </defs>
 
@@ -81,7 +82,7 @@ const WeatherEditorialChart = ({ data, isHourly = false, t }) => {
         <path
           d={pathD}
           fill="none"
-          stroke="#FF6B2C"
+          stroke="#42D9C8"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -96,12 +97,12 @@ const WeatherEditorialChart = ({ data, isHourly = false, t }) => {
               y1={c.y}
               x2={c.x}
               y2={svgHeight - paddingBottom}
-              stroke="rgba(255, 138, 61, 0.12)"
+              stroke="rgba(66, 217, 200, 0.15)"
               strokeDasharray="2,3"
             />
 
             {/* Circle Marker */}
-            <circle cx={c.x} cy={c.y} r="3.5" fill="#FFF7ED" stroke="#FF6B2C" strokeWidth="2" />
+            <circle cx={c.x} cy={c.y} r="3.5" fill="#F4F7F8" stroke="#42D9C8" strokeWidth="2" />
 
             {/* Temperature Tag */}
             <text
@@ -136,7 +137,7 @@ const WeatherEditorialChart = ({ data, isHourly = false, t }) => {
               x={c.x}
               y={svgHeight - 6}
               textAnchor="middle"
-              fill="#A49587"
+              fill="#A8B5BE"
               fontSize="11"
               fontWeight="600"
             >
@@ -151,6 +152,7 @@ const WeatherEditorialChart = ({ data, isHourly = false, t }) => {
 
 export default function WeatherPage() {
   const { t } = useTranslation();
+  const { openWeatherGPT } = useWeatherGPT();
 
   // Selected Location (Default: New Delhi, India)
   const [selectedLocation, setSelectedLocation] = useState({
@@ -450,72 +452,38 @@ export default function WeatherPage() {
               {feedStatus === 'LIVE' ? t('weather.liveData', 'LIVE DATA') : t('weather.cachedData', 'CACHED DATA')}
             </span>
 
-            <span style={{ fontSize: '0.76rem', color: '#B9A495', fontFamily: 'var(--font-mono)' }}>
-              {lastUpdated ? `${t('weather.lastUpdated', 'Updated')} ${lastUpdated}` : t('common.syncing', 'Syncing...')}
+            <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+              {lastUpdated ? `${t('weather.lastUpdated', 'Updated')} ${lastUpdated}` : 'Syncing telemetry...'}
             </span>
           </div>
 
-          {/* Large Editorial Heading */}
-          <h1 className="weather-editorial-title">
-            <span>{t('weather.editorialHeading1', 'WEATHER')}</span>
-            <br />
-            <span style={{ color: '#FF6B2C' }}>{t('weather.editorialHeading2', '& ATMOSPHERIC INTELLIGENCE')}</span>
+          {/* Large Atmospheric Intelligence Heading */}
+          <h1 className="weather-editorial-title" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+            <span style={{ color: '#F4F7F8' }}>ATMOSPHERIC INTELLIGENCE</span>
           </h1>
 
-          <p style={{ color: '#E7D6C8', fontSize: '0.94rem', lineHeight: 1.55, margin: 0 }}>
-            {t('weather.editorialDesc', 'Live conditions, forecast trends, air quality and atmospheric hazards for your selected location.')}
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.90rem', lineHeight: 1.55, margin: 0 }}>
+            Precision numerical atmospheric telemetry, sensor feeds, air quality and multi-hazard forecasting.
           </p>
         </div>
 
-        {/* Top Actions: WeatherGPT + Refresh */}
+        {/* Top Actions: Refresh */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <Link
-            to="/weather-gpt"
-            state={{
-              location: {
-                name: locationDisplayTitle,
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-              },
-            }}
-            style={{
-              background: '#191714',
-              border: '1px solid rgba(242, 238, 231, 0.12)',
-              color: '#F2EEE7',
-              padding: '0.55rem 1rem',
-              borderRadius: '4px',
-              fontWeight: 600,
-              fontSize: '0.84rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              textDecoration: 'none',
-              minHeight: '40px',
-              transition: 'border-color 0.15s ease',
-            }}
-          >
-            <span>Ask WeatherGPT</span>
-            <span style={{ color: '#D96B35' }}>→</span>
-          </Link>
-
           <button
             type="button"
             onClick={() => loadWeatherData(selectedLocation.latitude, selectedLocation.longitude)}
             disabled={isLoading}
-            className="btn"
+            className="btn btn-secondary"
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 138, 61, 0.25)',
-              color: '#FFF7ED',
-              padding: '0.65rem 1rem',
-              borderRadius: '8px',
-              fontSize: '0.85rem',
+              padding: '0.55rem 1rem',
+              borderRadius: '6px',
+              fontSize: '0.82rem',
               fontWeight: 700,
               cursor: 'pointer',
-              minHeight: '44px',
+              minHeight: '40px',
             }}
           >
-            ↻ {isLoading ? t('common.refreshing', 'Syncing...') : t('weather.refresh', 'Refresh')}
+            ↻ {isLoading ? 'Syncing...' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -523,13 +491,13 @@ export default function WeatherPage() {
       {/* 2. LOCATION SECTION */}
       <div className="weather-location-strip">
         <div>
-          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#FF6B2C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#42D9C8', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
             {selectedLocation.isGps ? t('weather.currentLocation', 'CURRENT LOCATION') : t('weather.selectedLocation', 'SELECTED LOCATION')}
           </div>
-          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#FFF7ED' }}>
+          <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#F4F7F8' }}>
             {locationDisplayTitle}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#B9A495', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
+          <div style={{ fontSize: '0.78rem', color: '#A8B5BE', fontFamily: 'var(--font-mono)', marginTop: '0.15rem' }}>
             {selectedLocation.latitude.toFixed(4)}°N · {selectedLocation.longitude.toFixed(4)}°E
           </div>
         </div>
@@ -539,11 +507,11 @@ export default function WeatherPage() {
             type="button"
             onClick={() => setShowLocationSearch((prev) => !prev)}
             style={{
-              background: showLocationSearch ? 'rgba(255, 107, 44, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 138, 61, 0.3)',
-              color: '#FFF7ED',
+              background: showLocationSearch ? 'rgba(66, 217, 200, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid #202D38',
+              color: '#F4F7F8',
               padding: '0.5rem 0.95rem',
-              borderRadius: '6px',
+              borderRadius: '8px',
               fontSize: '0.82rem',
               fontWeight: 700,
               cursor: 'pointer',
@@ -562,9 +530,9 @@ export default function WeatherPage() {
       {showLocationSearch && (
         <div
           style={{
-            background: 'rgba(28, 17, 13, 0.96)',
-            border: '1px solid rgba(255, 138, 61, 0.3)',
-            borderRadius: 'var(--radius-md)',
+            background: '#111A23',
+            border: '1px solid #202D38',
+            borderRadius: '12px',
             padding: '1.25rem 1.5rem',
             marginTop: '-0.75rem',
             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
@@ -576,10 +544,10 @@ export default function WeatherPage() {
               onClick={handleUseMyLocation}
               disabled={isLocating}
               style={{
-                background: '#FF6B2C',
-                color: '#ffffff',
+                background: '#42D9C8',
+                color: '#070B10',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: '8px',
                 padding: '0.55rem 1rem',
                 fontSize: '0.85rem',
                 fontWeight: 700,
@@ -673,7 +641,7 @@ export default function WeatherPage() {
       <div className="weather-hero-panel">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.25rem' }}>
           <div>
-            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#FF6B2C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#42D9C8', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
               {t('weather.currentConditions', 'CURRENT CONDITIONS')}
             </div>
 
@@ -683,10 +651,10 @@ export default function WeatherPage() {
               </div>
 
               <div>
-                <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FFF7ED' }}>
+                <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#F4F7F8' }}>
                   {condition.label}
                 </div>
-                <div style={{ fontSize: '0.92rem', color: '#B9A495', marginTop: '0.15rem' }}>
+                <div style={{ fontSize: '0.92rem', color: '#A8B5BE', marginTop: '0.15rem' }}>
                   {t('weather.feelsLike', 'Feels like')} {current?.apparentTemperature != null ? Math.round(current.apparentTemperature) : '--'}°C
                 </div>
               </div>
@@ -745,14 +713,14 @@ export default function WeatherPage() {
       <div className="weather-aqi-integrated">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
           <div>
-            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#FF6B2C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#42D9C8', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
               {t('weather.airQuality', 'AIR QUALITY')}
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.85rem' }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 800, color: '#FFF7ED', lineHeight: 1 }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '2.4rem', fontWeight: 800, color: '#F4F7F8', lineHeight: 1 }}>
                 {airQuality?.europeanAqi != null ? airQuality.europeanAqi : '--'}
               </span>
-              <span style={{ fontSize: '0.92rem', color: '#B9A495' }}>
+              <span style={{ fontSize: '0.92rem', color: '#A8B5BE' }}>
                 {t('weather.europeanAqi', 'European AQI')}
               </span>
               <span
@@ -833,43 +801,87 @@ export default function WeatherPage() {
         </div>
       </div>
 
+      {/* 4B. NEXT 6 HOURS (DEDICATED TELEMETRY STRIP) */}
+      <div
+        className="spatial-panel"
+        style={{
+          background: '#111A23',
+          border: '1px solid rgba(168, 181, 190, 0.14)',
+          borderRadius: '10px',
+          padding: '1.25rem 1.5rem',
+          marginBottom: '1.5rem',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+              FORWARD METEOROLOGICAL TELEMETRY
+            </div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#F4F7F8', margin: 0, fontFamily: 'var(--font-display)' }}>
+              NEXT 6 HOURS
+            </h2>
+          </div>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            Deterministic Numerical Prediction
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.75rem' }}>
+          {forecast?.hourly && forecast.hourly.length >= 6 ? (
+            forecast.hourly.slice(0, 6).map((h, i) => {
+              const hCond = getWeatherCondition(h.weatherCode, t);
+              const timeStr = h.time ? h.time.slice(11, 16) : `+${i + 1}h`;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    background: '#0E151D',
+                    border: '1px solid rgba(168, 181, 190, 0.1)',
+                    borderRadius: '8px',
+                    padding: '0.75rem 0.65rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                    textAlign: 'center',
+                  }}
+                >
+                  <span style={{ fontSize: '0.70rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                    {timeStr}
+                  </span>
+                  <span style={{ fontSize: '1.4rem' }}>{hCond.icon}</span>
+                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-mono)' }}>
+                    {Math.round(h.temperature)}°C
+                  </span>
+                  <span style={{ fontSize: '0.68rem', color: (h.precipitationProbability || 0) > 30 ? '#4DA3FF' : 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+                    💧 {h.precipitationProbability || 0}%
+                  </span>
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ padding: '0.75rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+              Calibrating 6-hour numerical feeds...
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* 5. FORECAST (HERO INFORMATION) */}
       <div className="weather-forecast-hero">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
-            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#FF6B2C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
               {t('weather.forecast', 'FORECAST')}
             </div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#FFF7ED', margin: 0 }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#F4F7F8', margin: 0, fontFamily: 'var(--font-display)' }}>
               {t('weather.forecastSubtitle', '7-Day Meteorological Trajectory')}
             </h2>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.78rem', color: '#B9A495' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
               {selectedLocation.city}
             </span>
-            <Link
-              to="/weather-gpt"
-              state={{
-                location: {
-                  name: locationDisplayTitle,
-                  latitude: selectedLocation.latitude,
-                  longitude: selectedLocation.longitude,
-                },
-              }}
-              style={{
-                fontSize: '0.82rem',
-                fontWeight: 600,
-                color: '#D96B35',
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}
-            >
-              <span>Ask WeatherGPT</span>
-              <span>→</span>
-            </Link>
           </div>
         </div>
 
@@ -886,10 +898,10 @@ export default function WeatherPage() {
               return (
                 <div key={idx} className={`weather-forecast-day ${isToday ? 'is-today' : ''}`}>
                   <div>
-                    <div style={{ fontSize: '0.84rem', fontWeight: 800, color: isToday ? '#FF6B2C' : '#FFF7ED' }}>
+                    <div style={{ fontSize: '0.84rem', fontWeight: 800, color: isToday ? '#42D9C8' : '#F4F7F8' }}>
                       {dayName}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: '#B9A495' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#A8B5BE' }}>
                       {dateFormatted}
                     </div>
                   </div>
@@ -899,10 +911,10 @@ export default function WeatherPage() {
                   </div>
 
                   <div>
-                    <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFF7ED', fontFamily: 'var(--font-mono)' }}>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#F4F7F8', fontFamily: 'var(--font-mono)' }}>
                       {Math.round(d.tempMax)}°
                     </span>
-                    <span style={{ fontSize: '0.85rem', color: '#B9A495', marginLeft: '4px', fontFamily: 'var(--font-mono)' }}>
+                    <span style={{ fontSize: '0.85rem', color: '#A8B5BE', marginLeft: '4px', fontFamily: 'var(--font-mono)' }}>
                       / {Math.round(d.tempMin)}°
                     </span>
                   </div>
@@ -911,21 +923,21 @@ export default function WeatherPage() {
                     style={{
                       fontSize: '0.74rem',
                       fontWeight: 700,
-                      color: (d.precipitationProbabilityMax ?? 0) >= 40 ? '#38bdf8' : '#B9A495',
+                      color: (d.precipitationProbabilityMax ?? 0) >= 40 ? '#4DA3FF' : '#A8B5BE',
                       fontFamily: 'var(--font-mono)',
                     }}
                   >
                     💧 {d.precipitationProbabilityMax ?? 0}%
                   </div>
 
-                  <div style={{ fontSize: '0.74rem', color: '#E7D6C8', minHeight: '1.8rem', lineHeight: 1.2 }}>
+                  <div style={{ fontSize: '0.74rem', color: '#A8B5BE', minHeight: '1.8rem', lineHeight: 1.2 }}>
                     {dCond.label}
                   </div>
                 </div>
               );
             })
           ) : (
-            <div style={{ padding: '1.5rem', textAlign: 'center', color: '#B9A495', gridColumn: '1 / -1' }}>
+            <div style={{ padding: '1.5rem', textAlign: 'center', color: '#A8B5BE', gridColumn: '1 / -1' }}>
               {t('common.loading', 'Loading forecast data...')}
             </div>
           )}
@@ -936,23 +948,23 @@ export default function WeatherPage() {
       <div className="weather-trend-container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#FF6B2C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#42D9C8', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
               {t('weather.trendTitle', 'TEMPERATURE & PRECIPITATION TREND')}
             </div>
-            <div style={{ fontSize: '0.84rem', color: '#B9A495' }}>
+            <div style={{ fontSize: '0.84rem', color: '#A8B5BE' }}>
               {trendMode === '7DAY' ? 'Trajectory across upcoming 7 days' : 'Hourly progression across next 12 hours'}
             </div>
           </div>
 
-          <div style={{ display: 'inline-flex', background: 'rgba(20, 13, 10, 0.8)', border: '1px solid rgba(255, 138, 61, 0.2)', borderRadius: '6px', padding: '2px' }}>
+          <div style={{ display: 'inline-flex', background: '#16212B', border: '1px solid #202D38', borderRadius: '8px', padding: '2px' }}>
             <button
               type="button"
               onClick={() => setTrendMode('7DAY')}
               style={{
-                background: trendMode === '7DAY' ? '#FF6B2C' : 'transparent',
-                color: trendMode === '7DAY' ? '#ffffff' : '#B9A495',
+                background: trendMode === '7DAY' ? '#42D9C8' : 'transparent',
+                color: trendMode === '7DAY' ? '#070B10' : '#A8B5BE',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 padding: '0.35rem 0.75rem',
                 fontSize: '0.76rem',
                 fontWeight: 700,
@@ -965,10 +977,10 @@ export default function WeatherPage() {
               type="button"
               onClick={() => setTrendMode('24HOUR')}
               style={{
-                background: trendMode === '24HOUR' ? '#FF6B2C' : 'transparent',
-                color: trendMode === '24HOUR' ? '#ffffff' : '#B9A495',
+                background: trendMode === '24HOUR' ? '#42D9C8' : 'transparent',
+                color: trendMode === '24HOUR' ? '#070B10' : '#A8B5BE',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '6px',
                 padding: '0.35rem 0.75rem',
                 fontSize: '0.76rem',
                 fontWeight: 700,
@@ -989,18 +1001,18 @@ export default function WeatherPage() {
 
       {/* 6B. WEATHER -> IMPACT CAUSAL CHAIN */}
       <div className="weather-impact-chain-surface" style={{
-        background: '#121413',
-        border: '1px solid rgba(242, 238, 231, 0.08)',
-        borderRadius: '4px',
+        background: '#111A23',
+        border: '1px solid #202D38',
+        borderRadius: '6px',
         padding: '1.25rem 1.5rem',
         marginBottom: '1.5rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
           <div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', color: '#D66A35', marginBottom: '0.2rem' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', color: '#42D9C8', marginBottom: '0.2rem' }}>
               CAUSAL ATMOSPHERIC CHAIN
             </div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#F7F4ED', margin: 0 }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#F4F7F8', margin: 0 }}>
               Weather → Environmental Impact Translation
             </h3>
           </div>
@@ -1018,42 +1030,42 @@ export default function WeatherPage() {
           gap: '1rem',
           alignItems: 'stretch',
         }}>
-          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>01 · PRECIPITATION</span>
-            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#F7F4ED', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+          <div style={{ background: '#16212B', border: '1px solid #202D38', borderRadius: '4px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#A8B5BE', fontWeight: 700 }}>01 · PRECIPITATION</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#F4F7F8', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
               {current?.precipitation != null ? `${current.precipitation} mm` : '4.2 mm/h'}
             </div>
-            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+            <p style={{ fontSize: '0.74rem', color: '#A8B5BE', margin: 0, lineHeight: 1.35 }}>
               Convective cloud ingress across municipal basin
             </p>
           </div>
 
-          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>02 · DRAINAGE STRESS</span>
-            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#C69A3A', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+          <div style={{ background: '#16212B', border: '1px solid #202D38', borderRadius: '4px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#A8B5BE', fontWeight: 700 }}>02 · DRAINAGE STRESS</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#F4B942', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
               78% Saturation
             </div>
-            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+            <p style={{ fontSize: '0.74rem', color: '#A8B5BE', margin: 0, lineHeight: 1.35 }}>
               Culvert inflow exceeds nominal absorption threshold
             </p>
           </div>
 
-          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>03 · WATERLOGGING</span>
-            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#D66A35', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
-              Elevated (Orange)
+          <div style={{ background: '#16212B', border: '1px solid #202D38', borderRadius: '4px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#A8B5BE', fontWeight: 700 }}>03 · WATERLOGGING</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#F4B942', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+              Elevated Risk
             </div>
-            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+            <p style={{ fontSize: '0.74rem', color: '#A8B5BE', margin: 0, lineHeight: 1.35 }}>
               Runoff pooling depth estimated at 18–35cm in low basins
             </p>
           </div>
 
-          <div style={{ background: '#181A18', border: '1px solid rgba(242, 238, 231, 0.08)', borderRadius: '3px', padding: '0.85rem' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#7A756D', fontWeight: 700 }}>04 · TRANSIT DISRUPTION</span>
-            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#D66A35', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
+          <div style={{ background: '#16212B', border: '1px solid #202D38', borderRadius: '4px', padding: '0.85rem' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#A8B5BE', fontWeight: 700 }}>04 · TRANSIT DISRUPTION</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#FF5C5C', margin: '0.25rem 0', fontFamily: 'var(--font-mono)' }}>
               +25–35 min Delay
             </div>
-            <p style={{ fontSize: '0.74rem', color: '#A49F93', margin: 0, lineHeight: 1.35 }}>
+            <p style={{ fontSize: '0.74rem', color: '#A8B5BE', margin: 0, lineHeight: 1.35 }}>
               Underpass diversion active on arterial ring bypass
             </p>
           </div>
@@ -1073,16 +1085,16 @@ export default function WeatherPage() {
               {atmosphericRisk.hasRisks ? '⚠️' : '✓'}
             </span>
             <div>
-              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: atmosphericRisk.hasRisks ? '#ef4444' : '#10b981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: atmosphericRisk.hasRisks ? '#FF5C5C' : '#52D273', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 {atmosphericRisk.hasRisks ? t('weather.atmosphericWatch', 'ATMOSPHERIC WATCH') : t('weather.atmosphericStatus', 'ATMOSPHERIC STATUS')}
               </div>
-              <div style={{ fontSize: '0.94rem', fontWeight: 700, color: '#FFF7ED', marginTop: '0.1rem' }}>
+              <div style={{ fontSize: '0.94rem', fontWeight: 700, color: '#F4F7F8', marginTop: '0.1rem' }}>
                 {atmosphericRisk.hasRisks ? atmosphericRisk.headline : t('weather.noHazards', 'No significant atmospheric hazards detected. Atmospheric indicators for your location remain stable.')}
               </div>
             </div>
           </div>
 
-          <span style={{ fontSize: '0.72rem', color: '#8c7b6d' }}>
+          <span style={{ fontSize: '0.72rem', color: '#A8B5BE' }}>
             {atmosphericRisk.disclaimer}
           </span>
         </div>
@@ -1095,20 +1107,20 @@ export default function WeatherPage() {
                 key={idx}
                 style={{
                   padding: '1rem',
-                  background: 'rgba(20, 13, 10, 0.75)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  background: 'rgba(255, 92, 92, 0.08)',
+                  border: '1px solid rgba(255, 92, 92, 0.25)',
                   borderRadius: '6px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#f87171' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#FF5C5C' }}>
                     {r.icon} {r.title}
                   </span>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#f87171', border: '1px solid #ef4444', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#FF5C5C', border: '1px solid #FF5C5C', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
                     {r.severity}
                   </span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: '#E7D6C8', margin: 0, lineHeight: 1.45 }}>
+                <p style={{ fontSize: '0.8rem', color: '#A8B5BE', margin: 0, lineHeight: 1.45 }}>
                   {r.detail}
                 </p>
               </div>
@@ -1117,74 +1129,69 @@ export default function WeatherPage() {
         )}
       </div>
 
-      {/* 8. ATMOSPHERIC INTELLIGENCE DESK */}
+      {/* 8. ATMOSPHERIC COPILOT QUICK LAUNCH */}
       <div
         style={{
-          background: '#191714',
-          border: '1px solid rgba(242, 238, 231, 0.08)',
-          borderRadius: '4px',
+          background: 'linear-gradient(135deg, rgba(66, 217, 200, 0.08) 0%, rgba(77, 163, 255, 0.05) 100%)',
+          border: '1px solid rgba(66, 217, 200, 0.25)',
+          borderRadius: '8px',
           padding: '1.25rem 1.5rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
+          marginBottom: '1.5rem',
         }}
       >
         <div>
-          <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9B958B', marginBottom: '0.25rem' }}>
-            ATMOSPHERIC INTELLIGENCE DESK
+          <div style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#42D9C8', marginBottom: '0.25rem' }}>
+            EARTH INTELLIGENCE COPILOT
           </div>
-          <div style={{ fontSize: '0.94rem', color: '#D4CDC3' }}>
-            Query localized precipitation windows, outdoor feasibility, and air quality risk directly.
+          <div style={{ fontSize: '0.92rem', color: '#F4F7F8', fontWeight: 600 }}>
+            Query localized precipitation trajectories, outdoor feasibility, and multi-hazard forecasting with WeatherGPT.
           </div>
         </div>
 
-        <Link
-          to="/weather-gpt"
-          state={{
-            location: {
-              name: locationDisplayTitle,
-              latitude: selectedLocation.latitude,
-              longitude: selectedLocation.longitude,
-            },
-          }}
+        <button
+          type="button"
+          onClick={() => openWeatherGPT(`Provide an atmospheric and disaster intelligence briefing for ${locationDisplayTitle}`)}
           style={{
-            background: '#211E1A',
-            border: '1px solid rgba(242, 238, 231, 0.14)',
-            color: '#F2EEE7',
+            background: 'rgba(66, 217, 200, 0.15)',
+            border: '1px solid #42D9C8',
+            color: '#42D9C8',
             padding: '0.55rem 1.15rem',
-            borderRadius: '4px',
+            borderRadius: '6px',
             fontSize: '0.85rem',
-            fontWeight: 600,
+            fontWeight: 700,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '0.45rem',
-            textDecoration: 'none',
-            transition: 'border-color 0.15s ease',
+            gap: '0.5rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
           }}
         >
-          <span>Ask WeatherGPT</span>
-          <span style={{ color: '#D96B35' }}>→</span>
-        </Link>
+          <span>Launch WeatherGPT Copilot</span>
+          <span>⚡</span>
+        </button>
       </div>
 
       {/* 9. GLOBAL RADAR & SATELLITE MAP (Collapsible / Toggleable) */}
       <div
         style={{
-          background: 'rgba(28, 17, 13, 0.88)',
-          border: '1px solid rgba(255, 138, 61, 0.16)',
-          borderRadius: 'var(--radius-lg)',
+          background: '#111A23',
+          border: '1px solid #202D38',
+          borderRadius: '12px',
           padding: '1.5rem 1.75rem',
           boxShadow: '0 8px 28px rgba(0, 0, 0, 0.5)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#FF6B2C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#42D9C8', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
               {t('weather.weatherMapTitle', 'ATMOSPHERIC RADAR & SATELLITE MAP')}
             </div>
-            <div style={{ fontSize: '0.86rem', color: '#B9A495' }}>
+            <div style={{ fontSize: '0.86rem', color: '#A8B5BE' }}>
               Live Doppler radar precipitation overlays and GDACS cyclone tracking
             </div>
           </div>
@@ -1193,11 +1200,11 @@ export default function WeatherPage() {
             type="button"
             onClick={() => setShowMap((prev) => !prev)}
             style={{
-              background: showMap ? 'rgba(255, 107, 44, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 138, 61, 0.25)',
-              color: '#FFF7ED',
+              background: showMap ? 'rgba(66, 217, 200, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid #202D38',
+              color: '#F4F7F8',
               padding: '0.45rem 0.95rem',
-              borderRadius: '6px',
+              borderRadius: '8px',
               fontSize: '0.82rem',
               fontWeight: 700,
               cursor: 'pointer',
@@ -1212,7 +1219,7 @@ export default function WeatherPage() {
         </div>
 
         {showMap && (
-          <div style={{ marginTop: '1.25rem', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+          <div style={{ marginTop: '1.25rem', borderRadius: '12px', overflow: 'hidden' }}>
             <WeatherMap
               userCoords={userCoords}
               selectedLocation={selectedLocation}
@@ -1226,27 +1233,27 @@ export default function WeatherPage() {
         )}
       </div>
 
-      {/* 10. TROPICAL CYCLONES (GDACS) REGISTRY (Clean Warm Presentation) */}
+      {/* 10. TROPICAL CYCLONES (GDACS) REGISTRY */}
       {cyclonesData.length > 0 && (
         <div
           style={{
-            background: 'rgba(28, 17, 13, 0.88)',
-            border: '1px solid rgba(255, 138, 61, 0.16)',
-            borderRadius: 'var(--radius-lg)',
+            background: '#111A23',
+            border: '1px solid #202D38',
+            borderRadius: '12px',
             padding: '1.75rem 2.25rem',
             boxShadow: '0 8px 28px rgba(0, 0, 0, 0.5)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
-              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#FF6B2C', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#42D9C8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 {t('weather.activeCyclones', 'GLOBAL TROPICAL CYCLONE INTELLIGENCE')}
               </div>
-              <div style={{ fontSize: '0.82rem', color: '#B9A495', marginTop: '0.15rem' }}>
+              <div style={{ fontSize: '0.82rem', color: '#A8B5BE', marginTop: '0.15rem' }}>
                 Live oceanic storm surveillance via Global Disaster Alert & Coordination System
               </div>
             </div>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#ef4444', border: '1px solid #ef4444', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#FF5C5C', border: '1px solid #FF5C5C', padding: '0.15rem 0.5rem', borderRadius: '6px' }}>
               {cyclonesData.length} ACTIVE STORMS
             </span>
           </div>
@@ -1257,9 +1264,9 @@ export default function WeatherPage() {
                 key={c.id}
                 style={{
                   padding: '1.15rem',
-                  background: 'rgba(20, 13, 10, 0.75)',
-                  border: '1px solid rgba(255, 138, 61, 0.18)',
-                  borderRadius: '8px',
+                  background: '#16212B',
+                  border: '1px solid #202D38',
+                  borderRadius: '10px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '0.5rem',
@@ -1267,17 +1274,17 @@ export default function WeatherPage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#ffffff' }}>🌀 {c.name}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#FF6B2C', fontWeight: 700 }}>{c.category}</div>
+                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#F4F7F8' }}>🌀 {c.name}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#F4B942', fontWeight: 700 }}>{c.category}</div>
                   </div>
-                  <span style={{ fontSize: '0.7rem', fontWeight: 800, color: c.alertLevel === 'Red' ? '#ef4444' : '#f59e0b' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 800, color: c.alertLevel === 'Red' ? '#FF5C5C' : '#F4B942' }}>
                     {c.alertLevel?.toUpperCase()}
                   </span>
                 </div>
 
-                <div style={{ fontSize: '0.78rem', color: '#B9A495', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginTop: '0.35rem' }}>
-                  <div>Wind: <strong style={{ color: '#ffffff' }}>{c.maxWindKmh} km/h</strong></div>
-                  <div>Basin: <strong style={{ color: '#ffffff' }}>{c.country || 'Oceanic'}</strong></div>
+                <div style={{ fontSize: '0.78rem', color: '#A8B5BE', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginTop: '0.35rem' }}>
+                  <div>Wind: <strong style={{ color: '#F4F7F8' }}>{c.maxWindKmh} km/h</strong></div>
+                  <div>Basin: <strong style={{ color: '#F4F7F8' }}>{c.country || 'Oceanic'}</strong></div>
                 </div>
 
                 {c.link && (
@@ -1285,7 +1292,7 @@ export default function WeatherPage() {
                     href={c.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ fontSize: '0.76rem', color: '#FF6B2C', textDecoration: 'none', fontWeight: 700, marginTop: '0.35rem' }}
+                    style={{ fontSize: '0.76rem', color: '#42D9C8', textDecoration: 'none', fontWeight: 700, marginTop: '0.35rem' }}
                   >
                     View Official GDACS Bulletin ↗
                   </a>
@@ -1300,20 +1307,20 @@ export default function WeatherPage() {
       <div
         style={{
           padding: '1.25rem 1.75rem',
-          background: 'rgba(20, 13, 10, 0.6)',
-          border: '1px solid rgba(255, 138, 61, 0.12)',
-          borderRadius: 'var(--radius-md)',
+          background: '#0A1017',
+          border: '1px solid #202D38',
+          borderRadius: '8px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '0.75rem',
           fontSize: '0.76rem',
-          color: '#8c7b6d',
+          color: '#64727D',
         }}
       >
         <div>
-          <strong style={{ color: '#B9A495' }}>DISASTERCHAIN OPERATIONAL WEATHER ATTRIBUTION:</strong>
+          <strong style={{ color: '#A8B5BE' }}>DISASTERCHAIN OPERATIONAL WEATHER ATTRIBUTION:</strong>
           <span style={{ marginLeft: '6px' }}>{t('weather.attribution', 'Open-Meteo · Copernicus CAMS · GDACS · RainViewer · OpenStreetMap')}</span>
         </div>
         <div>Compliant non-commercial civic emergency intelligence data architecture.</div>

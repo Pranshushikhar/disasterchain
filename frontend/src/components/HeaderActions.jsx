@@ -29,10 +29,10 @@ const HeaderActions = ({ onOpenSos, onLogout, onOpenAppModal }) => {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            background: 'rgba(217, 107, 53, 0.08)',
-            border: '1px solid rgba(217, 107, 53, 0.28)',
+            background: 'rgba(66, 217, 200, 0.08)',
+            border: '1px solid rgba(66, 217, 200, 0.28)',
             borderRadius: '6px',
-            color: '#E6E1D6',
+            color: '#F4F7F8',
             fontSize: '0.74rem',
             fontFamily: 'JetBrains Mono, monospace',
             padding: '5px 10px',
@@ -41,7 +41,7 @@ const HeaderActions = ({ onOpenSos, onLogout, onOpenAppModal }) => {
             whiteSpace: 'nowrap',
           }}
         >
-          <Icon name="smartphone" size={14} color="#D96B35" />
+          <Icon name="smartphone" size={14} color="#42D9C8" />
           <span>GET ANDROID APP</span>
         </button>
       </div>

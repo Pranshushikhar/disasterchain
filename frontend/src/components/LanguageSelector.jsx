@@ -170,7 +170,7 @@ const LanguageSelector = ({ compact = false, className = '' }) => {
             gap: '0.4rem',
             fontSize: '0.72rem',
             fontWeight: 700,
-            color: 'var(--primary, #FF6B2C)',
+            color: 'var(--primary, #42D9C8)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
             marginBottom: '0.45rem',
@@ -296,7 +296,7 @@ const LanguageSelector = ({ compact = false, className = '' }) => {
                   )}
                 </div>
                 {isSelected && (
-                  <span style={{ color: 'var(--primary, #FF6B2C)', fontWeight: 800, fontSize: '0.9rem' }}>✓</span>
+                  <span style={{ color: 'var(--primary, #42D9C8)', fontWeight: 800, fontSize: '0.9rem' }}>✓</span>
                 )}
               </button>
             );

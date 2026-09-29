@@ -61,14 +61,14 @@ const Navbar = ({ onOpenSos, onToggleSidebar, isMobileMenuOpen, onOpenAppModal }
               to={brandDestination}
               className="nav-brand-link"
               id="disasterchain-brand-logo"
-              title="DisasterChain Response Network"
+              title="DisasterChain Earth Intelligence"
             >
               <div className="nav-brand-mark" aria-hidden="true">
-                <Icon name="shield-check" size={20} color="var(--primary, #FF6B2C)" />
+                <Icon name="shield-check" size={20} color="var(--primary)" />
               </div>
               <div className="nav-brand-text">
                 <span className="nav-brand-title">DISASTERCHAIN</span>
-                <span className="nav-brand-subtitle">RESPONSE NETWORK</span>
+                <span className="nav-brand-subtitle">EARTH INTELLIGENCE</span>
               </div>
             </Link>
           </div>
@@ -109,10 +109,10 @@ const Navbar = ({ onOpenSos, onToggleSidebar, isMobileMenuOpen, onOpenAppModal }
           <Link
             to={brandDestination}
             className="mobile-brand-link"
-            title="DisasterChain Response Network"
+            title="DisasterChain Earth Intelligence"
           >
             <div className="mobile-brand-mark" aria-hidden="true">
-              <Icon name="shield-check" size={17} color="var(--primary, #FF6B2C)" />
+              <Icon name="shield-check" size={17} color="var(--primary)" />
             </div>
             <div className="mobile-brand-title-wrap">
               <span className="mobile-brand-name">DISASTERCHAIN</span>

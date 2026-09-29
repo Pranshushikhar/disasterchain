@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './i18n/i18n';
 import { PWAProvider } from './context/PWAContext';
+import { WeatherGPTProvider, useWeatherGPT } from './context/WeatherGPTContext';
 import { initNativeApp, registerBackButtonHandler } from './services/nativeService';
 
 // Components
@@ -17,6 +18,7 @@ import MobileEmergencyNav from './components/MobileEmergencyNav';
 import ErrorBoundary from './components/ErrorBoundary';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import PWAUpdateToast from './components/PWAUpdateToast';
+import WeatherGPTCopilot from './components/WeatherGPTCopilot';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -122,17 +124,22 @@ const AppLayout = () => {
 
   // DEDICATED MOBILE APP SHELL (Specification: DO NOT PATCH. REBUILD THE MOBILE EXPERIENCE)
   if (isMobile && !isPublicStandalone) {
-    return <MobileAppShell />;
+    return (
+      <>
+        <MobileAppShell />
+        <WeatherGPTCopilot />
+      </>
+    );
   }
 
   return (
     <div className="app-container">
-      {/* Sidebar navigation: Desktop rail hidden in favor of clean Top Command Bar; Mobile drawer always available */}
+      {/* Sidebar navigation: Desktop compact command rail; Mobile drawer always available */}
       <Sidebar
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         onOpenSos={() => setIsSosOpen(true)}
-        hideDesktopRail={true}
+        hideDesktopRail={false}
       />
 
       {/* Main Content Area */}
@@ -223,7 +230,8 @@ const AppLayout = () => {
             <Route path="/transparency" element={<TransparencyLedgerPage />} />
             <Route path="/offline" element={<OfflineEmergencyPage />} />
             <Route path="/weather" element={<WeatherPage />} />
-            <Route path="/weather-gpt" element={<WeatherGPTPage />} />
+            <Route path="/weather-gpt" element={<WeatherGPTRedirect />} />
+            <Route path="/weathergpt" element={<WeatherGPTRedirect />} />
             <Route
               path="/admin"
               element={
@@ -235,8 +243,8 @@ const AppLayout = () => {
           </Routes>
         </main>
 
-        {/* Shared Global Application Footer (Suppressed on full-viewport intelligence desk) */}
-        {location.pathname !== '/weather-gpt' && <Footer />}
+        {/* Shared Global Application Footer */}
+        <Footer />
       </div>
 
       {/* Persistent Mobile Emergency Bottom Navigation (Phase 13) */}
@@ -246,6 +254,8 @@ const AppLayout = () => {
         onToggleSidebar={() => setIsMobileMenuOpen((prev) => !prev)}
       />
 
+      {/* Persistent Global Floating WeatherGPT Copilot */}
+      <WeatherGPTCopilot />
 
       {/* Global Modals */}
       <SosModal
@@ -269,17 +279,28 @@ const AppLayout = () => {
         onOpenAppModal={() => setIsAppModalOpen(true)}
       />
 
-      {/* Desktop Native Android App Distribution Modal (Specification Section 8 & 9) */}
+      {/* Desktop Native Android App Distribution Modal */}
       <DesktopAppDownloadModal
         isOpen={isAppModalOpen}
         onClose={() => setIsAppModalOpen(false)}
       />
 
       {/* PWA Mobile Installation Prompt & Service Worker Update Alert */}
-      {location.pathname !== '/weather-gpt' && <PWAInstallPrompt />}
+      <PWAInstallPrompt />
       <PWAUpdateToast />
     </div>
   );
+};
+
+// WeatherGPT Route Redirector: preserves deep links without a standalone page
+const WeatherGPTRedirect = () => {
+  const { openWeatherGPT } = useWeatherGPT();
+  const navigate = useNavigate();
+  useEffect(() => {
+    openWeatherGPT();
+    navigate('/weather', { replace: true });
+  }, [openWeatherGPT, navigate]);
+  return null;
 };
 
 function App() {
@@ -289,7 +310,9 @@ function App() {
         <LanguageProvider>
           <AuthProvider>
             <Router>
-              <AppLayout />
+              <WeatherGPTProvider>
+                <AppLayout />
+              </WeatherGPTProvider>
             </Router>
           </AuthProvider>
         </LanguageProvider>
