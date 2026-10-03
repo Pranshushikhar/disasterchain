@@ -37,4 +37,7 @@ frontend/android/gradle.properties
 edge_temp_profile/
 frontend/scripts/edge_temp_profile/
 .edge_*
+.temp_edge_qa/
+/*.png
+capture_all_qa.js
 

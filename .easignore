@@ -1,0 +1,13 @@
+/*
+!/mobile
+!/mobile/**
+mobile/node_modules/
+mobile/ios/
+mobile/dist/
+mobile/.expo/
+mobile/scripts/
+mobile/target_inspect/
+mobile/test_archive/
+mobile/*.log
+mobile/android/.gradle/
+mobile/android/app/build/

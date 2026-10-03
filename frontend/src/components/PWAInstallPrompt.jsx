@@ -31,18 +31,18 @@ const PWAInstallPrompt = () => {
       className="pwa-install-banner-responsive"
       style={{
         position: 'fixed',
-        bottom: '20px',
-        left: '20px',
+        bottom: '24px',
+        left: '24px',
         right: 'auto',
         maxWidth: '360px',
-        width: 'calc(100% - 40px)',
+        width: 'calc(100% - 48px)',
         boxSizing: 'border-box',
         zIndex: 9990,
-        backgroundColor: '#111A23',
-        border: '1px solid #202D38',
-        borderRadius: '8px',
-        padding: '10px 14px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.75)',
+        backgroundColor: '#FFFDF8',
+        border: '1px solid #D8CDBA',
+        borderRadius: '12px',
+        padding: '12px 16px',
+        boxShadow: '0 10px 30px rgba(30, 39, 37, 0.1)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -58,8 +58,8 @@ const PWAInstallPrompt = () => {
           style={{
             width: '36px',
             height: '36px',
-            borderRadius: '6px',
-            border: '1px solid #202D38',
+            borderRadius: '8px',
+            border: '1px solid #D8CDBA',
             flexShrink: 0,
             objectFit: 'cover',
           }}
@@ -70,7 +70,7 @@ const PWAInstallPrompt = () => {
               fontSize: '0.8rem',
               fontWeight: '700',
               letterSpacing: '0.04em',
-              color: '#F4F7F8',
+              color: '#1E2725',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -80,9 +80,9 @@ const PWAInstallPrompt = () => {
           </div>
           <div
             style={{
-              fontSize: '0.72rem',
-              color: '#A8B5BE',
-              lineHeight: 1.25,
+              fontSize: '0.74rem',
+              color: '#65706B',
+              lineHeight: 1.3,
               marginTop: '1px',
             }}
           >
@@ -92,18 +92,18 @@ const PWAInstallPrompt = () => {
       </div>
 
       {/* Action Buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         <button
           type="button"
           onClick={dismissInstallPrompt}
           style={{
             background: 'transparent',
-            border: '1px solid #202D38',
-            color: '#A8B5BE',
-            fontSize: '0.72rem',
+            border: '1px solid #D8CDBA',
+            color: '#65706B',
+            fontSize: '0.74rem',
             fontWeight: '600',
-            padding: '5px 9px',
-            borderRadius: '5px',
+            padding: '6px 10px',
+            borderRadius: '6px',
             cursor: 'pointer',
             minHeight: '30px',
           }}
@@ -115,13 +115,13 @@ const PWAInstallPrompt = () => {
           type="button"
           onClick={handleInstallClick}
           style={{
-            background: '#42D9C8',
+            background: '#263F35',
             border: 'none',
-            color: '#070B10',
-            fontSize: '0.74rem',
-            fontWeight: '800',
-            padding: '5px 12px',
-            borderRadius: '5px',
+            color: '#FFFDF8',
+            fontSize: '0.75rem',
+            fontWeight: '600',
+            padding: '6px 12px',
+            borderRadius: '6px',
             cursor: 'pointer',
             minHeight: '30px',
             display: 'flex',
