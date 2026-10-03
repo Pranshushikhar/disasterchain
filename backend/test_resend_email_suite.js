@@ -1,8 +1,9 @@
 /**
  * DisasterChain - Resend Transactional Email & Auth Flow Test Suite
  * Validates real transactional email configuration, template rendering,
- * registration verification, forgot-password reset dispatch, token verification,
- * anti-enumeration, and zero-exposure security constraints.
+ * registration verification dispatch, forgot-password reset dispatch,
+ * invalid/expired verification token handling, invalid/expired reset token handling,
+ * anti-enumeration, Resend provider failure handling, and missing API key behavior.
  */
 
 const assert = require('assert');
@@ -10,6 +11,22 @@ const crypto = require('crypto');
 const emailService = require('./services/emailService');
 const memoryStore = require('./config/memoryStore');
 const authController = require('./controllers/authController');
+
+function createMockRes() {
+  const res = {
+    statusCode: 200,
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    jsonData: null,
+    json(data) {
+      this.jsonData = data;
+      return this;
+    },
+  };
+  return res;
+}
 
 async function runTestSuite() {
   console.log('========================================================================');
@@ -43,22 +60,40 @@ async function runTestSuite() {
     }
   }
 
-  // 1. Verify Configuration & Provider Safety
-  test('Email config status reports non-sensitive health indicators without exposing secrets', () => {
+  // Preserve initial environment
+  const originalResendApiKey = process.env.RESEND_API_KEY;
+
+  // ---------------------------------------------------------------------------
+  // 1. API KEY MISSING BEHAVIOR & CONFIGURATION
+  // ---------------------------------------------------------------------------
+  delete process.env.RESEND_API_KEY;
+
+  test('Missing API key reports unconfigured status without throwing or leaking secrets', () => {
     const configStatus = emailService.checkEmailConfigStatus();
     assert(configStatus && typeof configStatus === 'object', 'Config status should be an object');
-    assert('RESEND_API_KEY' in configStatus, 'Contains RESEND_API_KEY indicator');
-    assert('EMAIL_FROM' in configStatus, 'Contains EMAIL_FROM indicator');
-    assert('FRONTEND_URL' in configStatus, 'Contains FRONTEND_URL indicator');
-    // Ensure no raw secrets are in the returned strings
-    const serialized = JSON.stringify(configStatus);
-    assert(!serialized.includes('re_'), 'Must never expose real API key values');
+    assert.strictEqual(configStatus.RESEND_API_KEY, '✗ missing', 'Reports missing API key status');
+    assert(configStatus.EMAIL_FROM.includes('onboarding@resend.dev'), 'Default testing sender configured');
+    assert(configStatus.FRONTEND_URL.includes('https://disasterchain.vercel.app'), 'Production Vercel frontend URL configured');
   });
 
-  // 2. Mock Resend Emails prototype to intercept dispatches and verify payload correctness
-  let dispatchedEmails = [];
-  const originalResendApiKey = process.env.RESEND_API_KEY;
+  await testAsync('Missing API key returns EMAIL_DELIVERY_FAILED result safely without crashing', async () => {
+    const result = await emailService.sendVerificationEmail({
+      email: 'unconfigured@disasterchain.org',
+      name: 'Unconfigured Test',
+      token: 'mocktoken123',
+    });
+
+    assert.strictEqual(result.success, false, 'Dispatch fails gracefully when API key is missing');
+    assert.strictEqual(result.code, 'EMAIL_DELIVERY_FAILED', 'Returns standard EMAIL_DELIVERY_FAILED code');
+    assert.strictEqual(result.status, 'unconfigured', 'Indicates unconfigured provider status');
+    assert.strictEqual(result.mode, 'none', 'Indicates no active provider mode');
+  });
+
+  // ---------------------------------------------------------------------------
+  // 2. MOCK RESEND ENGINE FOR AUTOMATED TESTING
+  // ---------------------------------------------------------------------------
   process.env.RESEND_API_KEY = 're_test_mock_token_123456789';
+  let dispatchedEmails = [];
 
   const { Resend } = require('resend');
   const dummyResend = new Resend('mock_key');
@@ -88,207 +123,265 @@ async function runTestSuite() {
     };
   };
 
-  // 3. Test Registration Verification Email Dispatch
-  await testAsync('sendVerificationEmail produces correct recipient, sender, subject and Earth & Paper HTML', async () => {
+  // ---------------------------------------------------------------------------
+  // 3. REGISTRATION TRIGGERS VERIFICATION EMAIL
+  // ---------------------------------------------------------------------------
+  await testAsync('User registration triggers real verification email dispatch with correct payload and styling', async () => {
     dispatchedEmails = [];
-    const testEmail = 'newoperator@test.disasterchain.org';
-    const testToken = 'abc123verificationtoken456';
-    const result = await emailService.sendVerificationEmail({
-      email: testEmail,
-      name: 'Sarah Connor',
-      token: testToken,
-    });
+    const testRegEmail = `cadet_${Date.now()}@disasterchain.org`;
+    const regReq = {
+      body: {
+        name: 'Cadet Anya',
+        email: testRegEmail,
+        password: 'SecurePassword2026!',
+        confirmPassword: 'SecurePassword2026!',
+        role: 'volunteer',
+      },
+    };
+    const regRes = createMockRes();
+    await authController.register(regReq, regRes);
 
-    assert(result.success === true, 'Verification email dispatch should succeed');
-    assert(dispatchedEmails.length === 1, 'Exactly one email dispatched');
+    assert.strictEqual(regRes.statusCode, 201, 'Registration returns 201 Created');
+    assert.strictEqual(regRes.jsonData.success, true, 'Registration succeeds');
+    assert.strictEqual(dispatchedEmails.length, 1, 'Exactly one verification email was dispatched via Resend');
 
     const email = dispatchedEmails[0];
-    assert.deepStrictEqual(email.to, [testEmail], 'Correct recipient email');
-    assert.strictEqual(email.from, 'DisasterChain <onboarding@resend.dev>', 'Sender must strictly be DisasterChain <onboarding@resend.dev>');
-    assert.strictEqual(email.subject, 'Verify your DisasterChain account', 'Correct verification subject line');
-    
-    // Verify Earth & Paper Theme Tokens
-    assert(email.html.includes('#F1EBDD'), 'Includes Earth Parchment background token (#F1EBDD)');
-    assert(email.html.includes('#FFFDF8'), 'Includes Paper Card container token (#FFFDF8)');
-    assert(email.html.includes('#1E2725'), 'Includes Primary Ink text token (#1E2725)');
-    assert(email.html.includes('#496B5A'), 'Includes Forest accent token (#496B5A)');
-    assert(email.html.includes('#263F35'), 'Includes Deep Pine button token (#263F35)');
-    assert(email.html.includes('#DCD3C3'), 'Includes Warm border token (#DCD3C3)');
-    assert(email.html.includes('DISASTERCHAIN'), 'Includes Brand Name DISASTERCHAIN');
-    assert(email.html.includes('Earth Intelligence & Emergency Operations'), 'Includes brand sub-tag');
-    assert(email.html.includes(`/verify-email?token=${testToken}`), 'Includes formatted verification URL with token');
-    assert(email.html.includes('24 hours'), 'Specifies 24-hour validity duration');
+    assert.deepStrictEqual(email.to, [testRegEmail], 'Recipient matches registered email address');
+    assert.strictEqual(email.from, 'DisasterChain <onboarding@resend.dev>', 'Sender strictly matches DisasterChain <onboarding@resend.dev>');
+    assert.strictEqual(email.subject, 'Verify your DisasterChain account', 'Subject strictly matches: Verify your DisasterChain account');
+
+    // Email Design & Content Verification (Earth & Paper Identity)
+    assert(email.html.includes('#F1EBDD'), 'Contains Earth Parchment background token (#F1EBDD)');
+    assert(email.html.includes('#FFFDF8'), 'Contains Paper Card container token (#FFFDF8)');
+    assert(email.html.includes('#1E2725'), 'Contains Primary Ink typography token (#1E2725)');
+    assert(email.html.includes('#496B5A'), 'Contains Forest badge accent token (#496B5A)');
+    assert(email.html.includes('#263F35'), 'Contains Deep Pine action button token (#263F35)');
+    assert(email.html.includes('#DCD3C3'), 'Contains Warm border token (#DCD3C3)');
+    assert(email.html.includes('DISASTERCHAIN'), 'Displays DisasterChain branding');
+    assert(email.html.includes('VERIFY EMAIL'), 'Contains clear VERIFY EMAIL button');
+    assert(email.html.includes('24 hours'), 'Specifies 24-hour expiration duration');
+    assert(email.html.includes('/verify-email?token='), 'Contains verification link to frontend route');
+    assert(email.html.includes('disregard this transmission'), 'Includes security disclaimer note');
+
+    // Plain text alternative
+    assert(email.text && email.text.includes('/verify-email?token='), 'Contains plain text alternative URL');
   });
 
-  // 4. Test Forgot Password Reset Email Dispatch
-  await testAsync('sendPasswordResetEmail produces correct 15-minute reset link and sender', async () => {
-    dispatchedEmails = [];
-    const testEmail = 'responder@test.disasterchain.org';
-    const testToken = 'resetsecrettoken789';
-    const result = await emailService.sendPasswordResetEmail({
-      email: testEmail,
-      name: 'John Connor',
-      token: testToken,
-    });
+  // ---------------------------------------------------------------------------
+  // 4. INVALID & EXPIRED VERIFICATION TOKEN
+  // ---------------------------------------------------------------------------
+  await testAsync('Email verification rejects invalid verification token with 400 Bad Request', async () => {
+    const invalidReq = { body: { token: 'completely_bogus_token_xyz999' } };
+    const invalidRes = createMockRes();
+    await authController.verifyEmail(invalidReq, invalidRes);
 
-    assert(result.success === true, 'Password reset email dispatch should succeed');
-    assert(dispatchedEmails.length === 1, 'Exactly one email dispatched');
-
-    const email = dispatchedEmails[0];
-    assert.deepStrictEqual(email.to, [testEmail], 'Correct recipient email');
-    assert.strictEqual(email.from, 'DisasterChain <onboarding@resend.dev>', 'Sender must strictly be DisasterChain <onboarding@resend.dev>');
-    assert.strictEqual(email.subject, 'Reset your DisasterChain password', 'Correct reset subject line');
-    
-    // Verify Earth & Paper styling & tokens
-    assert(email.html.includes('#F1EBDD'), 'Contains Earth & Paper background (#F1EBDD)');
-    assert(email.html.includes('#263F35'), 'Contains Forest Pine action button (#263F35)');
-    assert(email.html.includes(`/reset-password?token=${testToken}`), 'Contains formatted reset URL');
-    assert(email.html.includes('15 minutes'), 'States 15 minutes expiration window');
+    assert.strictEqual(invalidRes.statusCode, 400, 'Invalid token returns 400 Bad Request');
+    assert.strictEqual(invalidRes.jsonData.success, false, 'Invalid verification fails');
+    assert(
+      invalidRes.jsonData.message.includes('Invalid') || invalidRes.jsonData.message.includes('expired'),
+      'Error message notes token is invalid or expired'
+    );
   });
 
-  // 5. Test Password Changed Email Dispatch
-  await testAsync('sendPasswordChangedEmail confirms password update securely', async () => {
-    dispatchedEmails = [];
-    const testEmail = 'responder@test.disasterchain.org';
-    const result = await emailService.sendPasswordChangedEmail({
-      email: testEmail,
-      name: 'John Connor',
-    });
+  await testAsync('Email verification rejects expired verification token with 400 Bad Request', async () => {
+    // Inject expired user into memoryStore
+    const expiredTokenRaw = 'expired_raw_token_111222';
+    const expiredTokenHash = crypto.createHash('sha256').update(expiredTokenRaw).digest('hex');
+    const expiredUser = {
+      _id: 'expired_user_001',
+      name: 'Expired Subject',
+      email: 'expired@disasterchain.org',
+      password: 'HashPassword123!',
+      role: 'citizen',
+      isVerified: false,
+      verificationToken: expiredTokenHash,
+      rawToken: expiredTokenRaw,
+      verificationTokenExpires: Date.now() - 3600 * 1000, // Expired 1 hour ago
+    };
+    memoryStore.users.push(expiredUser);
 
-    assert(result.success === true, 'Password changed email dispatch should succeed');
-    assert(dispatchedEmails.length === 1, 'Exactly one email dispatched');
+    const expiredReq = { body: { token: expiredTokenRaw } };
+    const expiredRes = createMockRes();
+    await authController.verifyEmail(expiredReq, expiredRes);
 
-    const email = dispatchedEmails[0];
-    assert.deepStrictEqual(email.to, [testEmail], 'Correct recipient email');
-    assert.strictEqual(email.from, 'DisasterChain <onboarding@resend.dev>', 'Sender must be DisasterChain <onboarding@resend.dev>');
-    assert.strictEqual(email.subject, 'Your DisasterChain password was changed', 'Subject confirms password change');
-    assert(email.html.includes('#F1EBDD'), 'Matches Earth & Paper theme');
+    assert.strictEqual(expiredRes.statusCode, 400, 'Expired token returns 400 Bad Request');
+    assert.strictEqual(expiredRes.jsonData.success, false, 'Expired verification fails');
+    assert.strictEqual(expiredUser.isVerified, false, 'Expired user remains unverified');
   });
 
-  // 6. Test Forgot Password Controller: Anti-Enumeration & Token Generation (In-Memory)
-  await testAsync('authController.forgotPassword provides anti-enumeration and creates valid reset token', async () => {
+  await testAsync('Email verification succeeds with valid token and dispatches welcome email', async () => {
+    dispatchedEmails = [];
+    const validRawToken = 'valid_active_token_333444';
+    const validTokenHash = crypto.createHash('sha256').update(validRawToken).digest('hex');
+    const validUser = {
+      _id: 'valid_user_002',
+      name: 'Dr. Marcus Vance',
+      email: 'marcus.vance@disasterchain.org',
+      password: 'SecurePassword123!',
+      role: 'responder',
+      isVerified: false,
+      verificationToken: validTokenHash,
+      rawToken: validRawToken,
+      verificationTokenExpires: Date.now() + 24 * 3600 * 1000,
+    };
+    memoryStore.users.push(validUser);
+
+    const verifyReq = { body: { token: validRawToken } };
+    const verifyRes = createMockRes();
+    await authController.verifyEmail(verifyReq, verifyRes);
+
+    assert.strictEqual(verifyRes.statusCode, 200, 'Valid verification returns 200 OK');
+    assert.strictEqual(verifyRes.jsonData.success, true, 'Verification succeeds');
+    assert.strictEqual(validUser.isVerified, true, 'User is marked verified in store');
+    assert.strictEqual(validUser.verificationToken, undefined, 'Verification token cleared after activation');
+    assert(verifyRes.jsonData.token, 'Returns authenticated JWT token upon successful email verification');
+  });
+
+  // ---------------------------------------------------------------------------
+  // 5. FORGOT PASSWORD TRIGGERS RESET EMAIL & ANTI-ENUMERATION
+  // ---------------------------------------------------------------------------
+  await testAsync('Forgot password triggers reset email with anti-enumeration protection', async () => {
     dispatchedEmails = [];
 
-    // Setup user in memoryStore
-    const testUser = {
-      _id: 'user_test_reset_001',
-      name: 'Elena Rostova',
-      email: 'elena.rostova@disasterchain.org',
+    const existingUser = {
+      _id: 'user_reset_test_003',
+      name: 'Maya Lin',
+      email: 'maya.lin@disasterchain.org',
+      password: 'CurrentPassword123!',
+      role: 'ngo',
+      isVerified: true,
+    };
+    memoryStore.users = memoryStore.users.filter((u) => u.email !== existingUser.email);
+    memoryStore.users.push(existingUser);
+
+    // A. Test non-existent user returns exact anti-enumeration response
+    const nonExistentReq = { body: { email: 'nobody_here@disasterchain.org' } };
+    const nonExistentRes = createMockRes();
+    await authController.forgotPassword(nonExistentReq, nonExistentRes);
+
+    assert.strictEqual(nonExistentRes.statusCode, 200, 'Non-existent account returns 200 OK');
+    assert.strictEqual(nonExistentRes.jsonData.success, true, 'Returns success: true for anti-enumeration');
+    const antiEnumMsg = nonExistentRes.jsonData.message;
+    assert(antiEnumMsg.includes('If an account is associated with that email'), 'Uniform anti-enumeration message returned');
+    assert.strictEqual(dispatchedEmails.length, 0, 'No email dispatched for non-existent account');
+
+    // B. Test existing user triggers real email and returns identical message
+    const existingReq = { body: { email: existingUser.email } };
+    const existingRes = createMockRes();
+    await authController.forgotPassword(existingReq, existingRes);
+
+    assert.strictEqual(existingRes.statusCode, 200, 'Existing account returns 200 OK');
+    assert.strictEqual(existingRes.jsonData.success, true, 'Returns success: true');
+    assert.strictEqual(existingRes.jsonData.message, antiEnumMsg, 'Returns identical message (zero enumeration leakage)');
+    assert.strictEqual(dispatchedEmails.length, 1, 'Exactly one reset email dispatched via Resend');
+
+    const resetEmail = dispatchedEmails[0];
+    assert.deepStrictEqual(resetEmail.to, [existingUser.email], 'Recipient matches requested email');
+    assert.strictEqual(resetEmail.from, 'DisasterChain <onboarding@resend.dev>', 'Sender is DisasterChain <onboarding@resend.dev>');
+    assert.strictEqual(resetEmail.subject, 'Reset your DisasterChain password', 'Subject strictly matches: Reset your DisasterChain password');
+    assert(resetEmail.html.includes('RESET PASSWORD'), 'Contains RESET PASSWORD action button');
+    assert(resetEmail.html.includes('15 minutes'), 'Mentions 15-minute token expiry');
+    assert(resetEmail.html.includes('/reset-password?token='), 'Link points to frontend reset-password route');
+    assert(resetEmail.html.includes('disregard this transmission'), 'Contains security disclaimer');
+    assert(resetEmail.text && resetEmail.text.includes('/reset-password?token='), 'Contains plain text fallback link');
+  });
+
+  // ---------------------------------------------------------------------------
+  // 6. INVALID & EXPIRED PASSWORD RESET TOKEN
+  // ---------------------------------------------------------------------------
+  await testAsync('Password reset rejects invalid reset token with 400 Bad Request', async () => {
+    const invalidResetReq = {
+      body: {
+        token: 'invalid_reset_token_code_999',
+        password: 'NewValidPassword2026!',
+        confirmPassword: 'NewValidPassword2026!',
+      },
+    };
+    const invalidResetRes = createMockRes();
+    await authController.resetPassword(invalidResetReq, invalidResetRes);
+
+    assert.strictEqual(invalidResetRes.statusCode, 400, 'Invalid reset token returns 400 Bad Request');
+    assert.strictEqual(invalidResetRes.jsonData.success, false, 'Invalid reset token fails');
+  });
+
+  await testAsync('Password reset rejects expired reset token with 400 Bad Request', async () => {
+    const rawExpiredResetToken = 'expired_raw_reset_token_555';
+    const hashedExpiredResetToken = crypto.createHash('sha256').update(rawExpiredResetToken).digest('hex');
+
+    const userWithExpiredReset = {
+      _id: 'user_expired_reset_004',
+      name: 'Expired Reset User',
+      email: 'expired.reset@disasterchain.org',
+      password: 'CurrentPassword123!',
+      role: 'citizen',
+      isVerified: true,
+      resetPasswordToken: hashedExpiredResetToken,
+      resetPasswordExpires: Date.now() - 60 * 1000, // Expired 1 minute ago
+    };
+    memoryStore.users.push(userWithExpiredReset);
+
+    const expiredResetReq = {
+      body: {
+        token: rawExpiredResetToken,
+        password: 'BrandNewPassword2026!',
+        confirmPassword: 'BrandNewPassword2026!',
+      },
+    };
+    const expiredResetRes = createMockRes();
+    await authController.resetPassword(expiredResetReq, expiredResetRes);
+
+    assert.strictEqual(expiredResetRes.statusCode, 400, 'Expired reset token returns 400 Bad Request');
+    assert.strictEqual(expiredResetRes.jsonData.success, false, 'Expired reset token rejected');
+    assert.strictEqual(userWithExpiredReset.password, 'CurrentPassword123!', 'Password remains unchanged');
+  });
+
+  await testAsync('Password reset succeeds with valid token, updates password, clears token, and sends confirmation', async () => {
+    dispatchedEmails = [];
+    const validResetToken = 'valid_raw_reset_token_777';
+    const hashedValidResetToken = crypto.createHash('sha256').update(validResetToken).digest('hex');
+
+    const userValidReset = {
+      _id: 'user_valid_reset_005',
+      name: 'Rohan Sharma',
+      email: 'rohan.sharma@disasterchain.org',
       password: 'OldPassword123!',
       role: 'volunteer',
       isVerified: true,
+      resetPasswordToken: hashedValidResetToken,
+      resetPasswordExpires: Date.now() + 15 * 60 * 1000,
     };
-    memoryStore.users = memoryStore.users.filter((u) => u.email !== testUser.email);
-    memoryStore.users.push(testUser);
+    memoryStore.users.push(userValidReset);
 
-    // Helper mock req/res
-    function createMockRes() {
-      const res = {
-        statusCode: 200,
-        status(code) {
-          this.statusCode = code;
-          return this;
-        },
-        jsonData: null,
-        json(data) {
-          this.jsonData = data;
-          return this;
-        },
-      };
-      return res;
-    }
-
-    // A. Request for non-existent email (anti-enumeration check)
-    const reqNonExistent = { body: { email: 'nonexistent@nowhere.org' } };
-    const resNonExistent = createMockRes();
-    await authController.forgotPassword(reqNonExistent, resNonExistent);
-
-    assert.strictEqual(resNonExistent.statusCode, 200, 'Returns 200 for non-existent email');
-    assert.strictEqual(resNonExistent.jsonData.success, true, 'Returns success: true for anti-enumeration');
-    assert.strictEqual(
-      resNonExistent.jsonData.message,
-      'If an account is associated with that email, a password reset link has been sent to your inbox.',
-      'Returns exact uniform anti-enumeration message'
-    );
-    assert.strictEqual(dispatchedEmails.length, 0, 'No email sent for non-existent user');
-
-    // B. Request for existing email
-    const reqExisting = { body: { email: testUser.email } };
-    const resExisting = createMockRes();
-    await authController.forgotPassword(reqExisting, resExisting);
-
-    assert.strictEqual(resExisting.statusCode, 200, 'Returns 200 for existing email');
-    assert.strictEqual(resExisting.jsonData.success, true, 'Returns success: true');
-    assert.strictEqual(
-      resExisting.jsonData.message,
-      'If an account is associated with that email, a password reset link has been sent to your inbox.',
-      'Returns exact same message as non-existent user'
-    );
-    assert.strictEqual(dispatchedEmails.length, 1, 'Dispatches reset email via Resend');
-
-    // Inspect memory user
-    const updatedUser = memoryStore.users.find((u) => u.email === testUser.email);
-    assert(updatedUser.resetPasswordToken, 'Generates resetPasswordToken on user');
-    assert(updatedUser.resetPasswordExpires > Date.now(), 'Token has future expiration date');
-  });
-
-  // 7. Test Reset Password Controller: Successful Reset & Invalidation
-  await testAsync('authController.resetPassword successfully updates password and invalidates token', async () => {
-    dispatchedEmails = [];
-    const testUser = memoryStore.users.find((u) => u.email === 'elena.rostova@disasterchain.org');
-    assert(testUser && testUser.resetPasswordToken, 'Test user must have active reset token');
-
-    // We need the raw token that generated updatedUser.resetPasswordToken
-    // Let's create a known token to test reset
-    const knownRawToken = 'testknownrawsecrettoken999';
-    testUser.resetPasswordToken = crypto.createHash('sha256').update(knownRawToken).digest('hex');
-    testUser.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
-
-    function createMockRes() {
-      const res = {
-        statusCode: 200,
-        status(code) {
-          this.statusCode = code;
-          return this;
-        },
-        jsonData: null,
-        json(data) {
-          this.jsonData = data;
-          return this;
-        },
-      };
-      return res;
-    }
-
-    const resetReq = {
+    const validResetReq = {
       body: {
-        token: knownRawToken,
-        password: 'NewStrongPassword2026!',
-        confirmPassword: 'NewStrongPassword2026!',
+        token: validResetToken,
+        password: 'UpdatedSecurePass2026!',
+        confirmPassword: 'UpdatedSecurePass2026!',
       },
     };
-    const resetRes = createMockRes();
-    await authController.resetPassword(resetReq, resetRes);
+    const validResetRes = createMockRes();
+    await authController.resetPassword(validResetReq, validResetRes);
 
-    assert.strictEqual(resetRes.statusCode, 200, 'Returns 200 OK');
-    assert.strictEqual(resetRes.jsonData.success, true, 'Returns success: true');
-    assert.strictEqual(testUser.password, 'NewStrongPassword2026!', 'User password updated');
-    assert.strictEqual(testUser.resetPasswordToken, undefined, 'Reset token invalidated after use');
-    assert.strictEqual(testUser.resetPasswordExpires, undefined, 'Reset expiration cleared');
+    assert.strictEqual(validResetRes.statusCode, 200, 'Valid reset returns 200 OK');
+    assert.strictEqual(validResetRes.jsonData.success, true, 'Reset succeeds');
+    assert.strictEqual(userValidReset.password, 'UpdatedSecurePass2026!', 'User password successfully updated');
+    assert.strictEqual(userValidReset.resetPasswordToken, undefined, 'Reset token cleared after single use');
+    assert.strictEqual(userValidReset.resetPasswordExpires, undefined, 'Reset expiration cleared');
 
     // Verify confirmation email was sent
     assert.strictEqual(dispatchedEmails.length, 1, 'Password changed confirmation email dispatched');
     assert.strictEqual(dispatchedEmails[0].subject, 'Your DisasterChain password was changed', 'Confirmation subject matches');
 
-    // Attempting to reuse the same token must now fail
-    const reuseRes = createMockRes();
-    await authController.resetPassword(resetReq, reuseRes);
-    assert.strictEqual(reuseRes.statusCode, 400, 'Reusing used token returns 400 Bad Request');
-    assert.strictEqual(reuseRes.jsonData.success, false, 'Reusing token fails');
+    // Replay attack prevention: Same token fails immediately on second use
+    const replayRes = createMockRes();
+    await authController.resetPassword(validResetReq, replayRes);
+    assert.strictEqual(replayRes.statusCode, 400, 'Replay attack blocked: single-use token cannot be reused');
   });
 
-  // 8. Test Error Handling when Resend fails
-  await testAsync('Handles Resend service errors gracefully without unhandled exceptions', async () => {
+  // ---------------------------------------------------------------------------
+  // 7. RESEND SERVICE FAILURE HANDLING
+  // ---------------------------------------------------------------------------
+  await testAsync('Handles Resend network errors gracefully without crashing or leaking secrets', async () => {
     emailsProto.send = async () => ({
       data: null,
       error: { message: 'Network connection timeout to Resend API', name: 'ResendError' },
@@ -303,16 +396,38 @@ async function runTestSuite() {
     assert.strictEqual(result.success, false, 'Returns failure result when provider errors');
     assert.strictEqual(result.code, 'EMAIL_DELIVERY_FAILED', 'Returns EMAIL_DELIVERY_FAILED code');
     assert(result.error.includes('Network connection timeout'), 'Passes sanitized error message');
+    assert(!result.error.includes('re_'), 'Never leaks API key in error message');
+  });
+
+  await testAsync('Handles Resend sandbox restrictions gracefully and marks isSandboxRestriction', async () => {
+    emailsProto.send = async () => ({
+      data: null,
+      error: {
+        message: 'You can only send testing emails to your own email address (onboarding@resend.dev)',
+        name: 'validation_error',
+      },
+    });
+
+    const result = await emailService.sendPasswordResetEmail({
+      email: 'unverified_sandbox_user@disasterchain.org',
+      name: 'Sandbox User',
+      token: 'sandbox_token',
+    });
+
+    assert.strictEqual(result.success, false, 'Returns failure object on sandbox error');
+    assert.strictEqual(result.isSandboxRestriction, true, 'Accurately detects Resend sandbox limitation');
   });
 
   // Restore env & prototype
   process.env.RESEND_API_KEY = originalResendApiKey;
+  emailsProto.send = originalSend;
+  emailsProto.get = originalGet;
 
   console.log('\n================================================================');
   console.log(`📊 TEST SUITE SUMMARY: ${passedTests} / ${totalTests} TESTS PASSED (${Math.round((passedTests / totalTests) * 100)}%)`);
   console.log('================================================================\n');
 
-  if (passedTests === totalTests && totalTests > 0) {
+  if (passedTests === totalTests && totalTests >= 10) {
     console.log('🎉 ALL RESEND EMAIL AUTH INTEGRATION TESTS PASSED PERFECTLY!\n');
     process.exit(0);
   } else {

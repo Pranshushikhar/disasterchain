@@ -158,6 +158,7 @@ exports.register = async (req, res) => {
 
     // In-memory fallback
     const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
     const mockUser = {
       _id: `user-${Date.now()}`,
       name: name.trim(),
@@ -165,8 +166,9 @@ exports.register = async (req, res) => {
       password,
       role: assignedRole,
       isVerified: false,
-      verificationToken: rawToken,
+      verificationToken: hashedToken,
       rawToken: rawToken,
+      verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000,
       createdAt: new Date(),
     };
     memoryStore.users.push(mockUser);
@@ -268,25 +270,35 @@ exports.verifyEmail = async (req, res) => {
 
     // In-memory fallback
     const memoryUser = memoryStore.users.find(
-      (u) => u.verificationToken === token || u.rawToken === token
-    ) || memoryStore.users[memoryStore.users.length - 1];
+      (u) =>
+        (u.verificationToken === hashedToken || u.verificationToken === token || u.rawToken === token) &&
+        (!u.verificationTokenExpires || u.verificationTokenExpires > Date.now())
+    );
 
     if (memoryUser) {
       memoryUser.isVerified = true;
       memoryUser.verificationToken = undefined;
+      memoryUser.rawToken = undefined;
+      memoryUser.verificationTokenExpires = undefined;
       const jwtToken = generateToken(memoryUser._id, memoryUser.role, memoryUser.email, memoryUser.name);
 
       return res.json({
         success: true,
         message: 'Your email has been verified successfully! Welcome to DisasterChain.',
         token: jwtToken,
-        user: memoryUser,
+        user: {
+          _id: memoryUser._id,
+          name: memoryUser.name,
+          email: memoryUser.email,
+          role: memoryUser.role,
+          isVerified: true,
+        },
       });
     }
 
     return res.status(400).json({
       success: false,
-      message: 'Invalid or expired verification token.',
+      message: 'Invalid or expired verification token. Please request a new verification link.',
     });
   } catch (error) {
     console.error('Email verification error:', error);
@@ -349,9 +361,42 @@ exports.resendVerification = async (req, res) => {
       });
     }
 
+    // In-memory fallback
+    const memUser = memoryStore.users.find(
+      (u) => u.email && u.email.toLowerCase() === normalizedEmail
+    );
+
+    if (memUser) {
+      if (memUser.isVerified) {
+        return res.json({
+          success: true,
+          message: 'This account is already verified. You can sign in directly.',
+          alreadyVerified: true,
+        });
+      }
+
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+      memUser.verificationToken = hashedToken;
+      memUser.rawToken = rawToken;
+      memUser.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
+
+      await sendVerificationEmail({
+        email: memUser.email,
+        name: memUser.name,
+        token: rawToken,
+      });
+
+      return res.json({
+        success: true,
+        message: 'A new verification link has been sent to your email inbox.',
+      });
+    }
+
     return res.json({
       success: true,
-      message: 'A new verification link has been sent.',
+      message:
+        'If an unverified account exists with that email address, a new verification link has been sent.',
     });
   } catch (error) {
     console.error('Resend verification error:', error);

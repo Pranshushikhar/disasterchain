@@ -247,21 +247,35 @@ const renderEmailTemplate = ({
 };
 
 // ==========================================
+// Safe error message sanitizer to ensure no keys or tokens ever leak
+const sanitizeError = (err) => {
+  if (!err) return 'Unknown email delivery error';
+  const msg = typeof err === 'string' ? err : (err.message || String(err));
+  return msg.replace(/re_[a-zA-Z0-9_\-]+/g, '[REDACTED_API_KEY]');
+};
+
+// ==========================================
 // PROVIDER DISPATCH ENGINE
 // ==========================================
 
-const sendEmail = async ({ to, subject, html, emailType }) => {
+const sendEmail = async ({ to, subject, html, text, emailType }) => {
   const resend = getResendClient();
   const fromEmail = getFromEmail();
 
   if (resend) {
     try {
-      const { data, error } = await resend.emails.send({
+      const emailPayload = {
         from: fromEmail,
         to: [to],
         subject,
         html,
-      });
+      };
+
+      if (text) {
+        emailPayload.text = text;
+      }
+
+      const { data, error } = await resend.emails.send(emailPayload);
 
       if (error) {
         const errorMsg = String(error.message || '');
@@ -288,7 +302,7 @@ const sendEmail = async ({ to, subject, html, emailType }) => {
           mode: 'resend',
           status: 'failed',
           isSandboxRestriction: isSandbox,
-          error: error.message,
+          error: sanitizeError(error.message),
         };
       }
 
@@ -320,7 +334,7 @@ const sendEmail = async ({ to, subject, html, emailType }) => {
         code: 'EMAIL_DELIVERY_FAILED',
         mode: 'resend',
         status: 'failed',
-        error: err.message,
+        error: sanitizeError(err.message),
       };
     }
   }
@@ -352,23 +366,37 @@ exports.sendVerificationEmail = async ({ email, name, token }) => {
   const subject = 'Verify your DisasterChain account';
 
   const html = renderEmailTemplate({
-    title: 'Confirm Operator Identity',
+    title: 'Verify your DisasterChain account',
     badge: 'IDENTITY VERIFICATION',
     badgeColor: '#496B5A',
     bodyHtml: `
       Hello <strong>${name || 'Citizen'}</strong>,<br><br>
-      Thank you for registering on the DisasterChain Emergency Network. To activate your account and access real-time SOS broadcasting, facility tracking, and crisis intelligence, please authenticate your email address.<br><br>
+      Thank you for registering on DisasterChain. To activate your account and access emergency broadcasts, shelter tracking, and crisis intelligence, please verify your email address.<br><br>
       This verification link is valid for <strong>24 hours</strong>.
     `,
     actionUrl: verificationUrl,
-    actionText: 'AUTHENTICATE EMAIL',
+    actionText: 'VERIFY EMAIL',
     warningNote: 'If you did not register for DisasterChain, please disregard this transmission.',
   });
+
+  const text = `DisasterChain — Verify your DisasterChain account
+
+Hello ${name || 'Citizen'},
+
+Thank you for registering on DisasterChain. To activate your account, please verify your email address.
+
+Click the link below or copy and paste it into your browser to verify your email (valid for 24 hours):
+${verificationUrl}
+
+If you did not register for DisasterChain, please disregard this transmission.
+
+© ${new Date().getFullYear()} DisasterChain Global Network. All rights reserved.`;
 
   return await sendEmail({
     to: email,
     subject,
     html,
+    text,
     emailType: 'verification',
   });
 };
@@ -383,7 +411,7 @@ exports.sendPasswordResetEmail = async ({ email, name, token }) => {
   const subject = 'Reset your DisasterChain password';
 
   const html = renderEmailTemplate({
-    title: 'Reset your password',
+    title: 'Reset your DisasterChain password',
     badge: 'DisasterChain Security',
     badgeColor: '#496B5A',
     bodyHtml: `
@@ -396,10 +424,24 @@ exports.sendPasswordResetEmail = async ({ email, name, token }) => {
     warningNote: 'DisasterChain operators will never ask for your password. If you did not initiate this request, you can safely disregard this transmission.',
   });
 
+  const text = `DisasterChain — Reset your DisasterChain password
+
+Hello ${name || 'Citizen'},
+
+We received a request to reset your password for your DisasterChain account (${maskEmail(email)}).
+
+Click the link below or copy and paste it into your browser to reset your password (valid for 15 minutes):
+${resetUrl}
+
+DisasterChain operators will never ask for your password. If you did not initiate this request, you can safely disregard this transmission.
+
+© ${new Date().getFullYear()} DisasterChain Global Network. All rights reserved.`;
+
   return await sendEmail({
     to: email,
     subject,
     html,
+    text,
     emailType: 'password_reset',
   });
 };
@@ -425,10 +467,24 @@ exports.sendPasswordChangedEmail = async ({ email, name }) => {
     warningNote: 'If this was unauthorized, contact your command center administrator or use forgot password to re-secure your access.',
   });
 
+  const text = `DisasterChain — Password Successfully Updated
+
+Hello ${name || 'Citizen'},
+
+This notification confirms that the password for your DisasterChain account was successfully updated on ${new Date().toUTCString()}.
+
+If you authorized this change, no further action is required. If you did not initiate this update, your credentials may be compromised.
+
+Sign in link:
+${loginUrl}
+
+© ${new Date().getFullYear()} DisasterChain Global Network. All rights reserved.`;
+
   return await sendEmail({
     to: email,
     subject,
     html,
+    text,
     emailType: 'password_changed',
   });
 };
@@ -465,10 +521,22 @@ exports.sendWelcomeEmail = async ({ email, name, role = 'citizen' }) => {
     actionText: 'Launch Mission Control',
   });
 
+  const text = `DisasterChain — Welcome to DisasterChain (Account Verified)
+
+Welcome, ${name || 'Operator'}!
+
+Your DisasterChain account has been successfully verified with role clearance: ${roleDisplay}.
+
+Launch Mission Control:
+${dashboardUrl}
+
+© ${new Date().getFullYear()} DisasterChain Global Network. All rights reserved.`;
+
   return await sendEmail({
     to: email,
     subject,
     html,
+    text,
     emailType: 'welcome',
   });
 };

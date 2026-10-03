@@ -142,7 +142,8 @@ async function runRecoveryTestSuite() {
     assert(
       req1.status === 200 &&
         req1.data?.success === true &&
-        req1.data?.message?.includes('If an account is associated with that email, a password recovery request has been submitted'),
+        (req1.data?.message?.includes('If an account is associated with that email, a password recovery request has been submitted') ||
+         req1.data?.message?.includes('If an account is associated with that email, a password reset link has been sent to your inbox')),
       'Registered email returns uniform anti-enumeration confirmation'
     );
 

@@ -203,7 +203,7 @@ const ResetPasswordPage = () => {
                   marginBottom: '0.35rem',
                 }}
               >
-                <span>Recovery Authorization Code</span>
+                <span>{initialToken ? 'Password Reset Token' : 'Reset Token or Recovery Code'}</span>
                 <span style={{ fontSize: '0.74rem', color: 'var(--dc-warning, #C38A35)', fontWeight: 600 }}>Valid for 15 min</span>
               </label>
               <input
@@ -225,7 +225,7 @@ const ResetPasswordPage = () => {
                 }}
                 value={recoveryCode}
                 onChange={(e) => setRecoveryCode(e.target.value)}
-                placeholder="RCVR-XXXX-XXXX-XXXX"
+                placeholder={initialToken ? 'Reset Token Loaded' : 'Paste Reset Token or RCVR Code'}
               />
             </div>
 
