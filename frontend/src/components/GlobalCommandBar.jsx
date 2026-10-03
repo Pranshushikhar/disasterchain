@@ -250,10 +250,10 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
         .dc-command-modal {
           width: 100%;
           max-width: 620px;
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--dc-border, #DCD3C3);
           border-radius: 12px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+          box-shadow: 0 20px 50px rgba(38, 63, 53, 0.15);
           overflow: hidden;
           font-family: var(--font-sans);
           animation: modalSlide 0.15s ease-out;
@@ -264,12 +264,12 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           align-items: center;
           gap: 0.75rem;
           padding: 1rem 1.25rem;
-          border-bottom: 1px solid #202D38;
-          background: #16212B;
+          border-bottom: 1px solid var(--dc-border, #DCD3C3);
+          background: var(--dc-surface, #F8F5EE);
         }
 
         .dc-search-icon {
-          color: #42D9C8;
+          color: var(--dc-forest, #496B5A);
           flex-shrink: 0;
         }
 
@@ -277,22 +277,22 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           flex: 1;
           background: transparent;
           border: none;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           font-size: 0.95rem;
           outline: none;
         }
 
         .dc-command-input::placeholder {
-          color: #64727D;
+          color: var(--dc-text-subtle, #65706B);
           font-size: 0.85rem;
         }
 
         .dc-esc-key {
           font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
-          color: #A8B5BE;
-          background: #202D38;
-          border: 1px solid #263541;
+          color: var(--dc-text-subtle, #65706B);
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--dc-border, #DCD3C3);
           padding: 0.2rem 0.45rem;
           border-radius: 6px;
         }
@@ -301,7 +301,7 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           max-height: 380px;
           overflow-y: auto;
           padding: 0.5rem;
-          background: #111A23;
+          background: var(--dc-elevated, #FFFDF8);
         }
 
         .dc-command-item {
@@ -316,11 +316,11 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
 
         .dc-command-item:hover,
         .dc-command-item.selected {
-          background: rgba(66, 217, 200, 0.1);
+          background: rgba(73, 107, 90, 0.08);
         }
 
         .dc-command-item.selected .item-title {
-          color: #42D9C8;
+          color: var(--dc-forest, #496B5A);
         }
 
         .dc-command-item.selected .item-enter-hint {
@@ -343,7 +343,7 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
         .item-title {
           font-size: 0.88rem;
           font-weight: 600;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
         }
 
         .item-category {
@@ -351,22 +351,22 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           font-size: 0.58rem;
           font-weight: 700;
           letter-spacing: 0.08em;
-          color: #64727D;
-          background: #16212B;
-          border: 1px solid #263541;
+          color: var(--dc-forest, #496B5A);
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--dc-border, #DCD3C3);
           padding: 0.1rem 0.4rem;
           border-radius: 6px;
         }
 
         .item-subtitle {
           font-size: 0.74rem;
-          color: #A8B5BE;
+          color: var(--dc-text-subtle, #65706B);
         }
 
         .item-enter-hint {
           font-family: var(--font-mono, monospace);
           font-size: 0.72rem;
-          color: #42D9C8;
+          color: var(--dc-forest, #496B5A);
           opacity: 0;
           transition: opacity 0.1s ease;
         }
@@ -381,14 +381,14 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           font-family: var(--font-mono, monospace);
           font-size: 0.72rem;
           font-weight: 700;
-          color: #42D9C8;
+          color: var(--dc-forest, #496B5A);
           letter-spacing: 0.1em;
           margin-bottom: 0.35rem;
         }
 
         .dc-command-empty p {
           font-size: 0.78rem;
-          color: #A8B5BE;
+          color: var(--dc-text-subtle, #65706B);
           margin: 0;
         }
 
@@ -398,11 +398,11 @@ export default function GlobalCommandBar({ isOpen, onClose, onOpenSos, onOpenInc
           justify-content: flex-end;
           gap: 1rem;
           padding: 0.5rem 1.25rem;
-          background: #16212B;
-          border-top: 1px solid #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border-top: 1px solid var(--dc-border, #DCD3C3);
           font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
-          color: #64727D;
+          color: var(--dc-text-subtle, #65706B);
         }
 
         @keyframes overlayFade {

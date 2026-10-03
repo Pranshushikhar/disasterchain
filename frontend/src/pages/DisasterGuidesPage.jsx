@@ -76,20 +76,22 @@ const DisasterGuidesPage = () => {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          background: 'rgba(9, 14, 25, 0.94)',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
+          borderRadius: '12px',
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
-            <span className="badge badge-info">{t('guides.guidesTitle')}</span>
-            <span className="micro-label" style={{ color: 'var(--cyan)' }}>
+            <span className="badge badge-info" style={{ background: 'rgba(73, 107, 90, 0.12)', color: 'var(--dc-forest, #263F35)', borderColor: 'rgba(73, 107, 90, 0.25)' }}>{t('guides.guidesTitle')}</span>
+            <span className="micro-label" style={{ color: 'var(--dc-forest, #263F35)' }}>
               {t('guides.guidesSubtitle')}
             </span>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.25rem' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.25rem' }}>
             {t('guides.guidesTitle')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+          <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.85rem' }}>
             {t('guides.guidesSubtitle')}
           </p>
         </div>
@@ -100,7 +102,9 @@ const DisasterGuidesPage = () => {
         className="spatial-panel"
         style={{
           padding: '0.85rem 1.25rem',
-          background: 'rgba(9, 14, 25, 0.92)',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
+          borderRadius: '12px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -129,7 +133,7 @@ const DisasterGuidesPage = () => {
         <input
           type="text"
           className="form-input"
-          style={{ maxWidth: '240px', padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+          style={{ maxWidth: '240px', padding: '0.35rem 0.75rem', fontSize: '0.8rem', background: 'var(--dc-elevated, #FFFDF8)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))', color: 'var(--dc-text, #1E2725)', borderRadius: '6px' }}
           placeholder={t('common.search')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -138,29 +142,29 @@ const DisasterGuidesPage = () => {
 
       {/* Loading state */}
       {loading && (
-        <div style={{ textAlign: 'center', padding: '3.5rem 0', color: 'var(--text-muted)' }}>
-          <div className="live-beacon-pulse" style={{ width: 22, height: 22, margin: '0 auto 1rem' }} />
+        <div style={{ textAlign: 'center', padding: '3.5rem 0', color: 'var(--dc-text-secondary, #65706B)' }}>
+          <div className="live-beacon-pulse" style={{ width: 22, height: 22, margin: '0 auto 1rem', background: 'var(--dc-forest, #263F35)' }} />
           <span>{t('common.loading')}</span>
         </div>
       )}
 
       {/* Active Tactical Survival Manual View */}
       {currentGuide && !loading && (
-        <div className="spatial-panel" style={{ padding: '2rem', background: 'rgba(11, 17, 30, 0.88)' }}>
+        <div className="spatial-panel" style={{ padding: '2rem', background: 'var(--dc-elevated, #FFFDF8)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))', borderRadius: '12px', boxShadow: '0 2px 10px rgba(38, 63, 53, 0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
                 <span style={{ fontSize: '2rem' }}>{currentGuide.icon || '⚠️'}</span>
                 <div>
-                  <div className="micro-label" style={{ color: 'var(--cyan)' }}>
+                  <div className="micro-label" style={{ color: 'var(--dc-forest, #263F35)' }}>
                     {t('guides.guidesTitle')} • {currentGuide.disasterType.toUpperCase()}
                   </div>
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800, color: '#ffffff' }}>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)' }}>
                     {currentGuide.title || `${currentGuide.disasterType} Safety Protocol`}
                   </h2>
                 </div>
               </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: '750px' }}>
+              <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.88rem', maxWidth: '750px' }}>
                 {currentGuide.description}
               </p>
             </div>
@@ -253,29 +257,29 @@ const DisasterGuidesPage = () => {
           {/* Tab 2: DURING HAZARD */}
           {activeTab === 'during' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>{t('guides.whatToDo')}</h3>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)' }}>{t('guides.whatToDo')}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {currentGuide.during?.map((step, idx) => (
                   <div
                     key={idx}
                     style={{
                       padding: '1rem',
-                      background: 'rgba(15, 23, 42, 0.7)',
-                      border: '1px solid var(--border-subtle)',
+                      background: 'var(--dc-surface, #F8F5EE)',
+                      border: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))',
                       borderRadius: 'var(--radius-sm)',
                       display: 'flex',
                       alignItems: 'flex-start',
                       gap: '0.75rem',
                     }}
                   >
-                    <span className="micro-label" style={{ color: 'var(--cyan)', marginTop: 2 }}>
+                    <span className="micro-label" style={{ color: 'var(--dc-forest, #263F35)', marginTop: 2 }}>
                       STEP 0{idx + 1}
                     </span>
-                    <span style={{ color: 'var(--text-primary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--dc-text, #1E2725)', fontSize: '0.88rem', lineHeight: 1.5 }}>
                       {step}
                     </span>
                   </div>
-                )) || <p style={{ color: 'var(--text-secondary)' }}>Follow official broadcast alerts and maintain shelter.</p>}
+                )) || <p style={{ color: 'var(--dc-text-secondary, #65706B)' }}>Follow official broadcast alerts and maintain shelter.</p>}
               </div>
             </div>
           )}
@@ -283,29 +287,29 @@ const DisasterGuidesPage = () => {
           {/* Tab 3: AFTER HAZARD / EVACUATION */}
           {activeTab === 'after' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>{t('guides.evacuationGuidelines')}</h3>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)' }}>{t('guides.evacuationGuidelines')}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {currentGuide.after?.map((step, idx) => (
                   <div
                     key={idx}
                     style={{
                       padding: '1rem',
-                      background: 'rgba(15, 23, 42, 0.7)',
-                      border: '1px solid var(--border-subtle)',
+                      background: 'var(--dc-surface, #F8F5EE)',
+                      border: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))',
                       borderRadius: 'var(--radius-sm)',
                       display: 'flex',
                       alignItems: 'flex-start',
                       gap: '0.75rem',
                     }}
                   >
-                    <span className="micro-label" style={{ color: 'var(--mint)', marginTop: 2 }}>
+                    <span className="micro-label" style={{ color: 'var(--dc-forest, #263F35)', marginTop: 2 }}>
                       CHECK 0{idx + 1}
                     </span>
-                    <span style={{ color: 'var(--text-primary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                    <span style={{ color: 'var(--dc-text, #1E2725)', fontSize: '0.88rem', lineHeight: 1.5 }}>
                       {step}
                     </span>
                   </div>
-                )) || <p style={{ color: 'var(--text-secondary)' }}>Check for gas leaks and proceed to designated relief shelters.</p>}
+                )) || <p style={{ color: 'var(--dc-text-secondary, #65706B)' }}>Check for gas leaks and proceed to designated relief shelters.</p>}
               </div>
             </div>
           )}
@@ -314,7 +318,7 @@ const DisasterGuidesPage = () => {
           {activeTab === 'checklist' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>{t('guides.emergencyKit')}</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)' }}>{t('guides.emergencyKit')}</h3>
                 <span className="micro-label" style={{ color: 'var(--cyan)' }}>
                   {t('offline.offlineActive')}
                 </span>

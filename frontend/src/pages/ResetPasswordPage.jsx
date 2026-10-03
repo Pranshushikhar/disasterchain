@@ -73,18 +73,19 @@ const ResetPasswordPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem 1.5rem',
-        background: 'var(--bg-space)',
+        padding: '3rem 1.5rem',
+        backgroundColor: 'var(--dc-bg, #F1EBDD)',
       }}
     >
       <div
-        className="spatial-panel"
         style={{
           maxWidth: '480px',
           width: '100%',
           padding: '2.5rem 2.25rem',
-          border: '1px solid var(--border-highlight)',
-          boxShadow: 'var(--glow-cyan)',
+          backgroundColor: 'var(--dc-elevated, #FFFDF8)',
+          border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+          borderRadius: 'var(--radius-lg, 16px)',
+          boxShadow: 'var(--shadow-md)',
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
@@ -92,36 +93,55 @@ const ResetPasswordPage = () => {
             style={{
               width: '52px',
               height: '52px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'linear-gradient(135deg, var(--cyan), var(--mint))',
+              borderRadius: 'var(--radius-sm, 8px)',
+              background: 'rgba(73, 107, 90, 0.12)',
+              color: 'var(--dc-forest, #263F35)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
-              boxShadow: 'var(--glow-cyan)',
             }}
           >
-            <Icon name="key" size={24} color="#ffffff" />
+            <Icon name="key" size={24} color="var(--dc-forest, #263F35)" />
           </div>
-          <div className="micro-label" style={{ color: 'var(--cyan)', marginBottom: '0.25rem' }}>
-            {t('auth.credentialReset', 'CREDENTIAL RESET')}
+          <div
+            style={{
+              fontFamily: 'var(--font-mono, monospace)',
+              fontSize: '0.70rem',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--dc-earth-green, #496B5A)',
+              marginBottom: '0.25rem',
+            }}
+          >
+            CREDENTIAL RESET
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
-            {t('auth.resetPasswordTitle', 'Set New Operator Key')}
+          <h1
+            style={{
+              fontFamily: 'var(--font-display, inherit)',
+              fontSize: '1.65rem',
+              fontWeight: 800,
+              color: 'var(--dc-text, #1E2725)',
+              marginBottom: '0.35rem',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Set New Password
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem' }}>
-            Enter your admin-issued recovery code and new password to restore account access.
+          <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.45 }}>
+            Enter your verification recovery code and define your new secure account password.
           </p>
         </div>
 
         {error && (
           <div
             style={{
-              background: 'rgba(255, 46, 77, 0.15)',
-              border: '1px solid var(--border-red)',
-              borderRadius: 'var(--radius-xs)',
+              background: 'rgba(201, 75, 75, 0.08)',
+              border: '1px solid rgba(201, 75, 75, 0.3)',
+              borderRadius: 'var(--radius-xs, 4px)',
               padding: '0.75rem 1rem',
-              color: '#ff8597',
+              color: 'var(--dc-emergency, #C94B4B)',
               fontSize: '0.82rem',
               marginBottom: '1.25rem',
             }}
@@ -132,50 +152,109 @@ const ResetPasswordPage = () => {
 
         {success ? (
           <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-            <div style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>✅</div>
-            <div style={{ fontWeight: 800, color: '#ffffff', fontSize: '1.2rem', marginBottom: '0.35rem' }}>
-              {t('auth.keyResetSuccess', 'Key Re-established Successfully')}
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'rgba(79, 128, 96, 0.15)',
+                color: 'var(--dc-safe, #4F8060)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+              }}
+            >
+              <Icon name="check-circle" size={32} color="var(--dc-safe, #4F8060)" />
             </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>
-              Your operator credentials have been updated and synchronized with the security grid. You can now log in.
+            <div style={{ fontWeight: 800, color: 'var(--dc-text, #1E2725)', fontSize: '1.2rem', marginBottom: '0.35rem' }}>
+              Password Reset Successfully
+            </div>
+            <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+              Your credentials have been updated and synchronized with the security grid. You can now log in.
             </p>
-            <Link to="/login" className="btn btn-primary" style={{ width: '100%', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {t('auth.proceedToSignIn', 'Proceed to Grid Sign In')}
+            <Link
+              to="/login"
+              style={{
+                width: '100%',
+                display: 'block',
+                boxSizing: 'border-box',
+                padding: '11px',
+                borderRadius: 'var(--radius-sm, 8px)',
+                backgroundColor: 'var(--dc-forest, #263F35)',
+                color: '#FFFDF8',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              Proceed to Sign In
             </Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="form-group" style={{ marginBottom: '1.15rem' }}>
-              <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ marginBottom: '1.15rem' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: 'var(--dc-text, #1E2725)',
+                  marginBottom: '0.35rem',
+                }}
+              >
                 <span>Recovery Authorization Code</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--amber)', fontWeight: 600 }}>Valid for 15 min</span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--dc-warning, #C38A35)', fontWeight: 600 }}>Valid for 15 min</span>
               </label>
               <input
                 type="text"
                 required
-                className="form-input"
                 style={{
-                  fontFamily: 'var(--font-mono)',
-                  letterSpacing: '0.08em',
-                  fontWeight: 700,
-                  color: '#38bdf8',
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm, 8px)',
+                  border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+                  backgroundColor: 'var(--dc-surface, #F8F5EE)',
+                  color: 'var(--dc-text, #1E2725)',
+                  fontSize: '0.88rem',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  letterSpacing: '0.06em',
                   textTransform: 'uppercase',
+                  outline: 'none',
+                  boxSizing: 'border-box',
                 }}
                 value={recoveryCode}
                 onChange={(e) => setRecoveryCode(e.target.value)}
                 placeholder="RCVR-XXXX-XXXX-XXXX"
               />
-              <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-                Provided directly by your DisasterChain incident commander or administrator.
-              </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1.15rem' }}>
-              <label className="form-label">{t('auth.newPassword', 'New Password')}</label>
+            <div style={{ marginBottom: '1.15rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: 'var(--dc-text, #1E2725)',
+                  marginBottom: '0.35rem',
+                }}
+              >
+                New Password
+              </label>
               <input
                 type="password"
                 required
-                className="form-input"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm, 8px)',
+                  border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+                  backgroundColor: 'var(--dc-surface, #F8F5EE)',
+                  color: 'var(--dc-text, #1E2725)',
+                  fontSize: '0.88rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
@@ -190,35 +269,55 @@ const ResetPasswordPage = () => {
                 gap: '0.35rem',
                 marginBottom: '1rem',
                 fontSize: '0.72rem',
-                fontFamily: 'var(--font-mono)',
-                background: 'rgba(255, 255, 255, 0.03)',
-                padding: '0.65rem 0.85rem',
-                borderRadius: 'var(--radius-xs)',
+                fontFamily: 'var(--font-mono, monospace)',
+                backgroundColor: 'var(--dc-surface-2, #EFE9DC)',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm, 8px)',
               }}
             >
-              <span style={{ color: passwordCriteria.hasLength ? 'var(--mint)' : 'var(--text-muted)' }}>
-                {passwordCriteria.hasLength ? '✓' : '○'} {t('auth.criteriaLength', '8+ Characters')}
+              <span style={{ color: passwordCriteria.hasLength ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
+                {passwordCriteria.hasLength ? '✓' : '○'} 8+ Characters
               </span>
-              <span style={{ color: passwordCriteria.hasUpper ? 'var(--mint)' : 'var(--text-muted)' }}>
-                {passwordCriteria.hasUpper ? '✓' : '○'} {t('auth.criteriaUpper', 'Uppercase (A-Z)')}
+              <span style={{ color: passwordCriteria.hasUpper ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
+                {passwordCriteria.hasUpper ? '✓' : '○'} Uppercase (A-Z)
               </span>
-              <span style={{ color: passwordCriteria.hasLower ? 'var(--mint)' : 'var(--text-muted)' }}>
-                {passwordCriteria.hasLower ? '✓' : '○'} {t('auth.criteriaLower', 'Lowercase (a-z)')}
+              <span style={{ color: passwordCriteria.hasLower ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
+                {passwordCriteria.hasLower ? '✓' : '○'} Lowercase (a-z)
               </span>
-              <span style={{ color: passwordCriteria.hasNumber ? 'var(--mint)' : 'var(--text-muted)' }}>
-                {passwordCriteria.hasNumber ? '✓' : '○'} {t('auth.criteriaNumber', 'Number (0-9)')}
+              <span style={{ color: passwordCriteria.hasNumber ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
+                {passwordCriteria.hasNumber ? '✓' : '○'} Number (0-9)
               </span>
-              <span style={{ color: passwordCriteria.hasSpecial ? 'var(--mint)' : 'var(--text-muted)' }}>
-                {passwordCriteria.hasSpecial ? '✓' : '○'} {t('auth.criteriaSpecial', 'Special (!@#...)')}
+              <span style={{ color: passwordCriteria.hasSpecial ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
+                {passwordCriteria.hasSpecial ? '✓' : '○'} Special (!@#...)
               </span>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label">{t('auth.confirmPassword', 'Confirm New Password')}</label>
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: 'var(--dc-text, #1E2725)',
+                  marginBottom: '0.35rem',
+                }}
+              >
+                Confirm New Password
+              </label>
               <input
                 type="password"
                 required
-                className="form-input"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm, 8px)',
+                  border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+                  backgroundColor: 'var(--dc-surface, #F8F5EE)',
+                  color: 'var(--dc-text, #1E2725)',
+                  fontSize: '0.88rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••••••"
@@ -228,17 +327,28 @@ const ResetPasswordPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-primary"
-              style={{ width: '100%', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                width: '100%',
+                backgroundColor: 'var(--dc-forest, #263F35)',
+                color: '#FFFDF8',
+                border: 'none',
+                borderRadius: 'var(--radius-sm, 8px)',
+                padding: '11px 16px',
+                fontSize: '0.90rem',
+                fontWeight: 700,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1,
+                boxShadow: 'var(--shadow-sm)',
+              }}
             >
-              {loading ? t('common.loading', 'Re-establishing...') : t('auth.resetBtn', 'Update Operator Password →')}
+              {loading ? 'Updating Credentials...' : 'Update Password'}
             </button>
           </form>
         )}
 
-        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.82rem', color: 'var(--dc-text-secondary, #65706B)' }}>
           Don't have a recovery code yet?{' '}
-          <Link to="/forgot-password" style={{ color: 'var(--cyan)', fontWeight: 700 }}>
+          <Link to="/forgot-password" style={{ color: 'var(--dc-earth-green, #496B5A)', fontWeight: 700, textDecoration: 'none' }}>
             Request Recovery
           </Link>
         </div>

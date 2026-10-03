@@ -9,11 +9,11 @@ export default function Footer() {
       className="app-footer"
       role="contentinfo"
       style={{
-        background: 'var(--bg-secondary, #0E151D)',
-        borderTop: '1px solid var(--border-subtle, #202D38)',
+        background: 'var(--dc-bg-2, #E7DECD)',
+        borderTop: '1px solid var(--dc-border, #DCD3C3)',
         padding: '1.5rem 2rem',
         marginTop: 'auto',
-        color: 'var(--text-secondary, #A8B5BE)',
+        color: 'var(--dc-text-subtle, #65706B)',
         fontFamily: 'var(--font-sans)',
         position: 'relative',
         zIndex: 10,
@@ -37,14 +37,14 @@ export default function Footer() {
               fontWeight: 800,
               fontSize: '0.85rem',
               letterSpacing: '0.08em',
-              color: 'var(--primary, #42D9C8)',
+              color: 'var(--dc-forest, #496B5A)',
               fontFamily: 'var(--font-display, inherit)',
             }}
           >
             DISASTERCHAIN / EARTH INTELLIGENCE
           </span>
-          <span style={{ color: 'var(--border-medium, #263541)' }}>•</span>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64727D)' }}>
+          <span style={{ color: 'var(--dc-border, #DCD3C3)' }}>•</span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--dc-text-subtle, #65706B)' }}>
             {t('landing.footerText', 'DisasterChain Emergency Network v2.6 • Global Disaster Intelligence & Mission Control')}
           </span>
         </div>
@@ -62,7 +62,7 @@ export default function Footer() {
           <span
             className="developer-credit-text"
             style={{
-              color: 'var(--text-muted, #64727D)',
+              color: 'var(--dc-text-subtle, #65706B)',
               fontWeight: 500,
               letterSpacing: '0.02em',
               transition: 'color 0.2s ease, transform 0.2s ease',
@@ -76,7 +76,7 @@ export default function Footer() {
 
       <style>{`
         .developer-credit-text:hover {
-          color: var(--primary, #42D9C8) !important;
+          color: var(--dc-forest, #263F35) !important;
         }
         @media (max-width: 768px) {
           .app-footer {

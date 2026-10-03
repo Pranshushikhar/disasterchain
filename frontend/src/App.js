@@ -45,7 +45,10 @@ const AppLayout = () => {
   // Cinematic Intro State
   const [showIntro, setShowIntro] = useState(() => {
     try {
-      const seen = sessionStorage.getItem('disasterchain_intro_seen');
+      if (window.location.search.includes('skip_intro=1') || (window.location.pathname !== '/' && window.location.pathname !== '')) {
+        return false;
+      }
+      const seen = sessionStorage.getItem('disasterchain_intro_seen') || localStorage.getItem('disasterchain_intro_seen');
       return !seen;
     } catch (e) {
       return false;
@@ -107,13 +110,11 @@ const AppLayout = () => {
       )}
 
       {/* 2. PRIMARY NAVIGATION (Top on desktop, bottom on mobile) */}
-      {!isPublicStandalone && (
-        <ModernNav
-          onOpenSos={() => setIsSosOpen(true)}
-          onReplayIntro={handleReplayIntro}
-          onOpenAppModal={() => setIsAppModalOpen(true)}
-        />
-      )}
+      <ModernNav
+        onOpenSos={() => setIsSosOpen(true)}
+        onReplayIntro={handleReplayIntro}
+        onOpenAppModal={() => setIsAppModalOpen(true)}
+      />
 
       {/* 3. MAIN APPLICATION VIEWPORT WITH SMOOTH PAGE TRANSITIONS */}
       <main className="dc-main-viewport">

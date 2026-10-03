@@ -151,15 +151,16 @@ const SosPage = ({ refreshKey }) => {
       {/* 1. Header & Dominant One-Click SOS Action (Section 12) */}
       <div
         style={{
-          background: '#191714',
-          border: '1px solid rgba(242, 238, 231, 0.08)',
-          borderRadius: '4px',
+          background: 'var(--dc-elevated, #FFFDF8)',
+          border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
+          borderRadius: '12px',
           padding: '3rem 2rem',
           textAlign: 'center',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           gap: '1rem',
+          boxShadow: '0 4px 20px rgba(38, 63, 53, 0.05)',
         }}
       >
         <div
@@ -169,7 +170,7 @@ const SosPage = ({ refreshKey }) => {
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.14em',
-            color: '#9B958B',
+            color: 'var(--dc-emergency, #C94B4B)',
           }}
         >
           EMERGENCY SOS
@@ -181,7 +182,7 @@ const SosPage = ({ refreshKey }) => {
             fontSize: '2.5rem',
             fontWeight: 400,
             letterSpacing: '-0.02em',
-            color: '#F2EEE7',
+            color: 'var(--dc-text, #1E2725)',
             margin: 0,
             lineHeight: 1.15,
           }}
@@ -192,7 +193,7 @@ const SosPage = ({ refreshKey }) => {
         <p
           style={{
             fontSize: '0.94rem',
-            color: '#9B958B',
+            color: 'var(--dc-text-secondary, #65706B)',
             maxWidth: '460px',
             margin: '0 0 1rem 0',
             lineHeight: 1.5,
@@ -206,19 +207,19 @@ const SosPage = ({ refreshKey }) => {
           <div
             style={{
               padding: '1.25rem 2rem',
-              background: 'rgba(98, 139, 99, 0.12)',
-              border: '1px solid #628B63',
-              borderRadius: '4px',
+              background: 'rgba(79, 128, 96, 0.12)',
+              border: '1px solid #4F8060',
+              borderRadius: '8px',
               maxWidth: '480px',
             }}
           >
-            <div style={{ color: '#628B63', fontWeight: 700, fontSize: '1.05rem', marginBottom: '0.35rem' }}>
+            <div style={{ color: '#4F8060', fontWeight: 700, fontSize: '1.05rem', marginBottom: '0.35rem' }}>
               DISTRESS BEACON BROADCASTED
             </div>
-            <div style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono, monospace)', color: '#D4CDC3' }}>
+            <div style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono, monospace)', color: 'var(--dc-text, #1E2725)' }}>
               Signal Identifier: {dispatchedReceipt.requestId || dispatchedReceipt._id}
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#9B958B', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '0.78rem', color: 'var(--dc-text-secondary, #65706B)', marginTop: '0.5rem' }}>
               Responders in your sector have been alerted. Maintain radio/phone standby.
             </div>
             <button
@@ -227,10 +228,10 @@ const SosPage = ({ refreshKey }) => {
               style={{
                 marginTop: '1rem',
                 padding: '0.4rem 1rem',
-                background: 'transparent',
-                border: '1px solid rgba(242, 238, 231, 0.15)',
-                borderRadius: '3px',
-                color: '#F2EEE7',
+                background: 'var(--dc-surface, #F8F5EE)',
+                border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
+                borderRadius: '6px',
+                color: 'var(--dc-text, #1E2725)',
                 fontSize: '0.8rem',
                 cursor: 'pointer',
               }}
@@ -248,15 +249,16 @@ const SosPage = ({ refreshKey }) => {
                 minHeight: '56px',
                 minWidth: '240px',
                 padding: '0 2.5rem',
-                background: '#C94235',
-                color: '#FFFFFF',
+                background: 'var(--dc-emergency, #C94B4B)',
+                color: '#FFFDF8',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '8px',
                 fontSize: '1.1rem',
                 fontWeight: 700,
                 letterSpacing: '0.04em',
                 cursor: isBroadcasting ? 'wait' : 'pointer',
                 transition: 'background 0.15s ease, transform 0.15s ease',
+                boxShadow: '0 4px 18px rgba(201, 75, 75, 0.35)',
               }}
             >
               {isBroadcasting ? 'Broadcasting Beacon...' : 'SEND SOS'}
@@ -265,7 +267,7 @@ const SosPage = ({ refreshKey }) => {
             <span
               style={{
                 fontSize: '0.84rem',
-                color: '#9B958B',
+                color: 'var(--dc-text-secondary, #65706B)',
                 fontFamily: 'var(--font-mono, monospace)',
               }}
             >
@@ -283,7 +285,7 @@ const SosPage = ({ refreshKey }) => {
               marginTop: '1.25rem',
               background: 'transparent',
               border: 'none',
-              color: '#9B958B',
+              color: 'var(--dc-forest, #263F35)',
               fontSize: '0.82rem',
               cursor: 'pointer',
               textDecoration: 'underline',
@@ -299,10 +301,11 @@ const SosPage = ({ refreshKey }) => {
       {showManualForm && !dispatchedReceipt && (
         <div
           style={{
-            background: '#191714',
-            border: '1px solid rgba(242, 238, 231, 0.08)',
-            borderRadius: '4px',
+            background: 'var(--dc-elevated, #FFFDF8)',
+            border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
+            borderRadius: '12px',
             padding: '1.75rem',
+            boxShadow: '0 4px 16px rgba(38, 63, 53, 0.04)',
           }}
         >
           <div
@@ -311,7 +314,7 @@ const SosPage = ({ refreshKey }) => {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              color: '#9B958B',
+              color: 'var(--dc-forest, #263F35)',
               marginBottom: '1rem',
             }}
           >
@@ -321,7 +324,7 @@ const SosPage = ({ refreshKey }) => {
           <form onSubmit={handleSubmitForm} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: '#9B958B', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--dc-text-secondary, #65706B)', marginBottom: '0.35rem' }}>
                   Name / Identifier
                 </label>
                 <input
@@ -332,10 +335,10 @@ const SosPage = ({ refreshKey }) => {
                   style={{
                     width: '100%',
                     minHeight: '40px',
-                    background: '#11100E',
-                    border: '1px solid rgba(242, 238, 231, 0.12)',
-                    borderRadius: '3px',
-                    color: '#F2EEE7',
+                    background: 'var(--dc-surface, #F8F5EE)',
+                    border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))',
+                    borderRadius: '6px',
+                    color: 'var(--dc-text, #1E2725)',
                     padding: '0.45rem 0.75rem',
                     fontSize: '0.88rem',
                   }}
@@ -343,7 +346,7 @@ const SosPage = ({ refreshKey }) => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: '#9B958B', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--dc-text-secondary, #65706B)', marginBottom: '0.35rem' }}>
                   Phone / Radio Frequency
                 </label>
                 <input
@@ -355,10 +358,10 @@ const SosPage = ({ refreshKey }) => {
                   style={{
                     width: '100%',
                     minHeight: '40px',
-                    background: '#11100E',
-                    border: '1px solid rgba(242, 238, 231, 0.12)',
-                    borderRadius: '3px',
-                    color: '#F2EEE7',
+                    background: 'var(--dc-surface, #F8F5EE)',
+                    border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))',
+                    borderRadius: '6px',
+                    color: 'var(--dc-text, #1E2725)',
                     padding: '0.45rem 0.75rem',
                     fontSize: '0.88rem',
                   }}
@@ -368,7 +371,7 @@ const SosPage = ({ refreshKey }) => {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: '#9B958B', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--dc-text-secondary, #65706B)', marginBottom: '0.35rem' }}>
                   Emergency Category
                 </label>
                 <select
@@ -377,10 +380,10 @@ const SosPage = ({ refreshKey }) => {
                   style={{
                     width: '100%',
                     minHeight: '40px',
-                    background: '#11100E',
-                    border: '1px solid rgba(242, 238, 231, 0.12)',
-                    borderRadius: '3px',
-                    color: '#F2EEE7',
+                    background: 'var(--dc-surface, #F8F5EE)',
+                    border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))',
+                    borderRadius: '6px',
+                    color: 'var(--dc-text, #1E2725)',
                     padding: '0 0.75rem',
                     fontSize: '0.88rem',
                   }}
@@ -393,7 +396,7 @@ const SosPage = ({ refreshKey }) => {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: '#9B958B', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--dc-text-secondary, #65706B)', marginBottom: '0.35rem' }}>
                   Location / Landmark
                 </label>
                 <input
@@ -404,10 +407,10 @@ const SosPage = ({ refreshKey }) => {
                   style={{
                     width: '100%',
                     minHeight: '40px',
-                    background: '#11100E',
-                    border: '1px solid rgba(242, 238, 231, 0.12)',
-                    borderRadius: '3px',
-                    color: '#F2EEE7',
+                    background: 'var(--dc-surface, #F8F5EE)',
+                    border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))',
+                    borderRadius: '6px',
+                    color: 'var(--dc-text, #1E2725)',
                     padding: '0.45rem 0.75rem',
                     fontSize: '0.88rem',
                   }}
@@ -416,7 +419,7 @@ const SosPage = ({ refreshKey }) => {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', color: '#9B958B', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--dc-text-secondary, #65706B)', marginBottom: '0.35rem' }}>
                 Situation Details
               </label>
               <textarea
@@ -426,10 +429,10 @@ const SosPage = ({ refreshKey }) => {
                 placeholder="Injuries, trapped individuals, water level..."
                 style={{
                   width: '100%',
-                  background: '#11100E',
-                  border: '1px solid rgba(242, 238, 231, 0.12)',
-                  borderRadius: '3px',
-                  color: '#F2EEE7',
+                  background: 'var(--dc-surface, #F8F5EE)',
+                  border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))',
+                  borderRadius: '6px',
+                  color: 'var(--dc-text, #1E2725)',
                   padding: '0.55rem 0.75rem',
                   fontSize: '0.88rem',
                   resize: 'vertical',
@@ -444,13 +447,14 @@ const SosPage = ({ refreshKey }) => {
                 style={{
                   minHeight: '40px',
                   padding: '0 1.5rem',
-                  background: '#C94235',
+                  background: 'var(--dc-emergency, #C94B4B)',
                   color: '#FFFFFF',
                   border: 'none',
-                  borderRadius: '3px',
+                  borderRadius: '6px',
                   fontWeight: 700,
                   fontSize: '0.84rem',
                   cursor: 'pointer',
+                  boxShadow: '0 2px 10px rgba(201, 75, 75, 0.25)',
                 }}
               >
                 Transmit Verified Details
@@ -463,7 +467,7 @@ const SosPage = ({ refreshKey }) => {
       {/* 3. Restrained Log of Monitored Distress Calls */}
       <div
         style={{
-          borderTop: '1px solid rgba(242, 238, 231, 0.08)',
+          borderTop: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.15))',
           paddingTop: '1.5rem',
         }}
       >
@@ -473,7 +477,7 @@ const SosPage = ({ refreshKey }) => {
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
-            color: '#9B958B',
+            color: 'var(--dc-forest, #263F35)',
             marginBottom: '0.75rem',
           }}
         >
@@ -481,7 +485,7 @@ const SosPage = ({ refreshKey }) => {
         </div>
 
         {sosList.length === 0 ? (
-          <div style={{ color: '#9B958B', fontSize: '0.84rem' }}>
+          <div style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.84rem' }}>
             No active distress signals in monitored radius.
           </div>
         ) : (
@@ -494,15 +498,15 @@ const SosPage = ({ refreshKey }) => {
                   justifyContent: 'space-between',
                   alignItems: 'baseline',
                   padding: '0.75rem 0',
-                  borderBottom: '1px solid rgba(242, 238, 231, 0.05)',
+                  borderBottom: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.1))',
                   fontSize: '0.84rem',
                 }}
               >
                 <div>
-                  <strong style={{ color: '#F2EEE7' }}>{item.emergencyType || 'Distress Call'}</strong>
-                  <span style={{ color: '#9B958B', marginLeft: '0.5rem' }}>• {item.location}</span>
+                  <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{item.emergencyType || 'Distress Call'}</strong>
+                  <span style={{ color: 'var(--dc-text-secondary, #65706B)', marginLeft: '0.5rem' }}>• {item.location}</span>
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.74rem', color: '#9B958B' }}>
+                <div style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.74rem', color: 'var(--dc-text-muted, #85938D)' }}>
                   {item.createdAt ? new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent'}
                 </div>
               </div>

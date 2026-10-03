@@ -28,13 +28,13 @@ const PWAUpdateToast = () => {
         zIndex: 99999,
         maxWidth: '92vw',
         width: '440px',
-        backgroundColor: '#111A23',
+        backgroundColor: 'var(--dc-elevated, #FFFDF8)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid #42D9C8',
+        border: '1px solid var(--dc-border, #DCD3C3)',
         borderRadius: '12px',
         padding: '12px 16px',
-        boxShadow: '0 10px 35px rgba(0,0,0,0.8), 0 0 20px rgba(66, 217, 200, 0.25)',
+        boxShadow: '0 10px 30px rgba(38, 63, 53, 0.15)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -48,15 +48,15 @@ const PWAUpdateToast = () => {
             width: '32px',
             height: '32px',
             borderRadius: '8px',
-            background: 'rgba(66, 217, 200, 0.15)',
-            border: '1px solid rgba(66, 217, 200, 0.4)',
+            background: 'var(--dc-surface, #F8F5EE)',
+            border: '1px solid var(--dc-border, #DCD3C3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}
         >
-          <Icon name="refresh" size={16} color="#42D9C8" />
+          <Icon name="refresh" size={16} color="var(--dc-forest, #496B5A)" />
         </div>
         <div>
           <div
@@ -64,13 +64,13 @@ const PWAUpdateToast = () => {
               fontSize: '0.80rem',
               fontWeight: '800',
               letterSpacing: '0.05em',
-              color: '#42D9C8',
+              color: 'var(--dc-forest, #496B5A)',
               fontFamily: 'var(--font-heading, sans-serif)',
             }}
           >
             {t('pwa.updateTitle', 'NEW VERSION AVAILABLE')}
           </div>
-          <div style={{ fontSize: '0.74rem', color: '#A8B5BE', marginTop: '1px' }}>
+          <div style={{ fontSize: '0.74rem', color: 'var(--dc-text-subtle, #65706B)', marginTop: '1px' }}>
             {t('pwa.updateDesc', 'Refresh to update DisasterChain.')}
           </div>
         </div>
@@ -80,11 +80,11 @@ const PWAUpdateToast = () => {
         type="button"
         onClick={triggerUpdate}
         style={{
-          background: '#42D9C8',
+          background: 'var(--dc-forest, #263F35)',
           border: 'none',
-          color: '#070B10',
+          color: '#FFFDF8',
           fontSize: '0.76rem',
-          fontWeight: '800',
+          fontWeight: '700',
           padding: '7px 14px',
           borderRadius: '8px',
           cursor: 'pointer',

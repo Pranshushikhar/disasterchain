@@ -358,7 +358,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           max-width: 1400px;
           margin: 0 auto;
           padding: 1.5rem 1.5rem 4rem 1.5rem;
-          color: #E9E5DC;
+          color: var(--dc-text, #1E2725);
           font-family: var(--font-sans, -apple-system, sans-serif);
         }
 
@@ -368,7 +368,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           justify-content: space-between;
           flex-wrap: wrap;
           gap: 1.25rem;
-          border-bottom: 1px solid rgba(242, 238, 231, 0.08);
+          border-bottom: 1px solid var(--border-medium, rgba(73, 107, 90, 0.2));
           padding-bottom: 1.25rem;
           margin-bottom: 1.15rem;
         }
@@ -385,13 +385,13 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           font-size: 0.68rem;
           font-weight: 700;
           letter-spacing: 0.12em;
-          color: #42D9C8;
+          color: var(--dc-forest, #263F35);
         }
 
         .inc-title {
           font-size: 1.85rem;
           font-weight: 700;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           margin: 0 0 0.35rem 0;
           letter-spacing: -0.01em;
           font-family: var(--font-display);
@@ -400,28 +400,28 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .inc-desc {
           font-size: 0.85rem;
           line-height: 1.45;
-          color: #A8B5BE;
+          color: var(--dc-text-secondary, #65706B);
           margin: 0;
           max-width: 720px;
         }
 
         .inc-report-btn {
-          background: #42D9C8;
-          color: #070B10;
+          background: var(--dc-forest, #263F35);
+          color: #FFFDF8;
           border: none;
           font-family: var(--font-mono, monospace);
           font-size: 0.74rem;
           font-weight: 700;
           letter-spacing: 0.06em;
           padding: 0.55rem 1rem;
-          border-radius: 10px;
+          border-radius: 8px;
           cursor: pointer;
           transition: all 0.15s ease;
         }
 
         .inc-report-btn:hover {
-          background: #32C7B6;
-          box-shadow: 0 0 16px rgba(66, 217, 200, 0.3);
+          background: var(--dc-earth-green, #496B5A);
+          box-shadow: 0 2px 10px rgba(38, 63, 53, 0.2);
         }
 
         /* Filter Bar */
@@ -431,8 +431,8 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           justify-content: space-between;
           flex-wrap: wrap;
           gap: 0.85rem;
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.2));
           border-radius: 12px;
           padding: 0.65rem 0.95rem;
           margin-bottom: 1.25rem;
@@ -445,26 +445,26 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         }
 
         .status-pill {
-          background: #16212B;
-          border: 1px solid #263541;
-          color: #A8B5BE;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.25));
+          color: var(--dc-text-secondary, #65706B);
           font-family: var(--font-mono, monospace);
           font-size: 0.64rem;
           padding: 0.25rem 0.55rem;
-          border-radius: 8px;
+          border-radius: 6px;
           cursor: pointer;
           transition: all 0.15s ease;
         }
 
         .status-pill:hover {
-          color: #F4F7F8;
-          border-color: #42D9C8;
+          color: var(--dc-text, #1E2725);
+          border-color: var(--dc-forest, #263F35);
         }
 
         .status-pill.active {
-          background: rgba(66, 217, 200, 0.12);
-          color: #42D9C8;
-          border-color: #42D9C8;
+          background: var(--dc-forest, #263F35);
+          color: #FFFDF8;
+          border-color: var(--dc-forest, #263F35);
           font-weight: 700;
         }
 
@@ -475,30 +475,30 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         }
 
         .sev-select {
-          background: #16212B;
-          border: 1px solid #263541;
-          color: #F4F7F8;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.25));
+          color: var(--dc-text, #1E2725);
           font-family: var(--font-mono, monospace);
           font-size: 0.68rem;
           padding: 0.35rem 0.65rem;
-          border-radius: 8px;
+          border-radius: 6px;
           outline: none;
         }
 
         .inc-search-box {
-          background: #16212B;
-          border: 1px solid #263541;
-          color: #F4F7F8;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.25));
+          color: var(--dc-text, #1E2725);
           font-size: 0.78rem;
           padding: 0.35rem 0.75rem;
-          border-radius: 8px;
+          border-radius: 6px;
           width: 220px;
           outline: none;
         }
 
         .inc-search-box:focus {
-          border-color: #42D9C8;
-          box-shadow: 0 0 0 2px rgba(66, 217, 200, 0.2);
+          border-color: var(--dc-forest, #263F35);
+          box-shadow: 0 0 0 2px rgba(38, 63, 53, 0.15);
         }
 
         /* Split Layout */
@@ -526,23 +526,24 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         }
 
         .dc-inc-card {
-          background: #111A23;
-          border: 1px solid #202D38;
-          border-radius: 12px;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.2));
+          border-radius: 10px;
           padding: 0.95rem;
           cursor: pointer;
           transition: all 0.15s ease;
+          box-shadow: 0 1px 4px rgba(38, 63, 53, 0.04);
         }
 
         .dc-inc-card:hover {
-          border-color: #263541;
-          background: #16212B;
+          border-color: var(--dc-forest, #263F35);
+          background: var(--dc-surface, #F8F5EE);
         }
 
         .dc-inc-card.selected {
-          border-color: #42D9C8;
-          border-left: 3px solid #42D9C8;
-          background: rgba(66, 217, 200, 0.05);
+          border-color: var(--dc-forest, #263F35);
+          border-left: 3px solid var(--dc-forest, #263F35);
+          background: var(--dc-surface-2, #E7DECD);
         }
 
         .card-top-row {
@@ -554,7 +555,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
 
         .card-id {
           font-size: 0.65rem;
-          color: #64727D;
+          color: var(--dc-text-muted, #85938D);
           font-weight: 700;
         }
 
@@ -565,20 +566,20 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           letter-spacing: 0.06em;
           padding: 0.12rem 0.4rem;
           border: 1px solid;
-          border-radius: 6px;
+          border-radius: 4px;
         }
 
         .card-title {
           font-size: 0.92rem;
           font-weight: 600;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           margin: 0 0 0.35rem 0;
           line-height: 1.3;
         }
 
         .card-meta-row {
           font-size: 0.74rem;
-          color: #A8B5BE;
+          color: var(--dc-text-secondary, #65706B);
           display: flex;
           align-items: center;
           gap: 0.35rem;
@@ -586,34 +587,35 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         }
 
         .card-sep {
-          color: #263541;
+          color: var(--border-medium, rgba(73, 107, 90, 0.3));
         }
 
         .card-bottom-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-top: 1px solid #202D38;
+          border-top: 1px solid var(--border-subtle, rgba(73, 107, 90, 0.12));
           padding-top: 0.45rem;
         }
 
         .card-status-badge {
           font-size: 0.62rem;
-          color: #42D9C8;
+          color: var(--dc-forest, #263F35);
           font-weight: 700;
         }
 
         .card-type {
           font-size: 0.62rem;
-          color: #64727D;
+          color: var(--dc-text-secondary, #65706B);
         }
 
         /* Inspector Column */
         .inspector-panel {
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.2));
           border-radius: 12px;
           padding: 1.5rem;
+          box-shadow: 0 2px 10px rgba(38, 63, 53, 0.04);
         }
 
         .insp-header-row {
@@ -621,7 +623,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           align-items: flex-start;
           justify-content: space-between;
           gap: 1rem;
-          border-bottom: 1px solid #202D38;
+          border-bottom: 1px solid var(--border-subtle, rgba(73, 107, 90, 0.12));
           padding-bottom: 1rem;
           margin-bottom: 1.25rem;
         }
@@ -629,7 +631,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .insp-id-tag {
           font-size: 0.68rem;
           font-weight: 700;
-          color: #42D9C8;
+          color: var(--dc-forest, #263F35);
           display: block;
           margin-bottom: 0.2rem;
         }
@@ -637,7 +639,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .insp-title {
           font-size: 1.35rem;
           font-weight: 700;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           margin: 0;
           line-height: 1.3;
           font-family: var(--font-display);
@@ -650,7 +652,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           letter-spacing: 0.06em;
           padding: 0.2rem 0.5rem;
           border: 1px solid;
-          border-radius: 6px;
+          border-radius: 4px;
           white-space: nowrap;
         }
 
@@ -658,9 +660,9 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .insp-stepper {
           display: flex;
           justify-content: space-between;
-          background: #16212B;
-          border: 1px solid #202D38;
-          border-radius: 10px;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--border-subtle, rgba(73, 107, 90, 0.12));
+          border-radius: 8px;
           padding: 0.75rem 1rem;
           margin-bottom: 1.25rem;
           overflow-x: auto;
@@ -681,26 +683,26 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           width: 20px;
           height: 20px;
           border-radius: 50%;
-          background: #0E151D;
-          border: 1px solid #263541;
+          background: var(--dc-surface-2, #E7DECD);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.25));
           font-size: 0.6rem;
           font-family: var(--font-mono, monospace);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #A8B5BE;
+          color: var(--dc-text-secondary, #65706B);
         }
 
         .step-node.done .step-circle {
-          background: #42D9C8;
-          border-color: #42D9C8;
-          color: #070B10;
+          background: var(--dc-forest, #263F35);
+          border-color: var(--dc-forest, #263F35);
+          color: #FFFDF8;
           font-weight: 700;
         }
 
         .step-label {
           font-size: 0.64rem;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
         }
 
         /* Details Grid */
@@ -720,21 +722,21 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .field-lbl {
           font-family: var(--font-mono, monospace);
           font-size: 0.62rem;
-          color: #64727D;
+          color: var(--dc-text-secondary, #65706B);
           letter-spacing: 0.06em;
         }
 
         .field-val {
           font-size: 0.85rem;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           font-weight: 500;
         }
 
         /* Desc Box */
         .insp-desc-box {
-          background: #16212B;
-          border: 1px solid #202D38;
-          border-radius: 10px;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--border-subtle, rgba(73, 107, 90, 0.12));
+          border-radius: 8px;
           padding: 0.95rem;
           margin-bottom: 1.25rem;
         }
@@ -742,7 +744,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .desc-box-lbl {
           display: block;
           font-size: 0.62rem;
-          color: #64727D;
+          color: var(--dc-text-secondary, #65706B);
           letter-spacing: 0.08em;
           margin-bottom: 0.35rem;
         }
@@ -750,7 +752,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .desc-box-text {
           font-size: 0.85rem;
           line-height: 1.45;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           margin: 0;
         }
 
@@ -762,7 +764,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         .res-box-lbl {
           display: block;
           font-size: 0.62rem;
-          color: #64727D;
+          color: var(--dc-text-secondary, #65706B);
           letter-spacing: 0.08em;
           margin-bottom: 0.45rem;
         }
@@ -774,9 +776,9 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         }
 
         .res-chip {
-          background: #16212B;
-          border: 1px solid #202D38;
-          border-radius: 8px;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--border-subtle, rgba(73, 107, 90, 0.12));
+          border-radius: 6px;
           padding: 0.35rem 0.65rem;
           font-size: 0.74rem;
           display: flex;
@@ -784,17 +786,17 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         }
 
         .chip-k {
-          color: #64727D;
+          color: var(--dc-text-secondary, #65706B);
         }
 
         .chip-v {
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           font-weight: 600;
         }
 
         /* Transition Actions */
         .insp-actions-row {
-          border-top: 1px solid #202D38;
+          border-top: 1px solid var(--border-subtle, rgba(73, 107, 90, 0.12));
           padding-top: 1rem;
           margin-bottom: 1rem;
           display: flex;
@@ -806,7 +808,7 @@ export default function IncidentReportsPage({ onOpenIncident }) {
 
         .actions-lbl {
           font-size: 0.62rem;
-          color: #64727D;
+          color: var(--dc-text-secondary, #65706B);
         }
 
         .actions-btns {
@@ -816,36 +818,36 @@ export default function IncidentReportsPage({ onOpenIncident }) {
         }
 
         .status-change-btn {
-          background: #16212B;
-          border: 1px solid #263541;
-          color: #F4F7F8;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.25));
+          color: var(--dc-text, #1E2725);
           font-family: var(--font-mono, monospace);
           font-size: 0.65rem;
           padding: 0.3rem 0.65rem;
-          border-radius: 8px;
+          border-radius: 6px;
           cursor: pointer;
           transition: all 0.15s ease;
         }
 
         .status-change-btn:hover:not(:disabled) {
-          border-color: #42D9C8;
-          color: #42D9C8;
+          border-color: var(--dc-forest, #263F35);
+          color: var(--dc-forest, #263F35);
         }
 
         .insp-trust-row {
-          border-top: 1px solid #202D38;
+          border-top: 1px solid var(--border-subtle, rgba(73, 107, 90, 0.12));
           padding-top: 0.75rem;
         }
 
         .inspector-placeholder {
-          background: #111A23;
-          border: 1px dashed #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px dashed var(--border-medium, rgba(73, 107, 90, 0.25));
           border-radius: 12px;
           padding: 4rem 2rem;
           text-align: center;
           font-family: var(--font-mono, monospace);
           font-size: 0.72rem;
-          color: #64727D;
+          color: var(--dc-text-secondary, #65706B);
           letter-spacing: 0.08em;
         }
 
@@ -853,8 +855,8 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           padding: 3rem 1.5rem;
           text-align: center;
           font-family: var(--font-mono, monospace);
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--border-medium, rgba(73, 107, 90, 0.2));
           border-radius: 12px;
         }
 
@@ -862,14 +864,14 @@ export default function IncidentReportsPage({ onOpenIncident }) {
           display: block;
           font-size: 0.76rem;
           font-weight: 700;
-          color: #42D9C8;
+          color: var(--dc-forest, #263F35);
           letter-spacing: 0.1em;
           margin-bottom: 0.35rem;
         }
 
         .inc-empty-state p {
           font-size: 0.78rem;
-          color: #A8B5BE;
+          color: var(--dc-text-secondary, #65706B);
           margin: 0;
           font-family: var(--font-sans, sans-serif);
         }

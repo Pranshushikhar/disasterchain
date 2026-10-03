@@ -144,18 +144,18 @@ const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
               INCIDENT TICKET: {submittedIncident.incidentId || 'INC-LOGGED'}
             </span>
 
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.35rem' }}>
               {t('incidents.loggedSuccess', 'Hazard Incident Successfully Logged')}
             </h2>
 
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+            <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.88rem', marginBottom: '1.25rem', lineHeight: 1.5 }}>
               {t('incidents.loggedDesc', 'Your report has been queued on the crisis response triage board. Safety responders and facility teams have been notified.')}
             </p>
 
             <div
               style={{
-                background: 'rgba(11, 18, 34, 0.9)',
-                border: '1px solid var(--border-subtle)',
+                background: 'var(--dc-surface, #F8F5EE)',
+                border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
                 borderRadius: 'var(--radius-md)',
                 padding: '1.15rem',
                 textAlign: 'left',
@@ -167,12 +167,12 @@ const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-muted)' }}>{t('common.title', 'Headline')}:</span>
-                <strong style={{ color: '#ffffff' }}>{submittedIncident.title}</strong>
+                <span style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('common.title', 'Headline')}:</span>
+                <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{submittedIncident.title}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-muted)' }}>{t('common.category', 'Hazard Category')}:</span>
-                <span style={{ color: '#818cf8', fontWeight: 700 }}>{submittedIncident.type}</span>
+                <span style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('common.category', 'Hazard Category')}:</span>
+                <span style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700 }}>{submittedIncident.type}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)' }}>{t('common.severity', 'Severity Level')}:</span>

@@ -117,14 +117,14 @@ const SheltersPage = () => {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          background: '#111A23',
-          border: '1px solid #202D38',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
           borderRadius: '12px',
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-            <span className="badge badge-info" style={{ background: 'rgba(77, 163, 255, 0.15)', color: '#4DA3FF', borderColor: 'rgba(77, 163, 255, 0.3)' }}>{t('nav.reliefShelters').toUpperCase()}</span>
+            <span className="badge badge-info" style={{ background: 'rgba(73, 107, 90, 0.12)', color: 'var(--dc-forest, #263F35)', borderColor: 'rgba(73, 107, 90, 0.25)' }}>{t('nav.reliefShelters').toUpperCase()}</span>
             <SourceBadge
               source="Registered Civil Defense Registry (Operator Maintained)"
               confidence="High"
@@ -133,10 +133,10 @@ const SheltersPage = () => {
               compact={true}
             />
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: '#F4F7F8', marginBottom: '0.25rem' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.25rem' }}>
             {t('shelters.shelterTitle')}
           </h1>
-          <p style={{ color: '#A8B5BE', fontSize: '0.85rem' }}>
+          <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.85rem' }}>
             {t('shelters.shelterSubtitle')}
           </p>
         </div>
@@ -153,28 +153,28 @@ const SheltersPage = () => {
 
       {/* Telemetry KPI Metrics */}
       <div className="grid-cols-4">
-        <div className="telemetry-widget" style={{ background: '#111A23', border: '1px solid #202D38', borderRadius: '12px' }}>
-          <span className="micro-label" style={{ color: '#64727D' }}>{t('shelters.availableBeds').toUpperCase()}</span>
-          <div className="telemetry-num" style={{ color: '#42D9C8' }}>{totalAvailableBeds.toLocaleString()}</div>
-          <div style={{ fontSize: '0.75rem', color: '#64727D' }}>{t('common.open')}</div>
+        <div className="telemetry-widget" style={{ background: 'var(--dc-surface, #F8F5EE)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))', borderRadius: '12px' }}>
+          <span className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.availableBeds').toUpperCase()}</span>
+          <div className="telemetry-num" style={{ color: 'var(--dc-forest, #263F35)' }}>{totalAvailableBeds.toLocaleString()}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--dc-text-secondary, #65706B)' }}>{t('common.open')}</div>
         </div>
 
-        <div className="telemetry-widget" style={{ background: '#111A23', border: '1px solid #202D38', borderRadius: '12px' }}>
-          <span className="micro-label" style={{ color: '#64727D' }}>{t('shelters.totalCapacity').toUpperCase()}</span>
-          <div className="telemetry-num" style={{ color: '#52D273' }}>{totalCapacity.toLocaleString()}</div>
-          <div style={{ fontSize: '0.75rem', color: '#64727D' }}>{t('shelters.totalCapacity')}</div>
+        <div className="telemetry-widget" style={{ background: 'var(--dc-surface, #F8F5EE)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))', borderRadius: '12px' }}>
+          <span className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.totalCapacity').toUpperCase()}</span>
+          <div className="telemetry-num" style={{ color: '#4F8060' }}>{totalCapacity.toLocaleString()}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.totalCapacity')}</div>
         </div>
 
-        <div className="telemetry-widget" style={{ background: '#111A23', border: '1px solid #202D38', borderRadius: '12px' }}>
-          <span className="micro-label" style={{ color: '#64727D' }}>{t('shelters.availableSafeHavens').toUpperCase()}</span>
-          <div className="telemetry-num" style={{ color: '#F4B942' }}>{openSheltersCount} / {shelters.length}</div>
-          <div style={{ fontSize: '0.75rem', color: '#64727D' }}>{t('common.active')}</div>
+        <div className="telemetry-widget" style={{ background: 'var(--dc-surface, #F8F5EE)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))', borderRadius: '12px' }}>
+          <span className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.availableSafeHavens').toUpperCase()}</span>
+          <div className="telemetry-num" style={{ color: '#C38A35' }}>{openSheltersCount} / {shelters.length}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--dc-text-secondary, #65706B)' }}>{t('common.active')}</div>
         </div>
 
-        <div className="telemetry-widget" style={{ background: '#111A23', border: '1px solid #202D38', borderRadius: '12px' }}>
-          <span className="micro-label" style={{ color: '#64727D' }}>{t('shelters.capacityRate').toUpperCase()}</span>
-          <div className="telemetry-num" style={{ color: '#FF5C5C' }}>{avgOccupancyRate}%</div>
-          <div style={{ fontSize: '0.75rem', color: '#64727D' }}>{t('shelters.occupancy')}</div>
+        <div className="telemetry-widget" style={{ background: 'var(--dc-surface, #F8F5EE)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))', borderRadius: '12px' }}>
+          <span className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.capacityRate').toUpperCase()}</span>
+          <div className="telemetry-num" style={{ color: avgOccupancyRate > 80 ? '#C94B4B' : 'var(--dc-text, #1E2725)' }}>{avgOccupancyRate}%</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.occupancy')}</div>
         </div>
       </div>
 
@@ -183,9 +183,9 @@ const SheltersPage = () => {
         <div
           className="spatial-panel"
           style={{
-            border: '1px solid #42D9C8',
-            background: '#16212B',
-            boxShadow: '0 0 20px rgba(66, 217, 200, 0.15)',
+            border: '1px solid var(--dc-earth-green, #496B5A)',
+            background: 'var(--dc-surface-2, #E7DECD)',
+            boxShadow: '0 4px 16px rgba(73, 107, 90, 0.12)',
             borderRadius: '12px',
             padding: '1.25rem 1.5rem',
             display: 'flex',
@@ -197,27 +197,27 @@ const SheltersPage = () => {
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-              <span className="badge badge-success" style={{ fontSize: '0.68rem', fontWeight: 800, background: 'rgba(82, 210, 115, 0.15)', color: '#52D273', border: '1px solid rgba(82, 210, 115, 0.3)' }}>
+              <span className="badge badge-success" style={{ fontSize: '0.68rem', fontWeight: 800, background: 'rgba(79, 128, 96, 0.15)', color: '#4F8060', border: '1px solid rgba(79, 128, 96, 0.3)' }}>
                 ⭐ {t('shelters.optimalSafeHaven')}
               </span>
-              <span className="micro-label" style={{ color: '#42D9C8' }}>
+              <span className="micro-label" style={{ color: 'var(--dc-forest, #263F35)' }}>
                 {incidentTitle ? `CONTEXT: ${incidentTitle.toUpperCase()}` : t('shelters.optimalSafeHaven')}
               </span>
             </div>
-            <div style={{ fontWeight: 800, fontSize: '1.2rem', color: '#F4F7F8', fontFamily: 'var(--font-display)' }}>
+            <div style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--dc-text, #1E2725)', fontFamily: 'var(--font-display)' }}>
               {recommendedShelter.name}
             </div>
-            <div style={{ fontSize: '0.82rem', color: '#A8B5BE' }}>
+            <div style={{ fontSize: '0.82rem', color: 'var(--dc-text-secondary, #65706B)' }}>
               📍 {recommendedShelter.address} • {t('common.contact')}: {recommendedShelter.phone}
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: '#42D9C8' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: 'var(--dc-forest, #263F35)' }}>
                 {recommendedShelter.capacity - recommendedShelter.occupancy} {t('shelters.openBedsAvailable')}
               </div>
-              <div className="micro-label" style={{ color: '#64727D' }}>
+              <div className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)' }}>
                 {t('shelters.totalCapacity')}: {recommendedShelter.capacity}
               </div>
             </div>
@@ -237,8 +237,8 @@ const SheltersPage = () => {
         className="spatial-panel"
         style={{
           padding: '1rem 1.5rem',
-          background: '#111A23',
-          border: '1px solid #202D38',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
           borderRadius: '12px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -250,7 +250,7 @@ const SheltersPage = () => {
         <input
           type="text"
           className="form-input"
-          style={{ maxWidth: '280px', padding: '0.45rem 0.85rem', fontSize: '0.82rem', background: '#16212B', border: '1px solid #263541', color: '#F4F7F8', borderRadius: '8px' }}
+          style={{ maxWidth: '280px', padding: '0.45rem 0.85rem', fontSize: '0.82rem', background: 'var(--dc-elevated, #FFFDF8)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))', color: 'var(--dc-text, #1E2725)', borderRadius: '8px' }}
           placeholder={t('shelters.searchShelters')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -259,7 +259,7 @@ const SheltersPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <select
             className="form-select"
-            style={{ width: 'auto', padding: '0.45rem 0.85rem', fontSize: '0.82rem', background: '#16212B', border: '1px solid #263541', color: '#F4F7F8', borderRadius: '8px' }}
+            style={{ width: 'auto', padding: '0.45rem 0.85rem', fontSize: '0.82rem', background: 'var(--dc-elevated, #FFFDF8)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))', color: 'var(--dc-text, #1E2725)', borderRadius: '8px' }}
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
@@ -271,7 +271,7 @@ const SheltersPage = () => {
 
           <select
             className="form-select"
-            style={{ width: 'auto', padding: '0.45rem 0.85rem', fontSize: '0.82rem', background: '#16212B', border: '1px solid #263541', color: '#F4F7F8', borderRadius: '8px' }}
+            style={{ width: 'auto', padding: '0.45rem 0.85rem', fontSize: '0.82rem', background: 'var(--dc-elevated, #FFFDF8)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.25))', color: 'var(--dc-text, #1E2725)', borderRadius: '8px' }}
             value={filterFacility}
             onChange={(e) => setFilterFacility(e.target.value)}
           >
@@ -285,23 +285,23 @@ const SheltersPage = () => {
 
       {/* Loading / Error / Empty States */}
       {loading && (
-        <div style={{ textAlign: 'center', padding: '3.5rem 0', color: '#A8B5BE', fontFamily: 'var(--font-mono)' }}>
-          <div className="live-beacon-pulse" style={{ width: 22, height: 22, margin: '0 auto 1rem', background: '#42D9C8' }} />
-          <span style={{ color: '#42D9C8', fontSize: '0.82rem', letterSpacing: '0.1em', fontWeight: 700 }}>FETCHING SHELTER STATUS...</span>
+        <div style={{ textAlign: 'center', padding: '3.5rem 0', color: 'var(--dc-text-secondary, #65706B)', fontFamily: 'var(--font-mono)' }}>
+          <div className="live-beacon-pulse" style={{ width: 22, height: 22, margin: '0 auto 1rem', background: 'var(--dc-forest, #263F35)' }} />
+          <span style={{ color: 'var(--dc-forest, #263F35)', fontSize: '0.82rem', letterSpacing: '0.1em', fontWeight: 700 }}>FETCHING SHELTER STATUS...</span>
         </div>
       )}
 
       {error && !loading && (
-        <div style={{ padding: '1rem', background: 'rgba(255, 92, 92, 0.1)', border: '1px solid #FF5C5C', borderRadius: '10px', color: '#FF5C5C', textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
+        <div style={{ padding: '1rem', background: 'rgba(201, 75, 75, 0.1)', border: '1px solid #C94B4B', borderRadius: '10px', color: '#C94B4B', textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
           {error}
         </div>
       )}
 
       {!loading && !error && filteredShelters.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#A8B5BE', background: '#111A23', border: '1px solid #202D38', borderRadius: '12px' }}>
-          <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem', color: '#42D9C8' }}>🛡️</div>
-          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#F4F7F8', fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>NO ACTIVE INCIDENTS OR SHELTERS IN SECTOR</div>
-          <div style={{ fontSize: '0.82rem', color: '#A8B5BE', marginTop: '0.35rem' }}>Network is currently clear in this area. Adjust filters or search radius.</div>
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--dc-text-secondary, #65706B)', background: 'var(--dc-surface, #F8F5EE)', border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))', borderRadius: '12px' }}>
+          <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem', color: 'var(--dc-forest, #263F35)' }}>🛡️</div>
+          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--dc-text, #1E2725)', fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>NO ACTIVE INCIDENTS OR SHELTERS IN SECTOR</div>
+          <div style={{ fontSize: '0.82rem', color: 'var(--dc-text-secondary, #65706B)', marginTop: '0.35rem' }}>Network is currently clear in this area. Adjust filters or search radius.</div>
         </div>
       )}
 
@@ -327,9 +327,10 @@ const SheltersPage = () => {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 padding: '1.35rem',
-                background: '#111A23',
-                border: '1px solid #202D38',
+                background: 'var(--dc-elevated, #FFFDF8)',
+                border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
                 borderRadius: '12px',
+                boxShadow: '0 2px 10px rgba(38, 63, 53, 0.04)',
               }}
             >
               <div>
@@ -337,9 +338,9 @@ const SheltersPage = () => {
                   <span
                     className="badge"
                     style={{
-                      background: sh.status === 'Open' ? 'rgba(82, 210, 115, 0.15)' : 'rgba(255, 92, 92, 0.15)',
-                      color: sh.status === 'Open' ? '#52D273' : '#FF5C5C',
-                      border: `1px solid ${sh.status === 'Open' ? 'rgba(82, 210, 115, 0.3)' : 'rgba(255, 92, 92, 0.3)'}`,
+                      background: sh.status === 'Open' ? 'rgba(79, 128, 96, 0.15)' : 'rgba(201, 75, 75, 0.15)',
+                      color: sh.status === 'Open' ? '#4F8060' : '#C94B4B',
+                      border: `1px solid ${sh.status === 'Open' ? 'rgba(79, 128, 96, 0.3)' : 'rgba(201, 75, 75, 0.3)'}`,
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.64rem',
                       letterSpacing: '0.04em',
@@ -355,7 +356,7 @@ const SheltersPage = () => {
                         cx="31"
                         cy="31"
                         r={radius}
-                        stroke="rgba(255, 255, 255, 0.08)"
+                        stroke="rgba(73, 107, 90, 0.12)"
                         strokeWidth="5"
                         fill="transparent"
                       />
@@ -363,7 +364,7 @@ const SheltersPage = () => {
                         cx="31"
                         cy="31"
                         r={radius}
-                        stroke={percent > 85 ? '#FF5C5C' : percent > 50 ? '#F4B942' : '#52D273'}
+                        stroke={percent > 85 ? '#C94B4B' : percent > 50 ? '#C38A35' : '#4F8060'}
                         strokeWidth="5"
                         strokeDasharray={circumference}
                         strokeDashoffset={strokeDashoffset}
@@ -372,25 +373,25 @@ const SheltersPage = () => {
                         style={{ transition: 'stroke-dashoffset 0.5s ease' }}
                       />
                     </svg>
-                    <div className="occupancy-ring-text" style={{ color: '#F4F7F8', fontFamily: 'var(--font-mono)' }}>
+                    <div className="occupancy-ring-text" style={{ color: 'var(--dc-text, #1E2725)', fontFamily: 'var(--font-mono)' }}>
                       {percent}%
                     </div>
                   </div>
                 </div>
 
-                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#F4F7F8', marginBottom: '0.35rem', fontFamily: 'var(--font-display)' }}>
+                <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--dc-text, #1E2725)', marginBottom: '0.35rem', fontFamily: 'var(--font-display)' }}>
                   {sh.name}
                 </div>
 
-                <div style={{ fontSize: '0.8rem', color: '#A8B5BE', marginBottom: '0.85rem' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--dc-text-secondary, #65706B)', marginBottom: '0.85rem' }}>
                   📍 {sh.address}
                 </div>
 
                 {/* Capacity Counter */}
                 <div
                   style={{
-                    background: '#16212B',
-                    border: '1px solid #202D38',
+                    background: 'var(--dc-surface, #F8F5EE)',
+                    border: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))',
                     borderRadius: '8px',
                     padding: '0.65rem 0.85rem',
                     marginBottom: '0.85rem',
@@ -400,14 +401,14 @@ const SheltersPage = () => {
                   }}
                 >
                   <div>
-                    <div className="micro-label" style={{ color: '#64727D' }}>{t('shelters.availableBeds', 'AVAILABLE BEDS')}</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.15rem', color: avail > 0 ? '#42D9C8' : '#FF5C5C' }}>
+                    <div className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.availableBeds', 'AVAILABLE BEDS')}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.15rem', color: avail > 0 ? 'var(--dc-forest, #263F35)' : '#C94B4B' }}>
                       {avail} BEDS
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="micro-label" style={{ color: '#64727D' }}>{t('shelters.occupancy', 'OCCUPANCY')}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: '#F4F7F8' }}>
+                    <div className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)' }}>{t('shelters.occupancy', 'OCCUPANCY')}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--dc-text, #1E2725)' }}>
                       {occ} / {cap}
                     </div>
                   </div>
@@ -423,10 +424,10 @@ const SheltersPage = () => {
                           fontSize: '0.7rem',
                           fontFamily: 'var(--font-mono)',
                           padding: '2px 7px',
-                          background: 'rgba(66, 217, 200, 0.08)',
-                          border: '1px solid #263541',
+                          background: 'var(--dc-surface-2, #E7DECD)',
+                          border: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))',
                           borderRadius: '6px',
-                          color: '#A8B5BE',
+                          color: 'var(--dc-forest, #263F35)',
                         }}
                       >
                         ✓ {fac}
@@ -437,7 +438,7 @@ const SheltersPage = () => {
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', borderTop: '1px solid #202D38', paddingTop: '0.85rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', borderTop: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))', paddingTop: '0.85rem' }}>
                 <a
                   href={sh.directionsUrl || (sh.latitude && sh.longitude ? `https://www.google.com/maps/dir/?api=1&destination=${sh.latitude},${sh.longitude}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sh.address || sh.name)}`)}
                   target="_blank"

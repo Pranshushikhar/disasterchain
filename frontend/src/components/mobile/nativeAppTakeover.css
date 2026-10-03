@@ -7,8 +7,8 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background-color: #0D0E0D;
-  color: #F7F4ED;
+  background-color: var(--dc-bg, #F1EBDD);
+  color: var(--dc-text, #1E2725);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -49,7 +49,7 @@
   align-items: center;
   justify-content: space-between;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #1E201D;
+  border-bottom: 1px solid var(--dc-border, #DCD3C3);
 }
 
 .dc-takeover-brand {
@@ -74,7 +74,7 @@
   font-weight: 700;
   font-size: 0.78rem;
   letter-spacing: 0.1em;
-  color: #F7F4ED;
+  color: var(--dc-text, #1E2725);
 }
 
 .dc-takeover-status-badge {
@@ -98,7 +98,7 @@
 .dc-takeover-kicker {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
-  color: #A49F93;
+  color: var(--dc-text-subtle, #65706B);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 0.25rem;
@@ -108,14 +108,14 @@
   font-family: 'Newsreader', Georgia, serif;
   font-size: 1.6rem;
   font-weight: 600;
-  color: #F7F4ED;
+  color: var(--dc-text, #1E2725);
   line-height: 1.2;
   margin: 0 0 0.4rem 0;
 }
 
 .dc-takeover-subtitle {
   font-size: 0.85rem;
-  color: #A49F93;
+  color: var(--dc-text-subtle, #65706B);
   line-height: 1.45;
   margin: 0 auto;
   max-width: 320px;
@@ -128,8 +128,8 @@
   width: 190px;
   height: 270px;
   border-radius: 18px;
-  background: #141514;
-  border: 2px solid #282A26;
+  background: var(--dc-surface, #F8F5EE);
+  border: 2px solid var(--dc-border, #DCD3C3);
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.03);
   overflow: hidden;
   display: flex;
@@ -152,7 +152,7 @@
   background: rgba(13, 14, 13, 0.85);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid #282A26;
+  border: 1px solid var(--dc-border, #DCD3C3);
   padding: 3px 8px;
   border-radius: 12px;
   font-family: 'JetBrains Mono', monospace;
@@ -225,7 +225,7 @@
 .dc-takeover-btn-secondary {
   min-height: 44px;
   background: transparent;
-  color: #A49F93;
+  color: var(--dc-text-subtle, #65706B);
   border: 1px solid #252824;
   border-radius: 6px;
   font-family: 'JetBrains Mono', monospace;
@@ -240,7 +240,7 @@
 }
 
 .dc-takeover-btn-secondary:active {
-  color: #F7F4ED;
+  color: var(--dc-text, #1E2725);
   border-color: #3C4039;
 }
 

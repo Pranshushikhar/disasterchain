@@ -10,8 +10,8 @@
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
-  background: #070B10;
-  color: #F4F7F8;
+  background: var(--dc-bg, #F1EBDD);
+  color: var(--dc-text, #1E2725);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
   position: relative;
@@ -25,10 +25,10 @@
   left: 0;
   right: 0;
   z-index: 9900;
-  background: rgba(11, 16, 23, 0.96);
+  background: var(--dc-bg, #F1EBDD);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid #202D38;
+  border-bottom: 1px solid var(--dc-border, #DCD3C3);
   padding: env(safe-area-inset-top, 0px) 1rem 0 1rem;
   height: calc(52px + env(safe-area-inset-top, 0px));
   display: flex;
@@ -72,7 +72,7 @@
   font-weight: 800;
   font-size: 0.82rem;
   letter-spacing: 0.08em;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
 }
 
 @media (max-width: 395px) {
@@ -85,11 +85,11 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  background: #16212B;
-  border: 1px solid #202D38;
+  background: var(--dc-surface-2, #E7DECD);
+  border: 1px solid var(--dc-border, #DCD3C3);
   border-radius: 6px;
   padding: 0.25rem 0.55rem;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
@@ -189,7 +189,7 @@
   background: rgba(7, 11, 16, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid #202D38;
+  border-top: 1px solid var(--dc-border, #DCD3C3);
   display: grid;
   grid-template-columns: 1fr 1fr auto 1fr 1fr;
   align-items: center;
@@ -362,7 +362,7 @@
 .mobile-risk-summary {
   font-size: 0.82rem;
   line-height: 1.45;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
 }
 
 /* WHY Section */
@@ -389,8 +389,8 @@
   display: flex;
   align-items: flex-start;
   gap: 0.65rem;
-  background: #111A23;
-  border: 1px solid #202D38;
+  background: var(--dc-surface, #F8F5EE);
+  border: 1px solid var(--dc-border, #DCD3C3);
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
 }
@@ -409,7 +409,7 @@
 .mobile-why-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
 }
 
 .mobile-why-desc {
@@ -420,8 +420,8 @@
 
 /* WHAT CHANGED Section (Latest 3 meaningful changes) */
 .mobile-what-changed-card {
-  background: #111A23;
-  border: 1px solid #202D38;
+  background: var(--dc-surface, #F8F5EE);
+  border: 1px solid var(--dc-border, #DCD3C3);
   border-radius: 8px;
   padding: 0.75rem;
   display: flex;
@@ -434,7 +434,7 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding-bottom: 0.55rem;
-  border-bottom: 1px solid #202D38;
+  border-bottom: 1px solid var(--dc-border, #DCD3C3);
 }
 
 .mobile-change-row:last-child {
@@ -610,7 +610,7 @@
 
 /* 7. Ask DisasterChain (WeatherGPT Accessible Entry - Section 7) */
 .mobile-ask-dc-card {
-  background: #111A23;
+  background: var(--dc-surface, #F8F5EE);
   border: 1px solid rgba(66, 217, 200, 0.3);
   border-radius: 12px;
   padding: 0.95rem;
@@ -649,9 +649,9 @@
 }
 
 .mobile-quick-q-btn {
-  background: #16212B;
-  border: 1px solid #202D38;
-  color: #F4F7F8;
+  background: var(--dc-surface-2, #E7DECD);
+  border: 1px solid var(--dc-border, #DCD3C3);
+  color: var(--dc-text, #1E2725);
   font-size: 0.72rem;
   font-weight: 500;
   padding: 0.35rem 0.65rem;
@@ -823,7 +823,7 @@
 
 .mobile-sheet-action-btn {
   background: #42D9C8;
-  color: #070B10;
+  color: var(--dc-bg, #F1EBDD);
   border: none;
   border-radius: 8px;
   padding: 0.65rem;
@@ -845,11 +845,11 @@
 }
 
 .mobile-alert-card {
-  background: #111A23;
+  background: var(--dc-surface, #F8F5EE);
   border-left: 4px solid #52D273;
-  border-top: 1px solid #202D38;
-  border-right: 1px solid #202D38;
-  border-bottom: 1px solid #202D38;
+  border-top: 1px solid var(--dc-border, #DCD3C3);
+  border-right: 1px solid var(--dc-border, #DCD3C3);
+  border-bottom: 1px solid var(--dc-border, #DCD3C3);
   border-radius: 10px;
   padding: 0.85rem;
   display: flex;
@@ -902,18 +902,18 @@
 .mobile-alert-headline {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
   line-height: 1.35;
 }
 
 .mobile-alert-what-to-do {
-  background: #16212B;
-  border: 1px solid #202D38;
+  background: var(--dc-surface-2, #E7DECD);
+  border: 1px solid var(--dc-border, #DCD3C3);
   border-radius: 8px;
   padding: 0.55rem 0.65rem;
   font-size: 0.75rem;
   line-height: 1.45;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
 }
 
 .mobile-alert-footer {
@@ -1102,18 +1102,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #111A23;
-  border: 1px solid #202D38;
+  background: var(--dc-surface, #F8F5EE);
+  border: 1px solid var(--dc-border, #DCD3C3);
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
   text-decoration: none;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .mobile-more-item:active {
-  background: #16212B;
+  background: var(--dc-surface-2, #E7DECD);
   border-color: #42D9C8;
 }
 
@@ -1139,7 +1139,7 @@
 .mobile-more-label {
   font-size: 0.84rem;
   font-weight: 600;
-  color: #F4F7F8;
+  color: var(--dc-text, #1E2725);
 }
 
 .mobile-more-desc {

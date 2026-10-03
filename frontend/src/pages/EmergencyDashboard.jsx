@@ -701,8 +701,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
       <style>{`
         .situation-room-root {
           min-height: calc(100vh - 64px);
-          background: #070B10;
-          color: #F4F7F8;
+          background: var(--dc-bg, #F1EBDD);
+          color: var(--dc-text, #1E2725);
           font-family: var(--font-sans);
           padding: 1.25rem 1.75rem 4rem 1.75rem;
           box-sizing: border-box;
@@ -715,8 +715,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           justify-content: space-between;
           flex-wrap: wrap;
           gap: 1rem;
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--dc-border, #DCD3C3);
           border-radius: 12px;
           padding: 0.65rem 1.25rem;
           margin-bottom: 1.25rem;
@@ -744,14 +744,14 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .telemetry-val {
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           font-weight: 600;
         }
 
         .telemetry-divider {
           width: 1px;
           height: 14px;
-          background: #202D38;
+          background: var(--dc-border, #DCD3C3);
         }
 
         .telemetry-right {
@@ -761,9 +761,9 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .telemetry-action-btn {
-          background: #16212B;
-          border: 1px solid #263541;
-          color: #F4F7F8;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--dc-border, #DCD3C3);
+          color: var(--dc-text, #1E2725);
           font-family: var(--font-mono, monospace);
           font-size: 0.65rem;
           padding: 0.3rem 0.65rem;
@@ -781,7 +781,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .cmd-kbd {
-          background: #202D38;
+          background: var(--dc-border, #DCD3C3);
           padding: 0.1rem 0.35rem;
           border-radius: 4px;
           color: #42D9C8;
@@ -843,8 +843,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .nav-rail-link:hover {
-          color: #F4F7F8;
-          background: #16212B;
+          color: var(--dc-text, #1E2725);
+          background: var(--dc-elevated, #FFFDF8);
         }
 
         .nav-rail-link.active {
@@ -907,8 +907,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
         /* Situational Status Surface */
         .situation-status-surface {
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--dc-border, #DCD3C3);
           border-radius: 12px;
           padding: 1.5rem;
         }
@@ -946,7 +946,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         .situation-statement-heading {
           font-size: 1.35rem;
           font-weight: 700;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           line-height: 1.35;
           margin: 0 0 0.65rem 0;
           letter-spacing: -0.01em;
@@ -961,8 +961,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .situation-actions-block {
-          background: #16212B;
-          border: 1px solid #202D38;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--dc-border, #DCD3C3);
           border-radius: 10px;
           padding: 0.95rem 1.15rem;
         }
@@ -991,7 +991,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           align-items: baseline;
           gap: 0.45rem;
           font-size: 0.82rem;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
         }
 
         .bullet-arrow {
@@ -1001,8 +1001,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
         /* Spatial Container */
         .situation-spatial-container {
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--dc-border, #DCD3C3);
           border-radius: 12px;
           overflow: hidden;
         }
@@ -1012,8 +1012,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 1.25rem;
-          background: #16212B;
-          border-bottom: 1px solid #202D38;
+          background: var(--dc-elevated, #FFFDF8);
+          border-bottom: 1px solid var(--dc-border, #DCD3C3);
           flex-wrap: wrap;
           gap: 0.5rem;
         }
@@ -1024,8 +1024,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .spatial-tab-btn {
-          background: #111A23;
-          border: 1px solid #263541;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--dc-border, #DCD3C3);
           color: #A8B5BE;
           font-family: var(--font-mono, monospace);
           font-size: 0.65rem;
@@ -1036,7 +1036,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .spatial-tab-btn:hover {
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           border-color: #42D9C8;
         }
 
@@ -1077,7 +1077,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           font-weight: 700;
           letter-spacing: 0.12em;
           color: #64727D;
-          border-bottom: 1px solid #202D38;
+          border-bottom: 1px solid var(--dc-border, #DCD3C3);
           padding-bottom: 0.45rem;
         }
 
@@ -1089,8 +1089,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .intel-block {
-          background: #111A23;
-          border: 1px solid #202D38;
+          background: var(--dc-surface, #F8F5EE);
+          border: 1px solid var(--dc-border, #DCD3C3);
           border-radius: 12px;
           padding: 1.1rem;
         }
@@ -1114,7 +1114,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         .intel-temp {
           font-size: 1.65rem;
           font-weight: 800;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           font-family: var(--font-display);
         }
 
@@ -1142,8 +1142,8 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
           grid-template-columns: repeat(6, 1fr);
           gap: 3px;
           text-align: center;
-          background: #16212B;
-          border: 1px solid #202D38;
+          background: var(--dc-elevated, #FFFDF8);
+          border: 1px solid var(--dc-border, #DCD3C3);
           border-radius: 8px;
           padding: 0.45rem 0.25rem;
           font-family: var(--font-mono, monospace);
@@ -1151,7 +1151,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         }
 
         .slot-time { color: #64727D; font-size: 0.55rem; display: block; }
-        .slot-temp { color: #F4F7F8; font-weight: 600; display: block; }
+        .slot-temp { color: var(--dc-text, #1E2725); font-weight: 600; display: block; }
         .slot-pop { font-size: 0.55rem; display: block; }
 
         .intel-gpt-link-wrapper {
@@ -1189,7 +1189,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         .intel-shelter-name {
           font-size: 0.88rem;
           font-weight: 600;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
         }
 
         .intel-shelter-address {
@@ -1199,7 +1199,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
 
         .shelter-gauge-bar {
           height: 4px;
-          background: #202D38;
+          background: var(--dc-border, #DCD3C3);
           border-radius: 2px;
           overflow: hidden;
           margin: 0.45rem 0;
@@ -1220,7 +1220,7 @@ export default function EmergencyDashboard({ onOpenSos, onOpenIncident, refreshK
         .intel-advisory-text {
           font-size: 0.8rem;
           line-height: 1.4;
-          color: #F4F7F8;
+          color: var(--dc-text, #1E2725);
           margin: 0;
         }
 

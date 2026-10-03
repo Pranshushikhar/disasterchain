@@ -14,19 +14,29 @@ import {
   HeartHandshake,
   FileText,
   RotateCcw,
+  User,
+  LogOut,
+  Settings,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const moreRef = useRef(null);
+  const accountRef = useRef(null);
 
-  // Close more menu when clicking outside
+  // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (moreRef.current && !moreRef.current.contains(e.target)) {
         setIsMoreOpen(false);
+      }
+      if (accountRef.current && !accountRef.current.contains(e.target)) {
+        setIsAccountOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -98,9 +108,98 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
             })}
           </nav>
 
-          {/* Right Action Suite: SOS + More Dropdown */}
+          {/* Right Action Suite: [ Login / Account ] -> [ SOS ] -> [ More ] */}
           <div className="dc-nav-actions">
-            {/* SOS Emergency Button */}
+            {/* Account / Login Action */}
+            {isAuthenticated ? (
+              <div className="dc-account-dropdown-wrap" ref={accountRef}>
+                <button
+                  id="dc-desktop-account-btn"
+                  className={`dc-nav-account-btn ${isAccountOpen ? 'open' : ''}`}
+                  onClick={() => setIsAccountOpen((prev) => !prev)}
+                  title="Operator Account"
+                  aria-haspopup="true"
+                  aria-expanded={isAccountOpen}
+                >
+                  <span className="dc-nav-avatar">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </span>
+                  <span className="dc-nav-username">
+                    {user?.name?.split(' ')[0] || 'Account'}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {isAccountOpen && (
+                    <motion.div
+                      className="dc-more-menu-panel dc-account-menu-panel"
+                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                    >
+                      <div className="dc-account-panel-header">
+                        <div className="dc-account-panel-name">{user?.name || 'Operator'}</div>
+                        <div className="dc-account-panel-email">{user?.email || ''}</div>
+                        <span className="dc-account-panel-badge">{user?.role?.toUpperCase() || 'CITIZEN'}</span>
+                      </div>
+
+                      <div className="dc-more-divider" />
+
+                      <button
+                        className="dc-more-item"
+                        onClick={() => {
+                          setIsAccountOpen(false);
+                          navigate('/profile');
+                        }}
+                      >
+                        <User size={15} />
+                        <span>Profile & Settings</span>
+                      </button>
+
+                      {user?.role === 'admin' && (
+                        <button
+                          className="dc-more-item"
+                          onClick={() => {
+                            setIsAccountOpen(false);
+                            navigate('/admin');
+                          }}
+                        >
+                          <Settings size={15} />
+                          <span>Admin Console</span>
+                        </button>
+                      )}
+
+                      <div className="dc-more-divider" />
+
+                      <button
+                        className="dc-more-item dc-logout-item"
+                        onClick={() => {
+                          setIsAccountOpen(false);
+                          logout();
+                          navigate('/');
+                        }}
+                      >
+                        <LogOut size={14} />
+                        <span>Sign Out</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <NavLink
+                to="/login"
+                id="dc-desktop-login-btn"
+                className={`dc-nav-auth-btn ${location.pathname === '/login' || location.pathname === '/register' ? 'active' : ''}`}
+                title="Sign In to DisasterChain"
+              >
+                <User size={15} />
+                <span>Login</span>
+              </NavLink>
+            )}
+
+            {/* SOS Emergency Button (Dominant Emergency Action) */}
             <button
               id="dc-desktop-sos-btn"
               onClick={onOpenSos}
@@ -133,6 +232,31 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
                     transition={{ duration: 0.18, ease: 'easeOut' }}
                   >
                     <div className="dc-more-header">Operations & Resources</div>
+
+                    {/* Account Access in More Menu */}
+                    {isAuthenticated ? (
+                      <button
+                        className="dc-more-item"
+                        onClick={() => {
+                          setIsMoreOpen(false);
+                          navigate('/profile');
+                        }}
+                      >
+                        <User size={15} />
+                        <span>Account Profile</span>
+                      </button>
+                    ) : (
+                      <button
+                        className="dc-more-item"
+                        onClick={() => {
+                          setIsMoreOpen(false);
+                          navigate('/login');
+                        }}
+                      >
+                        <User size={15} />
+                        <span>Operator Login</span>
+                      </button>
+                    )}
 
                     <button
                       className="dc-more-item"
@@ -193,6 +317,20 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
 
                     <div className="dc-more-divider" />
 
+                    {isAuthenticated && (
+                      <button
+                        className="dc-more-item dc-logout-item"
+                        onClick={() => {
+                          setIsMoreOpen(false);
+                          logout();
+                          navigate('/');
+                        }}
+                      >
+                        <LogOut size={14} />
+                        <span>Sign Out</span>
+                      </button>
+                    )}
+
                     <button
                       className="dc-more-item dc-replay-item"
                       onClick={() => {
@@ -221,6 +359,28 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
         </NavLink>
 
         <div className="dc-mobile-header-actions">
+          {/* Mobile Login / Account Button */}
+          {isAuthenticated ? (
+            <NavLink
+              to="/profile"
+              className="dc-mobile-auth-btn authenticated"
+              title="My Account"
+            >
+              <span className="dc-mobile-avatar">
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+              </span>
+            </NavLink>
+          ) : (
+            <NavLink
+              to="/login"
+              className="dc-mobile-auth-btn"
+              title="Sign In"
+            >
+              <User size={15} />
+              <span>Login</span>
+            </NavLink>
+          )}
+
           <button
             onClick={onOpenSos}
             className="dc-mobile-sos-pill"

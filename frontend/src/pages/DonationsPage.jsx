@@ -124,20 +124,21 @@ const DonationsPage = () => {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          background: 'rgba(9, 14, 25, 0.94)',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--dc-border, #DCD3C3)',
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
             <span className="badge badge-success">{t('donations.donationsTitle')}</span>
-            <span className="micro-label" style={{ color: 'var(--cyan)' }}>
+            <span className="micro-label" style={{ color: 'var(--dc-forest, #496B5A)' }}>
               {t('donations.makeDonation')}
             </span>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.25rem' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.25rem' }}>
             {t('donations.donationsTitle')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+          <p style={{ color: 'var(--dc-text-subtle, #65706B)', fontSize: '0.85rem' }}>
             {t('donations.donationsSubtitle')}
           </p>
         </div>
@@ -183,7 +184,8 @@ const DonationsPage = () => {
         className="spatial-panel"
         style={{
           padding: '1rem 1.5rem',
-          background: 'rgba(9, 14, 25, 0.92)',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--dc-border, #DCD3C3)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -230,9 +232,9 @@ const DonationsPage = () => {
       )}
 
       {!loading && !error && filteredDonations.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--dc-text-subtle, #65706B)' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎁</div>
-          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#ffffff' }}>{t('donations.donationsTitle')}</div>
+          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--dc-text, #1E2725)' }}>{t('donations.donationsTitle')}</div>
         </div>
       )}
 
@@ -244,7 +246,8 @@ const DonationsPage = () => {
             className="spatial-panel spatial-panel-hoverable"
             style={{
               padding: '1.35rem',
-              background: 'rgba(11, 17, 30, 0.88)',
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid var(--dc-border, #DCD3C3)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -255,28 +258,28 @@ const DonationsPage = () => {
                 <span className="badge badge-success">
                   {don.type?.toUpperCase() || t('donations.donationsTitle')}
                 </span>
-                <span className="micro-label" style={{ color: 'var(--cyan)' }}>
+                <span className="micro-label" style={{ color: 'var(--dc-forest, #496B5A)' }}>
                   {don.status || t('common.verified')}
                 </span>
               </div>
 
-              <div style={{ fontWeight: 800, fontSize: '1.15rem', color: '#ffffff', marginBottom: '0.35rem' }}>
+              <div style={{ fontWeight: 800, fontSize: '1.15rem', color: 'var(--dc-text, #1E2725)', marginBottom: '0.35rem' }}>
                 {don.resourceName}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginBottom: '0.75rem' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: 'var(--mint)' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: 'var(--dc-forest, #496B5A)' }}>
                   {don.quantity}
                 </span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                <span style={{ color: 'var(--dc-text-subtle, #65706B)', fontSize: '0.85rem' }}>
                   {don.unit || 'units'}
                 </span>
               </div>
 
               <div
                 style={{
-                  background: 'rgba(15, 23, 42, 0.7)',
-                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--dc-surface, #F8F5EE)',
+                  border: '1px solid var(--dc-border, #DCD3C3)',
                   borderRadius: 'var(--radius-sm)',
                   padding: '0.65rem 0.85rem',
                   marginBottom: '1rem',
@@ -286,10 +289,10 @@ const DonationsPage = () => {
                   gap: '0.3rem',
                 }}
               >
-                <div>👤 {t('donations.donorName')}: <strong style={{ color: '#ffffff' }}>{don.donor}</strong></div>
-                <div>📍 {t('resources.destinationFacility')}: <strong style={{ color: 'var(--cyan)' }}>{don.destination}</strong></div>
+                <div>👤 {t('donations.donorName')}: <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{don.donor}</strong></div>
+                <div>📍 {t('resources.destinationFacility')}: <strong style={{ color: 'var(--dc-forest, #496B5A)' }}>{don.destination}</strong></div>
                 {don.blockchainTransactionId && (
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--violet)' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--dc-water, #5D8990)' }}>
                     🔒 {t('donations.txHash')}: {don.blockchainTransactionId}
                   </div>
                 )}
@@ -325,8 +328,8 @@ const DonationsPage = () => {
             position: 'fixed',
             inset: 0,
             zIndex: 1100,
-            background: 'rgba(5, 8, 14, 0.85)',
-            backdropFilter: 'blur(16px)',
+            background: 'rgba(30, 39, 37, 0.4)',
+            backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -338,18 +341,19 @@ const DonationsPage = () => {
             style={{
               width: '100%',
               maxWidth: '520px',
-              border: '1px solid var(--border-highlight)',
-              boxShadow: 'var(--glow-cyan)',
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid var(--dc-border, #DCD3C3)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <div>
-                <span className="micro-label" style={{ color: 'var(--cyan)' }}>{t('resources.stage1')}</span>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ffffff' }}>{t('donations.makeDonation')}</h3>
+                <span className="micro-label" style={{ color: 'var(--dc-forest, #496B5A)' }}>{t('resources.stage1')}</span>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)' }}>{t('donations.makeDonation')}</h3>
               </div>
               <button
                 onClick={() => setIsFormOpen(false)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.2rem', cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: 'var(--dc-text-subtle, #65706B)', fontSize: '1.2rem', cursor: 'pointer' }}
               >
                 ✕
               </button>

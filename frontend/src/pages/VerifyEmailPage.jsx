@@ -66,29 +66,40 @@ const VerifyEmailPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem 1.5rem',
-        background: 'var(--bg-space)',
+        padding: '3rem 1.5rem',
+        backgroundColor: 'var(--dc-bg, #F1EBDD)',
       }}
     >
       <div
-        className="spatial-panel"
         style={{
           maxWidth: '480px',
           width: '100%',
           padding: '2.5rem 2.25rem',
           textAlign: 'center',
-          border: '1px solid var(--border-highlight)',
-          boxShadow: 'var(--glow-cyan)',
+          backgroundColor: 'var(--dc-elevated, #FFFDF8)',
+          border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+          borderRadius: 'var(--radius-lg, 16px)',
+          boxShadow: 'var(--shadow-md)',
         }}
       >
         {loading ? (
           <div>
-            <div className="live-beacon-pulse" style={{ width: 32, height: 32, margin: '0 auto 1.5rem' }} />
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem' }}>
-              {t('auth.validatingToken', 'Validating Dispatch Token...')}
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                margin: '0 auto 1.25rem',
+                border: '3px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+                borderTopColor: 'var(--dc-forest, #263F35)',
+                borderRadius: '50%',
+                animation: 'dcSpin 1s linear infinite',
+              }}
+            />
+            <h2 style={{ fontFamily: 'var(--font-display, inherit)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.4rem' }}>
+              Validating Email Signature...
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-              {t('auth.validatingDesc', 'Communicating with security authority to verify your cryptographic signature.')}
+            <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.85rem' }}>
+              Confirming account registration and initializing operational clearances.
             </p>
           </div>
         ) : verified ? (
@@ -98,31 +109,52 @@ const VerifyEmailPage = () => {
                 width: '64px',
                 height: '64px',
                 borderRadius: '50%',
-                background: 'rgba(16, 185, 129, 0.15)',
-                border: '2px solid var(--mint)',
+                background: 'rgba(79, 128, 96, 0.15)',
+                color: 'var(--dc-safe, #4F8060)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '1.25rem',
-                color: 'var(--mint)',
-                boxShadow: '0 0 24px rgba(16, 185, 129, 0.3)',
               }}
             >
-              <Icon name="shield-check" size={32} />
+              <Icon name="shield-check" size={32} color="var(--dc-safe, #4F8060)" />
             </div>
 
-            <div className="micro-label" style={{ color: 'var(--mint)', marginBottom: '0.3rem' }}>
-              {t('auth.clearanceConfirmed', 'CLEARANCE CONFIRMED')}
+            <div
+              style={{
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '0.70rem',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'var(--dc-safe, #4F8060)',
+                marginBottom: '0.3rem',
+              }}
+            >
+              EMAIL VERIFIED
             </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
-              {t('auth.identityVerified', 'Identity Successfully Verified')}
+            <h2 style={{ fontFamily: 'var(--font-display, inherit)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.5rem' }}>
+              Account Activated
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', lineHeight: 1.5, marginBottom: '1.75rem' }}>
-              {t('auth.identityVerifiedDesc', 'Your operator credentials have been authenticated. You now possess active clearance on DisasterChain.')}
+            <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.5, marginBottom: '1.75rem' }}>
+              Your email credentials have been authenticated. You now possess full active clearance on DisasterChain.
             </p>
 
-            <Link to="/login" className="btn btn-primary" style={{ width: '100%' }}>
-              {t('auth.proceedToSignIn', 'Proceed to Sign In →')}
+            <Link
+              to="/login"
+              style={{
+                width: '100%',
+                display: 'block',
+                boxSizing: 'border-box',
+                padding: '11px',
+                borderRadius: 'var(--radius-sm, 8px)',
+                backgroundColor: 'var(--dc-forest, #263F35)',
+                color: '#FFFDF8',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              Proceed to Sign In →
             </Link>
           </div>
         ) : (
@@ -132,41 +164,79 @@ const VerifyEmailPage = () => {
                 width: '64px',
                 height: '64px',
                 borderRadius: '50%',
-                background: 'rgba(255, 46, 77, 0.12)',
-                border: '2px solid var(--crimson)',
+                background: 'rgba(201, 75, 75, 0.12)',
+                color: 'var(--dc-emergency, #C94B4B)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '1.25rem',
-                color: 'var(--crimson)',
               }}
             >
-              <Icon name="alert-circle" size={32} />
+              <Icon name="alert-circle" size={32} color="var(--dc-emergency, #C94B4B)" />
             </div>
 
-            <div className="micro-label" style={{ color: 'var(--crimson)', marginBottom: '0.3rem' }}>
-              {t('auth.verificationRejected', 'VERIFICATION REJECTED')}
+            <div
+              style={{
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '0.70rem',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'var(--dc-emergency, #C94B4B)',
+                marginBottom: '0.3rem',
+              }}
+            >
+              VERIFICATION EXPIRED
             </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
-              {t('auth.tokenInvalid', 'Token Invalid or Expired')}
+            <h2 style={{ fontFamily: 'var(--font-display, inherit)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.5rem' }}>
+              Token Invalid or Expired
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: '1.5rem' }}>
-              {error || t('auth.tokenInvalidDesc', 'This verification token is no longer recognized by the cryptographic security grid.')}
+            <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+              {error || 'This verification link is invalid or has expired. Please enter your email to request a new verification token.'}
             </p>
 
             {resendMessage && (
-              <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid var(--border-mint)', color: 'var(--mint)', padding: '0.65rem', borderRadius: 'var(--radius-xs)', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
+              <div
+                style={{
+                  background: 'rgba(79, 128, 96, 0.1)',
+                  color: 'var(--dc-safe, #4F8060)',
+                  padding: '0.65rem',
+                  borderRadius: 'var(--radius-xs, 4px)',
+                  fontSize: '0.8rem',
+                  marginBottom: '1.25rem',
+                }}
+              >
                 ✓ {resendMessage}
               </div>
             )}
 
             <form onSubmit={handleResend} style={{ textAlign: 'left', marginBottom: '1.25rem' }}>
-              <div className="form-group">
-                <label className="form-label">{t('auth.requestFreshToken', 'Request Fresh Verification Dispatch')}</label>
+              <div style={{ marginBottom: '1rem' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    color: 'var(--dc-text, #1E2725)',
+                    marginBottom: '0.35rem',
+                  }}
+                >
+                  Request Fresh Verification Link
+                </label>
                 <input
                   type="email"
                   required
-                  className="form-input"
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: 'var(--radius-sm, 8px)',
+                    border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+                    backgroundColor: 'var(--dc-surface, #F8F5EE)',
+                    color: 'var(--dc-text, #1E2725)',
+                    fontSize: '0.88rem',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                  }}
                   value={resendEmail}
                   onChange={(e) => setResendEmail(e.target.value)}
                   placeholder="operator@disasterchain.org"
@@ -175,15 +245,24 @@ const VerifyEmailPage = () => {
               <button
                 type="submit"
                 disabled={resending}
-                className="btn btn-secondary btn-sm"
-                style={{ width: '100%' }}
+                style={{
+                  width: '100%',
+                  backgroundColor: 'var(--dc-forest, #263F35)',
+                  color: '#FFFDF8',
+                  border: 'none',
+                  borderRadius: 'var(--radius-sm, 8px)',
+                  padding: '10px 14px',
+                  fontWeight: 600,
+                  fontSize: '0.86rem',
+                  cursor: resending ? 'not-allowed' : 'pointer',
+                }}
               >
-                {resending ? t('common.loading', 'Dispatching...') : t('auth.resendBtn', 'Resend Verification Token')}
+                {resending ? 'Sending...' : 'Resend Verification Link'}
               </button>
             </form>
 
-            <Link to="/login" style={{ color: 'var(--cyan)', fontSize: '0.82rem' }}>
-              {t('auth.returnToSignIn', 'Return to Sign In')}
+            <Link to="/login" style={{ color: 'var(--dc-earth-green, #496B5A)', fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>
+              Return to Sign In
             </Link>
           </div>
         )}

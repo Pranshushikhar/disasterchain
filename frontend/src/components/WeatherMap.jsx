@@ -271,16 +271,16 @@ export default function WeatherMap({
         overflow: 'hidden',
         position: 'relative',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border-subtle)',
-        background: '#090d16',
+        border: '1px solid var(--border-medium, rgba(73, 107, 90, 0.2))',
+        background: 'var(--dc-surface, #F8F5EE)',
       }}
     >
       {/* Tactical Map Header & Controls HUD */}
       <div
         style={{
           padding: '0.85rem 1.25rem',
-          background: 'rgba(11, 17, 30, 0.95)',
-          borderBottom: '1px solid var(--border-subtle)',
+          background: 'var(--dc-elevated, #FFFDF8)',
+          borderBottom: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))',
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
@@ -293,7 +293,7 @@ export default function WeatherMap({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <span style={{ fontSize: '1.2rem' }}>🌐</span>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#ffffff', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {t('weather.globalMapTitle', 'GLOBAL ATMOSPHERIC & CYCLONE MAP')}
             </h3>
           </div>
@@ -347,15 +347,15 @@ export default function WeatherMap({
       <div
         style={{
           padding: '0.5rem 1.25rem',
-          background: 'rgba(5, 8, 14, 0.92)',
-          borderBottom: '1px solid var(--border-subtle)',
+          background: 'var(--dc-surface-2, #E7DECD)',
+          borderBottom: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))',
           display: 'flex',
           gap: '0.5rem',
           overflowX: 'auto',
           alignItems: 'center',
         }}
       >
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--dc-text-secondary, #65706B)', fontWeight: 700, whiteSpace: 'nowrap' }}>
           {t('weather.layers', 'LAYERS')}:
         </span>
 
@@ -565,34 +565,34 @@ export default function WeatherMap({
       <div
         style={{
           padding: '0.65rem 1.25rem',
-          background: 'rgba(11, 17, 30, 0.95)',
-          borderTop: '1px solid var(--border-subtle)',
+          background: 'var(--dc-elevated, #FFFDF8)',
+          borderTop: '1px solid var(--border-subtle, rgba(73, 107, 90, 0.12))',
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '1rem',
           fontSize: '0.75rem',
-          color: 'var(--text-secondary)',
+          color: 'var(--dc-text-secondary, #65706B)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          <span><strong>{t('map.legend', 'LEGEND')}:</strong></span>
+          <span><strong style={{ color: 'var(--dc-text, #1E2725)' }}>{t('map.legend', 'LEGEND')}:</strong></span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF2E4D' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#C94B4B' }} />
             {t('weather.severeStorm', 'Severe Cyclone (Red/Orange)')}
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF9900' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#C38A35' }} />
             {t('weather.moderateStorm', 'Tropical Storm (Green)')}
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--cyan)' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--dc-forest, #263F35)' }} />
             {t('weather.myLocation', 'User GPS')}
           </span>
         </div>
 
-        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+        <div style={{ fontSize: '0.72rem', color: 'var(--dc-text-muted, #85938D)' }}>
           {t('weather.sourcesAttribution', 'OpenStreetMap • GDACS TC Feed • RainViewer Radar')}
         </div>
       </div>

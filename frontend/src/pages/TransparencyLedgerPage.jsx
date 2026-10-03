@@ -74,20 +74,21 @@ const TransparencyLedgerPage = () => {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          background: 'rgba(9, 14, 25, 0.94)',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--dc-border, #DCD3C3)',
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
             <span className="badge badge-info">{t('transparency.transparencyTitle')}</span>
-            <span className="micro-label" style={{ color: 'var(--violet)' }}>
+            <span className="micro-label" style={{ color: 'var(--dc-forest, #496B5A)' }}>
               {t('transparency.currentHash')}
             </span>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.25rem' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.25rem' }}>
             {t('transparency.transparencyTitle')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+          <p style={{ color: 'var(--dc-text-subtle, #65706B)', fontSize: '0.85rem' }}>
             {t('transparency.transparencySubtitle')}
           </p>
         </div>
@@ -133,7 +134,8 @@ const TransparencyLedgerPage = () => {
         className="spatial-panel"
         style={{
           padding: '1rem 1.5rem',
-          background: 'rgba(9, 14, 25, 0.92)',
+          background: 'var(--dc-surface, #F8F5EE)',
+          border: '1px solid var(--dc-border, #DCD3C3)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -177,9 +179,9 @@ const TransparencyLedgerPage = () => {
       )}
 
       {!loading && !error && filteredRecords.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--dc-text-subtle, #65706B)' }}>
           <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⛓️</div>
-          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#ffffff' }}>{t('transparency.transparencyTitle')}</div>
+          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--dc-text, #1E2725)' }}>{t('transparency.transparencyTitle')}</div>
         </div>
       )}
 
@@ -191,8 +193,9 @@ const TransparencyLedgerPage = () => {
             className="spatial-panel spatial-panel-hoverable"
             style={{
               padding: '1.35rem',
-              background: 'rgba(11, 17, 30, 0.88)',
-              borderLeft: `4px solid ${block.entityType === 'Donation' ? 'var(--cyan)' : 'var(--amber)'}`,
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid var(--dc-border, #DCD3C3)',
+              borderLeft: `4px solid ${block.entityType === 'Donation' ? 'var(--dc-forest, #496B5A)' : 'var(--dc-warning, #C38A35)'}`,
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
@@ -200,31 +203,31 @@ const TransparencyLedgerPage = () => {
                 <span className={`badge ${block.entityType === 'Donation' ? 'badge-info' : 'badge-warning'}`}>
                   {block.entityType?.toUpperCase() || 'TRANSACTION'}
                 </span>
-                <span className="micro-label" style={{ color: 'var(--mint)' }}>
+                <span className="micro-label" style={{ color: 'var(--dc-safe, #4F8060)' }}>
                   ✓ {t('transparency.verifiedIntegrity')}
                 </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--dc-text-subtle, #65706B)' }}>
                   {t('transparency.blockHeight')} #{block.blockNumber || idx + 100}
                 </span>
               </div>
 
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--dc-text-subtle, #65706B)' }}>
                 ⏱️ {new Date(block.timestamp || block.createdAt).toLocaleString()}
               </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
               <div>
-                <div style={{ fontWeight: 800, fontSize: '1.15rem', color: '#ffffff', marginBottom: '0.2rem' }}>
+                <div style={{ fontWeight: 800, fontSize: '1.15rem', color: 'var(--dc-text, #1E2725)', marginBottom: '0.2rem' }}>
                   {block.resourceName}
                 </div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                  {t('resources.sourceWarehouse')}: <strong style={{ color: '#ffffff' }}>{block.donorOrSource}</strong> ➔ {t('resources.destinationFacility')}: <strong style={{ color: 'var(--cyan)' }}>{block.destination}</strong>
+                <div style={{ fontSize: '0.82rem', color: 'var(--dc-text-subtle, #65706B)' }}>
+                  {t('resources.sourceWarehouse')}: <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{block.donorOrSource}</strong> ➔ {t('resources.destinationFacility')}: <strong style={{ color: 'var(--dc-forest, #496B5A)' }}>{block.destination}</strong>
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.3rem', color: 'var(--mint)' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.3rem', color: 'var(--dc-forest, #496B5A)' }}>
                   {block.quantity} {block.unit || 'units'}
                 </div>
               </div>
@@ -233,8 +236,8 @@ const TransparencyLedgerPage = () => {
             {/* Monospace Cryptographic Hash Readout */}
             <div
               style={{
-                background: 'rgba(5, 8, 14, 0.85)',
-                border: '1px solid var(--border-subtle)',
+                background: 'var(--dc-surface, #F8F5EE)',
+                border: '1px solid var(--dc-border, #DCD3C3)',
                 borderRadius: 'var(--radius-xs)',
                 padding: '0.75rem 1rem',
                 fontFamily: 'var(--font-mono)',
@@ -247,8 +250,8 @@ const TransparencyLedgerPage = () => {
               }}
             >
               <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', minWidth: 0, flex: 1 }}>
-                <span style={{ color: 'var(--text-muted)' }}>{t('transparency.currentHash')}: </span>
-                <span style={{ color: 'var(--cyan)', wordBreak: 'break-all' }}>
+                <span style={{ color: 'var(--dc-text-subtle, #65706B)' }}>{t('transparency.currentHash')}: </span>
+                <span style={{ color: 'var(--dc-forest, #496B5A)', wordBreak: 'break-all' }}>
                   {block.blockHash || `0x7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069`}
                 </span>
               </div>

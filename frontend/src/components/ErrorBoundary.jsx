@@ -23,11 +23,11 @@ const ErrorFallbackView = ({ inline, onReset }) => {
         style={{
           maxWidth: '520px',
           width: '100%',
-          background: 'rgba(24, 15, 11, 0.95)',
-          border: '1px solid var(--border-medium, rgba(255, 107, 44, 0.25))',
+          background: 'var(--dc-elevated, #FFFDF8)',
+          border: '1px solid var(--dc-border, #DCD3C3)',
           borderRadius: 'var(--radius-md, 8px)',
           padding: '2rem',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 107, 44, 0.15)',
+          boxShadow: '0 20px 40px rgba(38, 63, 53, 0.12)',
           textAlign: 'center',
         }}
       >
@@ -39,13 +39,13 @@ const ErrorFallbackView = ({ inline, onReset }) => {
             width: '56px',
             height: '56px',
             borderRadius: '50%',
-            background: 'rgba(229, 57, 53, 0.15)',
-            border: '1px solid rgba(229, 57, 53, 0.4)',
-            color: '#E53935',
+            background: 'rgba(201, 75, 75, 0.12)',
+            border: '1px solid rgba(201, 75, 75, 0.3)',
+            color: 'var(--dc-emergency, #C94B4B)',
             marginBottom: '1.25rem',
           }}
         >
-          <Icon name="alert-triangle" size={28} color="#E53935" />
+          <Icon name="alert-triangle" size={28} color="var(--dc-emergency, #C94B4B)" />
         </div>
 
         <h2
@@ -53,7 +53,7 @@ const ErrorFallbackView = ({ inline, onReset }) => {
             fontFamily: 'var(--font-display, inherit)',
             fontSize: '1.4rem',
             fontWeight: 800,
-            color: '#ffffff',
+            color: 'var(--dc-text, #1E2725)',
             marginBottom: '0.5rem',
           }}
         >
@@ -62,7 +62,7 @@ const ErrorFallbackView = ({ inline, onReset }) => {
 
         <p
           style={{
-            color: 'var(--text-secondary, #a89f91)',
+            color: 'var(--dc-text-subtle, #65706B)',
             fontSize: '0.88rem',
             lineHeight: 1.5,
             marginBottom: '1.5rem',
@@ -77,8 +77,8 @@ const ErrorFallbackView = ({ inline, onReset }) => {
             onClick={onReset}
             className="btn btn-primary"
             style={{
-              background: 'var(--primary, #42D9C8)',
-              color: '#070B10',
+              background: 'var(--dc-forest, #263F35)',
+              color: '#FFFDF8',
               border: 'none',
               padding: '0.65rem 1.25rem',
               borderRadius: '8px',
@@ -97,17 +97,17 @@ const ErrorFallbackView = ({ inline, onReset }) => {
             }}
             className="btn btn-secondary"
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              color: 'var(--text-primary, #ffffff)',
-              border: '1px solid var(--border-medium, rgba(255, 107, 44, 0.3))',
+              background: 'var(--dc-surface, #F8F5EE)',
+              color: 'var(--dc-text, #1E2725)',
+              border: '1px solid var(--dc-border, #DCD3C3)',
               padding: '0.65rem 1.25rem',
-              borderRadius: '4px',
-              fontWeight: 700,
+              borderRadius: '8px',
+              fontWeight: 600,
               fontSize: '0.85rem',
               cursor: 'pointer',
             }}
           >
-            {t('errorBoundary.returnOverview', 'RETURN HOME')}
+            {t('common.returnHome', 'Return to Hub')}
           </button>
         </div>
       </div>

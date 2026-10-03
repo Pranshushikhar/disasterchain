@@ -25,7 +25,7 @@ const ForgotPasswordPage = () => {
 
     if (res.success) {
       setSubmitted(true);
-      setMessage(res.message || 'If an account is associated with that email, a password recovery request has been submitted for administrator review.');
+      setMessage(res.message || 'If an account is associated with that email, a password recovery request has been submitted.');
     } else {
       setError(res.message || 'Unable to submit recovery request right now. Please try again shortly.');
     }
@@ -38,18 +38,19 @@ const ForgotPasswordPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem 1.5rem',
-        background: 'var(--bg-space)',
+        padding: '3rem 1.5rem',
+        backgroundColor: 'var(--dc-bg, #F1EBDD)',
       }}
     >
       <div
-        className="spatial-panel"
         style={{
           maxWidth: '480px',
           width: '100%',
           padding: '2.5rem 2.25rem',
-          border: '1px solid var(--border-highlight)',
-          boxShadow: 'var(--glow-cyan)',
+          backgroundColor: 'var(--dc-elevated, #FFFDF8)',
+          border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+          borderRadius: 'var(--radius-lg, 16px)',
+          boxShadow: 'var(--shadow-md)',
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
@@ -57,60 +58,55 @@ const ForgotPasswordPage = () => {
             style={{
               width: '52px',
               height: '52px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'linear-gradient(135deg, var(--amber), var(--crimson))',
+              borderRadius: 'var(--radius-sm, 8px)',
+              background: 'rgba(195, 138, 53, 0.15)',
+              color: 'var(--dc-warning, #C38A35)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
-              boxShadow: 'var(--glow-amber)',
             }}
           >
-            <Icon name="key" size={24} color="#ffffff" />
+            <Icon name="key" size={24} color="var(--dc-warning, #C38A35)" />
           </div>
-          <div className="micro-label" style={{ color: 'var(--amber)', marginBottom: '0.25rem' }}>
-            {t('auth.forgotPasswordTitle', 'PASSWORD RECOVERY')}
+          <div
+            style={{
+              fontFamily: 'var(--font-mono, monospace)',
+              fontSize: '0.70rem',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--dc-warning, #C38A35)',
+              marginBottom: '0.25rem',
+            }}
+          >
+            PASSWORD RECOVERY
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.65rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
-            Verified Account Recovery
+          <h1
+            style={{
+              fontFamily: 'var(--font-display, inherit)',
+              fontSize: '1.65rem',
+              fontWeight: 800,
+              color: 'var(--dc-text, #1E2725)',
+              marginBottom: '0.35rem',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Account Recovery
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem' }}>
-            DisasterChain uses admin-verified recovery to ensure mission-critical field security.
+          <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.45 }}>
+            Submit your registered email address to verify identity and reset your authentication credentials.
           </p>
-        </div>
-
-        {/* Security Workflow Card */}
-        <div
-          style={{
-            background: 'rgba(30, 41, 59, 0.6)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '0.85rem 1rem',
-            marginBottom: '1.5rem',
-            fontSize: '0.78rem',
-            lineHeight: 1.5,
-            color: 'var(--text-secondary)',
-          }}
-        >
-          <div style={{ fontWeight: 700, color: '#ffffff', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Icon name="shield-check" size={14} color="#38bdf8" />
-            <span>{t('auth.howRecoveryWorks', 'How Admin-Verified Recovery Works:')}</span>
-          </div>
-          <ol style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <li>{t('auth.recoveryStep1', 'Submit your registered email address below.')}</li>
-            <li>{t('auth.recoveryStep2', 'Incident Commander or System Administrator verifies your identity.')}</li>
-            <li>{t('auth.recoveryStep3', 'You receive a single-use 15-minute recovery code.')}</li>
-          </ol>
         </div>
 
         {error && (
           <div
             style={{
-              background: 'rgba(255, 46, 77, 0.15)',
-              border: '1px solid var(--border-red)',
-              borderRadius: 'var(--radius-xs)',
+              background: 'rgba(201, 75, 75, 0.08)',
+              border: '1px solid rgba(201, 75, 75, 0.3)',
+              borderRadius: 'var(--radius-xs, 4px)',
               padding: '0.75rem 1rem',
-              color: '#ff8597',
+              color: 'var(--dc-emergency, #C94B4B)',
               fontSize: '0.82rem',
               marginBottom: '1.25rem',
             }}
@@ -121,54 +117,92 @@ const ForgotPasswordPage = () => {
 
         {submitted ? (
           <div style={{ textAlign: 'center', padding: '0.5rem 0' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🛡️</div>
-            <div style={{ fontWeight: 800, color: '#ffffff', fontSize: '1.15rem', marginBottom: '0.35rem' }}>
-              {t('auth.recoveryLogged', 'Recovery Request Logged')}
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
-              {message}
-            </p>
             <div
               style={{
-                background: 'rgba(245, 158, 11, 0.08)',
-                border: '1px solid rgba(245, 158, 11, 0.25)',
-                borderRadius: 'var(--radius-xs)',
-                padding: '0.75rem 0.9rem',
-                fontSize: '0.78rem',
-                color: '#fcd34d',
-                marginBottom: '1.5rem',
-                textAlign: 'left',
-                lineHeight: 1.45,
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: 'rgba(79, 128, 96, 0.15)',
+                color: 'var(--dc-safe, #4F8060)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
               }}
             >
-              ⏱️ <strong>{t('auth.nextStep', 'Next Step:')}</strong> {t('auth.nextStepDesc', 'Contact your field supervisor or system administrator to approve your recovery request. Once approved, you will receive a single-use code valid for 15 minutes.')}
+              <Icon name="check-circle" size={32} color="var(--dc-safe, #4F8060)" />
             </div>
+            <div style={{ fontWeight: 800, color: 'var(--dc-text, #1E2725)', fontSize: '1.2rem', marginBottom: '0.35rem' }}>
+              Recovery Request Submitted
+            </div>
+            <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
+              {message}
+            </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <Link
                 to="/reset-password"
-                className="btn btn-primary"
-                style={{ width: '100%', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{
+                  width: '100%',
+                  display: 'block',
+                  boxSizing: 'border-box',
+                  padding: '11px',
+                  borderRadius: 'var(--radius-sm, 8px)',
+                  backgroundColor: 'var(--dc-forest, #263F35)',
+                  color: '#FFFDF8',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                }}
               >
-                {t('auth.enterCode', 'I Received My Code → Enter Code')}
+                Enter Recovery Code →
               </Link>
               <Link
                 to="/login"
-                className="btn btn-ghost"
-                style={{ width: '100%', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{
+                  width: '100%',
+                  display: 'block',
+                  boxSizing: 'border-box',
+                  padding: '10px',
+                  borderRadius: 'var(--radius-sm, 8px)',
+                  border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+                  backgroundColor: 'var(--dc-surface, #F8F5EE)',
+                  color: 'var(--dc-text, #1E2725)',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                }}
               >
-                Back to Login
+                Back to Sign In
               </Link>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-              <label className="form-label">{t('auth.email', 'Registered Email Address')}</label>
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  color: 'var(--dc-text, #1E2725)',
+                  marginBottom: '0.35rem',
+                }}
+              >
+                Registered Email Address
+              </label>
               <input
                 type="email"
                 required
-                className="form-input"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm, 8px)',
+                  border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+                  backgroundColor: 'var(--dc-surface, #F8F5EE)',
+                  color: 'var(--dc-text, #1E2725)',
+                  fontSize: '0.88rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="operator@disasterchain.org"
@@ -178,10 +212,21 @@ const ForgotPasswordPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-primary"
-              style={{ width: '100%', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                width: '100%',
+                backgroundColor: 'var(--dc-forest, #263F35)',
+                color: '#FFFDF8',
+                border: 'none',
+                borderRadius: 'var(--radius-sm, 8px)',
+                padding: '11px 16px',
+                fontSize: '0.90rem',
+                fontWeight: 700,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1,
+                boxShadow: 'var(--shadow-sm)',
+              }}
             >
-              {loading ? t('common.loading', 'Processing...') : 'Request Password Recovery →'}
+              {loading ? 'Submitting Request...' : 'Send Recovery Instructions'}
             </button>
           </form>
         )}
@@ -193,14 +238,14 @@ const ForgotPasswordPage = () => {
             alignItems: 'center',
             marginTop: '1.75rem',
             paddingTop: '1rem',
-            borderTop: '1px solid var(--border-subtle)',
+            borderTop: '1px solid var(--border-subtle, rgba(30, 39, 37, 0.08))',
             fontSize: '0.82rem',
           }}
         >
-          <Link to="/reset-password" style={{ color: 'var(--cyan)', fontWeight: 700 }}>
+          <Link to="/reset-password" style={{ color: 'var(--dc-earth-green, #496B5A)', fontWeight: 700, textDecoration: 'none' }}>
             Have a recovery code?
           </Link>
-          <Link to="/login" style={{ color: 'var(--text-secondary)' }}>
+          <Link to="/login" style={{ color: 'var(--dc-text-secondary, #65706B)', textDecoration: 'none' }}>
             Back to Sign In
           </Link>
         </div>
