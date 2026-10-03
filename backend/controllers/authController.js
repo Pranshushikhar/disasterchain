@@ -500,7 +500,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// @desc    Forgot password (submits admin-verified recovery request without email dependency)
+// @desc    Forgot password - sends password reset email via Resend
 // @route   POST /api/auth/forgot-password
 // @access  Public
 exports.forgotPassword = async (req, res) => {
@@ -515,6 +515,8 @@ exports.forgotPassword = async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const safeResponseMessage =
+      'If an account is associated with that email, a password reset link has been sent to your inbox.';
 
     if (isDbConnected()) {
       const user = await User.findOne({ email: normalizedEmail });
@@ -523,33 +525,56 @@ exports.forgotPassword = async (req, res) => {
       if (!user) {
         return res.json({
           success: true,
-          message:
-            'If an account is associated with that email, a password recovery request has been submitted.',
+          message: safeResponseMessage,
         });
       }
 
-      // Invalidate/expire any existing pending requests for this user to avoid duplicate spam
-      await PasswordRecoveryRequest.updateMany(
-        { email: normalizedEmail, status: 'pending' },
-        { status: 'expired' }
-      );
+      // Generate 15-minute password reset token (User method hashes into resetPasswordToken)
+      const rawResetToken = user.createPasswordResetToken();
+      await user.save();
 
-      // Create new pending recovery request
-      await PasswordRecoveryRequest.create({
-        userId: user._id,
-        email: normalizedEmail,
-        status: 'pending',
-        requestedAt: new Date(),
+      // Dispatch password reset email via Resend
+      await sendPasswordResetEmail({
+        email: user.email,
+        name: user.name,
+        token: rawResetToken,
       });
 
-      return res.json({
+      // Keep PasswordRecoveryRequest in sync for admin tracking and backward compatibility
+      try {
+        await PasswordRecoveryRequest.updateMany(
+          { email: normalizedEmail, status: 'pending' },
+          { status: 'expired' }
+        );
+        await PasswordRecoveryRequest.create({
+          userId: user._id,
+          email: normalizedEmail,
+          status: 'pending',
+          requestedAt: new Date(),
+        });
+      } catch (logErr) {
+        // Non-critical tracking error
+      }
+
+      const responseData = {
         success: true,
-        message:
-          'If an account is associated with that email, a password recovery request has been submitted.',
-      });
+        message: safeResponseMessage,
+      };
+
+      if (process.env.NODE_ENV !== 'production') {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        responseData.devMode = {
+          enabled: true,
+          mode: 'DEVELOPMENT EMAIL MODE',
+          resetUrl: `${frontendUrl}/reset-password?token=${encodeURIComponent(rawResetToken)}`,
+          notice: 'Zero-cost development mode active. Omitted in production.',
+        };
+      }
+
+      return res.json(responseData);
     }
 
-    // In-memory fallback
+    // In-memory fallback (when DB is disconnected)
     if (!memoryStore.passwordRecoveryRequests) {
       memoryStore.passwordRecoveryRequests = [];
     }
@@ -559,6 +584,18 @@ exports.forgotPassword = async (req, res) => {
     );
 
     if (memUser) {
+      // Generate 15-minute token in memory
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+      memUser.resetPasswordToken = hashedToken;
+      memUser.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+      await sendPasswordResetEmail({
+        email: memUser.email,
+        name: memUser.name,
+        token: rawToken,
+      });
+
       memoryStore.passwordRecoveryRequests
         .filter((r) => r.email === normalizedEmail && r.status === 'pending')
         .forEach((r) => {
@@ -580,12 +617,28 @@ exports.forgotPassword = async (req, res) => {
         rejectedAt: null,
         rejectionReason: null,
       });
+
+      const responseData = {
+        success: true,
+        message: safeResponseMessage,
+      };
+
+      if (process.env.NODE_ENV !== 'production') {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        responseData.devMode = {
+          enabled: true,
+          mode: 'DEVELOPMENT EMAIL MODE',
+          resetUrl: `${frontendUrl}/reset-password?token=${encodeURIComponent(rawToken)}`,
+          notice: 'Zero-cost development mode active. Omitted in production.',
+        };
+      }
+
+      return res.json(responseData);
     }
 
     return res.json({
       success: true,
-      message:
-        'If an account is associated with that email, a password recovery request has been submitted.',
+      message: safeResponseMessage,
     });
   } catch (error) {
     console.error('Forgot password error:', error.message);
@@ -632,7 +685,7 @@ exports.checkEmailStatus = async (req, res) => {
   }
 };
 
-// @desc    Reset password via single-use recovery code
+// @desc    Reset password via single-use token or recovery code
 // @route   POST /api/auth/reset-password
 // @access  Public
 exports.resetPassword = async (req, res) => {
@@ -643,7 +696,7 @@ exports.resetPassword = async (req, res) => {
     if (!rawToken || typeof rawToken !== 'string' || !rawToken.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Recovery code is required.',
+        message: 'Recovery code or reset token is required.',
       });
     }
 
@@ -671,13 +724,44 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    // Hash token to compare with DB (check both uppercase and raw formats)
-    const hashUpper = crypto.createHash('sha256').update(token.toUpperCase()).digest('hex');
+    // Hash token to compare with DB (check raw format and uppercase for codes)
     const hashRaw = crypto.createHash('sha256').update(token).digest('hex');
-    const candidateHashes = Array.from(new Set([hashUpper, hashRaw]));
+    const hashUpper = crypto.createHash('sha256').update(token.toUpperCase()).digest('hex');
+    const candidateHashes = Array.from(new Set([hashRaw, hashUpper]));
 
     if (isDbConnected()) {
-      // 1. Check admin-approved PasswordRecoveryRequest
+      // 1. Direct User reset token from Resend email link (valid for 15 minutes)
+      const user = await User.findOne({
+        resetPasswordToken: { $in: candidateHashes },
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+
+      if (user) {
+        user.password = password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        // Expire any pending/approved recovery requests for this user
+        await PasswordRecoveryRequest.updateMany(
+          { email: user.email, status: { $in: ['pending', 'approved'] } },
+          { status: 'expired' }
+        );
+
+        // Send confirmation email via Resend (non-blocking)
+        sendPasswordChangedConfirmation({
+          email: user.email,
+          name: user.name,
+        }).catch((err) => console.error('Password changed email notice:', err.message));
+
+        return res.json({
+          success: true,
+          message:
+            'Your password has been reset successfully. You can now log in with your new password.',
+        });
+      }
+
+      // 2. Admin-approved PasswordRecoveryRequest fallback
       const recoveryReq = await PasswordRecoveryRequest.findOne({
         resetTokenHash: { $in: candidateHashes },
         status: 'approved',
@@ -685,27 +769,24 @@ exports.resetPassword = async (req, res) => {
       }).select('+resetTokenHash');
 
       if (recoveryReq) {
-        const user = await User.findById(recoveryReq.userId);
-        if (!user) {
+        const reqUser = await User.findById(recoveryReq.userId);
+        if (!reqUser) {
           return res.status(404).json({
             success: false,
             message: 'User account associated with this recovery code was not found.',
           });
         }
 
-        // Update password (bcrypt pre-save hook will hash)
-        user.password = password;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
+        reqUser.password = password;
+        reqUser.resetPasswordToken = undefined;
+        reqUser.resetPasswordExpires = undefined;
+        await reqUser.save();
 
-        // Mark recovery request as completed
         recoveryReq.status = 'completed';
         recoveryReq.completedAt = new Date();
         recoveryReq.resetTokenHash = undefined;
         await recoveryReq.save();
 
-        // Expire any other pending/approved requests for this user
         await PasswordRecoveryRequest.updateMany(
           {
             email: recoveryReq.email,
@@ -715,24 +796,10 @@ exports.resetPassword = async (req, res) => {
           { status: 'expired' }
         );
 
-        return res.json({
-          success: true,
-          message:
-            'Your password has been reset successfully. You can now log in with your new password.',
-        });
-      }
-
-      // 2. Backwards compatibility fallback for legacy resetPasswordToken
-      const legacyUser = await User.findOne({
-        resetPasswordToken: { $in: candidateHashes },
-        resetPasswordExpires: { $gt: Date.now() },
-      });
-
-      if (legacyUser) {
-        legacyUser.password = password;
-        legacyUser.resetPasswordToken = undefined;
-        legacyUser.resetPasswordExpires = undefined;
-        await legacyUser.save();
+        sendPasswordChangedConfirmation({
+          email: reqUser.email,
+          name: reqUser.name,
+        }).catch((err) => console.error('Password changed email notice:', err.message));
 
         return res.json({
           success: true,
@@ -748,11 +815,38 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    // In-memory fallback
+    // In-memory fallback (when DB is disconnected)
     if (!memoryStore.passwordRecoveryRequests) {
       memoryStore.passwordRecoveryRequests = [];
     }
 
+    // In-memory user token match
+    const memUser = memoryStore.users.find(
+      (u) =>
+        u.resetPasswordToken &&
+        candidateHashes.includes(u.resetPasswordToken) &&
+        u.resetPasswordExpires &&
+        u.resetPasswordExpires > Date.now()
+    );
+
+    if (memUser) {
+      memUser.password = password;
+      memUser.resetPasswordToken = undefined;
+      memUser.resetPasswordExpires = undefined;
+
+      sendPasswordChangedConfirmation({
+        email: memUser.email,
+        name: memUser.name,
+      }).catch((err) => console.error('Password changed email notice:', err.message));
+
+      return res.json({
+        success: true,
+        message:
+          'Your password has been reset successfully. You can now log in with your new password.',
+      });
+    }
+
+    // In-memory admin-approved request match
     const memReq = memoryStore.passwordRecoveryRequests.find(
       (r) =>
         (candidateHashes.includes(r.resetTokenHash) || r.rawCode === token.toUpperCase()) &&
@@ -762,11 +856,18 @@ exports.resetPassword = async (req, res) => {
     );
 
     if (memReq) {
-      const memUser = memoryStore.users.find(
+      const targetUser = memoryStore.users.find(
         (u) => u._id === memReq.userId || u.email === memReq.email
       );
-      if (memUser) {
-        memUser.password = password;
+      if (targetUser) {
+        targetUser.password = password;
+        targetUser.resetPasswordToken = undefined;
+        targetUser.resetPasswordExpires = undefined;
+
+        sendPasswordChangedConfirmation({
+          email: targetUser.email,
+          name: targetUser.name,
+        }).catch((err) => console.error('Password changed email notice:', err.message));
       }
       memReq.status = 'completed';
       memReq.completedAt = new Date();

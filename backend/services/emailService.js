@@ -22,7 +22,7 @@ const getFrontendUrl = () => {
 const getFromEmail = () => {
   return (
     process.env.EMAIL_FROM ||
-    'DisasterChain Emergency <onboarding@resend.dev>'
+    'DisasterChain <onboarding@resend.dev>'
   );
 };
 
@@ -62,13 +62,13 @@ const safeLog = (type, email, status, details = '') => {
 };
 
 // ==========================================
-// REUSABLE BRANDED HTML EMAIL TEMPLATE
+// REUSABLE BRANDED HTML EMAIL TEMPLATE (EARTH & PAPER IDENTITY)
 // ==========================================
 
 const renderEmailTemplate = ({
   title,
   badge = 'DISASTERCHAIN INTEL',
-  badgeColor = '#00f0ff',
+  badgeColor = '#496B5A',
   bodyHtml,
   actionUrl,
   actionText,
@@ -85,33 +85,33 @@ const renderEmailTemplate = ({
     body {
       margin: 0;
       padding: 0;
-      background-color: #070b13;
+      background-color: #F1EBDD;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #e2e8f0;
+      color: #1E2725;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
-      background-color: #070b13;
-      padding: 36px 12px;
+      background-color: #F1EBDD;
+      padding: 40px 14px;
     }
     .container {
       max-width: 580px;
       margin: 0 auto;
-      background-color: #0b111e;
-      border: 1px solid #1e293b;
+      background-color: #FFFDF8;
+      border: 1px solid #DCD3C3;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 20px rgba(38, 63, 53, 0.08);
     }
     .top-bar {
       height: 4px;
-      background: linear-gradient(90deg, #00f0ff 0%, #818cf8 50%, #ff2e4d 100%);
+      background: #496B5A;
     }
     .header {
-      padding: 24px 28px 16px;
-      border-bottom: 1px solid #1e293b;
-      background-color: #0c1424;
+      padding: 26px 30px 20px;
+      border-bottom: 1px solid #DCD3C3;
+      background-color: #FAF7F0;
     }
     .badge {
       display: inline-block;
@@ -120,7 +120,7 @@ const renderEmailTemplate = ({
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: ${badgeColor};
-      background: rgba(0, 240, 255, 0.08);
+      background: rgba(73, 107, 90, 0.08);
       border: 1px solid ${badgeColor}40;
       padding: 3px 8px;
       border-radius: 4px;
@@ -129,25 +129,26 @@ const renderEmailTemplate = ({
     .brand-title {
       font-size: 20px;
       font-weight: 800;
-      color: #ffffff;
+      color: #1E2725;
       margin: 0;
       letter-spacing: 0.5px;
     }
     .brand-tag {
       font-size: 12px;
-      color: #64748b;
+      color: #65706B;
       margin-top: 2px;
+      font-weight: 500;
     }
     .content {
-      padding: 28px;
-      color: #cbd5e1;
+      padding: 30px;
+      color: #1E2725;
       font-size: 14px;
       line-height: 1.65;
     }
     .content-heading {
       font-size: 18px;
       font-weight: 700;
-      color: #f8fafc;
+      color: #1E2725;
       margin: 0 0 16px 0;
     }
     .btn-container {
@@ -156,49 +157,49 @@ const renderEmailTemplate = ({
     }
     .btn {
       display: inline-block;
-      background: #00f0ff;
-      color: #05080e !important;
+      background: #263F35;
+      color: #FFFDF8 !important;
       text-decoration: none;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 13px;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      padding: 13px 28px;
-      border-radius: 6px;
-      box-shadow: 0 4px 14px rgba(0, 240, 255, 0.25);
+      padding: 14px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 14px rgba(38, 63, 53, 0.18);
     }
     .link-box {
-      background: #080d17;
-      border: 1px solid #1e293b;
+      background: #F8F5EE;
+      border: 1px solid #DCD3C3;
       border-radius: 6px;
       padding: 12px;
       font-family: monospace;
       font-size: 11px;
-      color: #94a3b8;
+      color: #4A5551;
       word-break: break-all;
       margin-top: 18px;
     }
     .warning-box {
-      background: rgba(245, 158, 11, 0.08);
-      border-left: 3px solid #f59e0b;
-      padding: 10px 14px;
+      background: rgba(195, 138, 53, 0.1);
+      border-left: 3px solid #C38A35;
+      padding: 11px 14px;
       font-size: 12px;
-      color: #fcd34d;
+      color: #8A5E1E;
       margin: 20px 0;
-      border-radius: 0 4px 4px 0;
+      border-radius: 0 6px 6px 0;
     }
     .footer {
-      padding: 20px 28px;
-      background-color: #070b13;
-      border-top: 1px solid #1e293b;
+      padding: 22px 30px;
+      background-color: #F8F5EE;
+      border-top: 1px solid #DCD3C3;
       font-size: 11px;
-      color: #64748b;
+      color: #65706B;
       text-align: center;
       line-height: 1.5;
     }
     .footer a {
-      color: #00f0ff;
-      text-decoration: none;
+      color: #496B5A;
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -210,7 +211,7 @@ const renderEmailTemplate = ({
       <div class="header">
         <div class="badge">${badge}</div>
         <div class="brand-title">DISASTERCHAIN</div>
-        <div class="brand-tag">Decentralized Emergency Operations Network</div>
+        <div class="brand-tag">Earth Intelligence & Emergency Operations</div>
       </div>
 
       <div class="content">
@@ -225,7 +226,7 @@ const renderEmailTemplate = ({
           </div>
           <div class="link-box">
             If button is inactive, navigate to:<br>
-            <a href="${actionUrl}" style="color: #00f0ff; text-decoration: underline;">${actionUrl}</a>
+            <a href="${actionUrl}" style="color: #496B5A; text-decoration: underline;">${actionUrl}</a>
           </div>
         `
             : ''
@@ -353,7 +354,7 @@ exports.sendVerificationEmail = async ({ email, name, token }) => {
   const html = renderEmailTemplate({
     title: 'Confirm Operator Identity',
     badge: 'IDENTITY VERIFICATION',
-    badgeColor: '#00f0ff',
+    badgeColor: '#496B5A',
     bodyHtml: `
       Hello <strong>${name || 'Citizen'}</strong>,<br><br>
       Thank you for registering on the DisasterChain Emergency Network. To activate your account and access real-time SOS broadcasting, facility tracking, and crisis intelligence, please authenticate your email address.<br><br>
@@ -384,7 +385,7 @@ exports.sendPasswordResetEmail = async ({ email, name, token }) => {
   const html = renderEmailTemplate({
     title: 'Reset your password',
     badge: 'DisasterChain Security',
-    badgeColor: '#00f0ff',
+    badgeColor: '#496B5A',
     bodyHtml: `
       Hello <strong>${name || 'Citizen'}</strong>,<br><br>
       We received a request to reset your password for your DisasterChain account associated with <strong>${maskEmail(email)}</strong>.<br><br>
@@ -407,13 +408,13 @@ exports.sendPasswordResetEmail = async ({ email, name, token }) => {
 // 3. PASSWORD CHANGED CONFIRMATION EMAIL
 // ==========================================
 exports.sendPasswordChangedEmail = async ({ email, name }) => {
-  const subject = 'Security Alert: Your DisasterChain password was changed';
+  const subject = 'Your DisasterChain password was changed';
   const loginUrl = `${getFrontendUrl()}/login`;
 
   const html = renderEmailTemplate({
     title: 'Password Successfully Updated',
     badge: 'SECURITY NOTIFICATION',
-    badgeColor: '#10b981',
+    badgeColor: '#496B5A',
     bodyHtml: `
       Hello <strong>${name || 'Citizen'}</strong>,<br><br>
       This notification confirms that the password for your DisasterChain account was successfully updated on <strong>${new Date().toUTCString()}</strong>.<br><br>
