@@ -18,22 +18,41 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  const handleEnterClick = React.useCallback(() => {
+    setIsEntering((prev) => {
+      if (prev) return prev;
+      // Smoothly animate out into main application
+      setTimeout(() => {
+        onEnter();
+      }, 600);
+      return true;
+    });
+  }, [onEnter]);
+
   useEffect(() => {
     if (prefersReducedMotion) {
       setPhase(3);
-      return;
+      const tAutoReduced = setTimeout(() => {
+        handleEnterClick();
+      }, 1200);
+      return () => clearTimeout(tAutoReduced);
     }
 
     const t1 = setTimeout(() => setPhase(1), 900);
     const t2 = setTimeout(() => setPhase(2), 2200);
     const t3 = setTimeout(() => setPhase(3), 3600);
+    // Automatic transition after full cinematic experience (~6.8s) so user is never trapped
+    const tAuto = setTimeout(() => {
+      handleEnterClick();
+    }, 6800);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(tAuto);
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, handleEnterClick]);
 
   // Abstract environmental wave canvas (silky, soundless, water / terrain / mist)
   useEffect(() => {
@@ -126,20 +145,6 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, []);
-
-  const handleEnterClick = () => {
-    setIsEntering(true);
-    // Mark as seen in session and local storage
-    try {
-      sessionStorage.setItem('disasterchain_intro_seen', 'true');
-      localStorage.setItem('disasterchain_intro_seen', 'true');
-    } catch (e) {}
-
-    // Animate out into main app smoothly
-    setTimeout(() => {
-      onEnter();
-    }, 600);
-  };
 
   return (
     <AnimatePresence>

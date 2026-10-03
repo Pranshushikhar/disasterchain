@@ -42,19 +42,41 @@ const AppLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Cinematic Intro State
+  // Cinematic Intro State: Plays on every fresh page load/reload, but does not repeat on SPA navigation
   const [showIntro, setShowIntro] = useState(() => {
     try {
-      if (window.location.search.includes('skip_intro=1') || (window.location.pathname !== '/' && window.location.pathname !== '')) {
+      const pathname = (window.location.pathname || '').toLowerCase().replace(/\/+$/, '');
+      const search = window.location.search || '';
+
+      // Direct bypass via skip_intro=1 query parameter
+      if (search.includes('skip_intro=1')) {
         return false;
       }
-      const seen = sessionStorage.getItem('disasterchain_intro_seen') || localStorage.getItem('disasterchain_intro_seen');
-      return !seen;
+
+      // Authentication action links bypass the intro so transactional email links remain frictionless
+      if (
+        pathname.startsWith('/verify-email') ||
+        pathname.startsWith('/reset-password') ||
+        search.includes('token=')
+      ) {
+        return false;
+      }
+
+      // Play intro on every full browser page load / reload
+      return true;
     } catch (e) {
       return false;
     }
   });
   const [isReplay, setIsReplay] = useState(false);
+
+  // Clean up legacy intro persistence keys so reload always plays intro
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem('disasterchain_intro_seen');
+      localStorage.removeItem('disasterchain_intro_seen');
+    } catch (e) {}
+  }, []);
 
   // Global Modals State
   const [isSosOpen, setIsSosOpen] = useState(false);

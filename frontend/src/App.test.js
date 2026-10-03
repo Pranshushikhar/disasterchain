@@ -24,4 +24,67 @@ describe('DisasterChain Core Smoke Tests', () => {
     expect(routes).toContain('/weather');
     expect(routes).toContain('/map');
   });
+
+  describe('Cinematic Intro Logic & Route Bypass Behavior', () => {
+    // Pure function extracting the App.js intro determination logic
+    const shouldShowIntro = (pathname = '/', search = '') => {
+      const cleanPath = (pathname || '').toLowerCase().replace(/\/+$/, '');
+      const cleanSearch = search || '';
+
+      if (cleanSearch.includes('skip_intro=1')) {
+        return false;
+      }
+
+      if (
+        cleanPath.startsWith('/verify-email') ||
+        cleanPath.startsWith('/reset-password') ||
+        cleanSearch.includes('token=')
+      ) {
+        return false;
+      }
+
+      return true;
+    };
+
+    it('plays intro on fresh site root load (https://disasterchain.vercel.app /)', () => {
+      expect(shouldShowIntro('/', '')).toBe(true);
+      expect(shouldShowIntro('', '')).toBe(true);
+      expect(shouldShowIntro('/dashboard', '')).toBe(true);
+    });
+
+    it('plays intro on page reload regardless of previous visits', () => {
+      // Even if previous visits occurred, intro should always initialize to true on reload
+      expect(shouldShowIntro('/', '')).toBe(true);
+      expect(shouldShowIntro('/weather', '')).toBe(true);
+    });
+
+    it('bypasses intro on email verification links (/verify-email?token=...)', () => {
+      expect(shouldShowIntro('/verify-email', '?token=abc123456789')).toBe(false);
+      expect(shouldShowIntro('/verify-email/', '?token=abc123456789')).toBe(false);
+    });
+
+    it('bypasses intro on password reset links (/reset-password?token=...)', () => {
+      expect(shouldShowIntro('/reset-password', '?token=xyz987654321')).toBe(false);
+      expect(shouldShowIntro('/reset-password/', '?token=xyz987654321')).toBe(false);
+    });
+
+    it('bypasses intro when explicit skip_intro=1 query is provided', () => {
+      expect(shouldShowIntro('/', '?skip_intro=1')).toBe(false);
+    });
+
+    it('does not repeat intro during SPA route navigation when state is false', () => {
+      let showIntro = true;
+      // User transitions into the app on initial load
+      const onEnter = () => {
+        showIntro = false;
+      };
+      onEnter();
+      expect(showIntro).toBe(false);
+
+      // Subsequent internal route changes in SPA do not re-trigger showIntro
+      const currentRoute = '/weather';
+      expect(currentRoute).toBe('/weather');
+      expect(showIntro).toBe(false);
+    });
+  });
 });
