@@ -3673,6 +3673,8 @@ body.drawer-open {
 }
 
 .dc-main-viewport {
+  position: relative;
+  z-index: 10;
   flex: 1;
   display: flex;
   flex-direction: column;

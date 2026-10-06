@@ -22,7 +22,8 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
   // Timeline and interaction state
   const [sceneIndex, setSceneIndex] = useState(1); // 1: Calm, 2: Volcano, 3: Tsunami, 4: Flood, 5: Intelligence
   const [isEntering, setIsEntering] = useState(false);
-  const [timelineSec, setTimelineSec] = useState(0);
+  const progressRef = useRef(null);
+  const currentSceneRef = useRef(1);
 
   // Parallax coordinates from mouse movement
   const mousePosRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
@@ -33,13 +34,12 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const handleEnterClick = useCallback(() => {
-    setIsEntering((prev) => {
-      if (prev) return prev;
-      setTimeout(() => {
-        onEnter();
-      }, 650);
-      return true;
-    });
+    setIsEntering(true);
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    onEnter();
   }, [onEnter]);
 
   // Keyboard navigation: Enter or Space triggers entry, Esc skips immediately
@@ -151,12 +151,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
     };
     document.addEventListener('visibilitychange', handleVisibility);
 
-    // If reduced motion is requested, render static scene and fast transition
-    if (prefersReducedMotion) {
-      setSceneIndex(5);
-      return;
-    }
-
+    // Smooth render loop for all 5 choreographed scenes
     const render = (now) => {
       if (!isVisible) {
         animFrameRef.current = requestAnimationFrame(render);
@@ -164,7 +159,9 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
       }
 
       const elapsedSec = (now - startTime) / 1000;
-      setTimelineSec(elapsedSec);
+      if (progressRef.current) {
+        progressRef.current.style.width = `${Math.min(100, (elapsedSec / 14.5) * 100)}%`;
+      }
 
       // Smooth mouse parallax interpolation
       mousePosRef.current.x += (mousePosRef.current.targetX - mousePosRef.current.x) * 0.05;
@@ -189,7 +186,10 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
       else if (elapsedSec < 11.8) currentScene = 4;
       else currentScene = 5;
 
-      setSceneIndex(currentScene);
+      if (currentScene !== currentSceneRef.current) {
+        currentSceneRef.current = currentScene;
+        setSceneIndex(currentScene);
+      }
 
       // Camera shake during volcanic eruption (3.8s to 4.8s)
       let shakeX = 0;
@@ -771,6 +771,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
 
           {/* Quick Direct Access */}
           <button
+            className="dc-cinematic-skip-btn"
             type="button"
             onClick={handleEnterClick}
             style={{
@@ -964,6 +965,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
               {/* Tactile Physical ENTER Button */}
               <button
                 id="enter-disasterchain-btn"
+                className="dc-cinematic-enter-btn"
                 type="button"
                 onClick={handleEnterClick}
                 disabled={isEntering}
@@ -1027,8 +1029,9 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
             }}
           >
             <div
+              ref={progressRef}
               style={{
-                width: `${Math.min(100, (timelineSec / 14.5) * 100)}%`,
+                width: '0%',
                 height: '100%',
                 backgroundColor: '#D8B98A',
                 transition: 'width 0.1s linear',

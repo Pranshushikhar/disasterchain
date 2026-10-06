@@ -196,6 +196,7 @@ export default function EnvironmentSelector({ compact = false }) {
                   <button
                     key={item.id}
                     type="button"
+                    data-env-id={item.id}
                     onClick={() => {
                       setEnvironment(item.id);
                       setIsOpen(false);
