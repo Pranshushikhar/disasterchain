@@ -19,6 +19,7 @@ import ModernIncidentsPage from './pages/ModernIncidentsPage';
 import ModernSafetyPage from './pages/ModernSafetyPage';
 import ModernWeatherGPT from './components/ModernWeatherGPT';
 import ModernSosModal from './components/ModernSosModal';
+import Footer from './components/Footer';
 
 // Existing Secondary Pages & Modals (Preserved functionality)
 import SheltersPage from './pages/SheltersPage';
@@ -229,6 +230,9 @@ const AppLayout = () => {
             <Route path="/verify-email" element={<VerifyEmailPage />} />
           </Routes>
         </AnimatePresence>
+
+        {/* 4. GLOBAL APPLICATION FOOTER & DEVELOPER CREDIT */}
+        {!isPublicStandalone && <Footer />}
       </main>
 
       {/* 4. PERSISTENT WEATHERGPT FLOATING ASSISTANT */}

@@ -113,4 +113,20 @@ describe('DisasterChain Core Smoke Tests', () => {
       expect(typeof EnvironmentSelector).toBe('function');
     });
   });
+
+  describe('Developer Credit & Global Footer', () => {
+    it('exports Footer component and validates developer credit specifications', () => {
+      const Footer = require('./components/Footer').default;
+      expect(typeof Footer).toBe('function');
+
+      const ReactDOMServer = require('react-dom/server');
+      const html = ReactDOMServer.renderToStaticMarkup(<Footer />);
+      
+      expect(html).toContain('dc-global-footer');
+      expect(html).toContain('© 2026 DisasterChain');
+      expect(html).toContain('Designed &amp; Developed by');
+      expect(html).toContain('Pranshu Shikhar');
+      expect(html).toContain('dc-credit-author');
+    });
+  });
 });
