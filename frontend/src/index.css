@@ -154,6 +154,153 @@
 }
 
 /* ==========================================================================
+   DISASTERCHAIN — LIVING ENVIRONMENT THEME SYSTEM OVERRIDES
+   Smoothly transforms the atmospheric palette across Rain, Storm, Night,
+   Snow, Fog, and Calm Earth while preserving high contrast & legibility.
+   ========================================================================== */
+
+/* Universal Environmental Transition */
+html,
+body,
+.dc-app-layout,
+.dc-desktop-nav,
+.dc-mobile-header,
+.dc-mobile-bottom-nav,
+.dc-main-viewport,
+.dc-card,
+.dc-panel,
+.dc-nav-tab,
+.dc-more-menu-panel {
+  transition: background-color 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 1. RAIN ENVIRONMENT: Overcast slate, cool precipitation gloss */
+[data-environment="rain"] {
+  --dc-bg: #E1E6E7;
+  --dc-bg-2: #D5DBDC;
+  --dc-surface: #EAF0F1;
+  --dc-surface-2: #DFE6E8;
+  --dc-surface-3: #D4DCE0;
+  --dc-elevated: #F4F8F9;
+  --dc-text: #162426;
+  --dc-text-secondary: #52666B;
+  --dc-text-muted: #748A90;
+  --dc-earth-green: #3F6761;
+  --dc-forest: #203834;
+  --dc-water: #487A88;
+  --border-subtle: rgba(22, 36, 38, 0.08);
+  --border-medium: rgba(22, 36, 38, 0.15);
+  --border-strong: rgba(63, 103, 97, 0.35);
+}
+
+/* 2. STORM ENVIRONMENT: Severe dark atmospheric tempest */
+[data-environment="storm"] {
+  --dc-bg: #131A1F;
+  --dc-bg-2: #18222A;
+  --dc-surface: #1E2932;
+  --dc-surface-2: #24323D;
+  --dc-surface-3: #2B3A47;
+  --dc-elevated: #222E38;
+  --dc-text: #F1F5F9;
+  --dc-text-secondary: #A0B2C2;
+  --dc-text-muted: #708494;
+  --dc-earth-green: #5D9284;
+  --dc-forest: #8BB7A8;
+  --dc-sand: #CEB590;
+  --dc-water: #6EA3B5;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(110, 163, 181, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* 3. NIGHT ENVIRONMENT: Deep nocturnal mission command */
+[data-environment="night"] {
+  --dc-bg: #0A0E13;
+  --dc-bg-2: #0F151C;
+  --dc-surface: #141C25;
+  --dc-surface-2: #1A2430;
+  --dc-surface-3: #212D3C;
+  --dc-elevated: #18222D;
+  --dc-text: #EAF0F6;
+  --dc-text-secondary: #8E9EA8;
+  --dc-text-muted: #647685;
+  --dc-earth-green: #528678;
+  --dc-forest: #8AB7A8;
+  --dc-sand: #D4B98E;
+  --dc-water: #6296A8;
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(98, 150, 168, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* 4. SNOW ENVIRONMENT: Frosted alpine crystalline overcast */
+[data-environment="snow"] {
+  --dc-bg: #E8EEF2;
+  --dc-bg-2: #DCE5EB;
+  --dc-surface: #F1F6F8;
+  --dc-surface-2: #E6EEF2;
+  --dc-surface-3: #DCE5EB;
+  --dc-elevated: #FAFCFE;
+  --dc-text: #18252E;
+  --dc-text-secondary: #546874;
+  --dc-text-muted: #798E9B;
+  --dc-earth-green: #446C6C;
+  --dc-forest: #233D3F;
+  --dc-water: #558C9B;
+  --border-subtle: rgba(24, 37, 46, 0.08);
+  --border-medium: rgba(24, 37, 46, 0.14);
+  --border-strong: rgba(68, 108, 108, 0.35);
+}
+
+/* 5. FOG ENVIRONMENT: Ethereal low-contrast rolling mist */
+[data-environment="fog"] {
+  --dc-bg: #E7E3D8;
+  --dc-bg-2: #DDD7CB;
+  --dc-surface: #F0EDE4;
+  --dc-surface-2: #E5E1D6;
+  --dc-surface-3: #DBD5C9;
+  --dc-elevated: #F9F7F1;
+  --dc-text: #212A28;
+  --dc-text-secondary: #66706C;
+  --dc-text-muted: #8A9490;
+  --dc-earth-green: #4E6E61;
+  --dc-forest: #2A413A;
+  --border-subtle: rgba(33, 42, 40, 0.07);
+  --border-medium: rgba(33, 42, 40, 0.13);
+  --border-strong: rgba(78, 110, 97, 0.35);
+}
+
+/* 6. CALM ENVIRONMENT (Earth & Paper Default) */
+[data-environment="calm"] {
+  --dc-bg: #F1EBDD;
+  --dc-bg-2: #E7DECD;
+  --dc-surface: #F8F5EE;
+  --dc-surface-2: #EFE9DC;
+  --dc-surface-3: #E6DECE;
+  --dc-elevated: #FFFDF8;
+  --dc-text: #1E2725;
+  --dc-text-secondary: #65706B;
+  --dc-text-muted: #8C938E;
+  --dc-earth-green: #496B5A;
+  --dc-forest: #263F35;
+  --dc-clay: #B86F52;
+  --dc-sand: #D8B98A;
+  --dc-water: #5D8990;
+  --dc-emergency: #C94B4B;
+  --dc-warning: #C38A35;
+  --dc-safe: #4F8060;
+}
+
+/* ==========================================================================
    RESET & SYSTEM DEFAULTS
    ========================================================================== */
 

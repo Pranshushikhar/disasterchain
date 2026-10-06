@@ -19,6 +19,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import EnvironmentSelector from './EnvironmentSelector';
 
 export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) {
   const location = useLocation();
@@ -108,8 +109,11 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
             })}
           </nav>
 
-          {/* Right Action Suite: [ Login / Account ] -> [ SOS ] -> [ More ] */}
+          {/* Right Action Suite: [ Living Environment ] -> [ Login / Account ] -> [ SOS ] -> [ More ] */}
           <div className="dc-nav-actions">
+            {/* Living Environment Selector */}
+            <EnvironmentSelector />
+
             {/* Account / Login Action */}
             {isAuthenticated ? (
               <div className="dc-account-dropdown-wrap" ref={accountRef}>
@@ -359,6 +363,9 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
         </NavLink>
 
         <div className="dc-mobile-header-actions">
+          {/* Mobile Environment Selector */}
+          <EnvironmentSelector compact={true} />
+
           {/* Mobile Login / Account Button */}
           {isAuthenticated ? (
             <NavLink

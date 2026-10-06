@@ -5,10 +5,12 @@ import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './i18n/i18n';
 import { PWAProvider } from './context/PWAContext';
 import { WeatherGPTProvider, useWeatherGPT } from './context/WeatherGPTContext';
+import { EnvironmentProvider } from './context/EnvironmentContext';
 import { initNativeApp, registerBackButtonHandler } from './services/nativeService';
 
 // Modern Redesigned Core Components
 import CinematicIntro from './components/CinematicIntro';
+import LivingEnvironment from './components/LivingEnvironment';
 import ModernNav from './components/ModernNav';
 import ModernHomePage from './pages/ModernHomePage';
 import ModernWeatherPage from './pages/ModernWeatherPage';
@@ -123,6 +125,9 @@ const AppLayout = () => {
 
   return (
     <div className="dc-app-layout">
+      {/* 0. LIVING ENVIRONMENT ATMOSPHERIC CANVAS */}
+      <LivingEnvironment />
+
       {/* 1. CINEMATIC FIRST-OPEN INTRO (Plays once per session, smooth shared exit) */}
       {showIntro && (
         <CinematicIntro
@@ -272,11 +277,13 @@ export default function App() {
       <PWAProvider>
         <LanguageProvider>
           <AuthProvider>
-            <Router>
-              <WeatherGPTProvider>
-                <AppLayout />
-              </WeatherGPTProvider>
-            </Router>
+            <EnvironmentProvider>
+              <Router>
+                <WeatherGPTProvider>
+                  <AppLayout />
+                </WeatherGPTProvider>
+              </Router>
+            </EnvironmentProvider>
           </AuthProvider>
         </LanguageProvider>
       </PWAProvider>

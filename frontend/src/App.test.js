@@ -87,4 +87,30 @@ describe('DisasterChain Core Smoke Tests', () => {
       expect(showIntro).toBe(false);
     });
   });
+
+  describe('Living Environment Theme System', () => {
+    it('defines all 6 living atmospheric environments with complete metadata', () => {
+      const { ENVIRONMENTS } = require('./context/EnvironmentContext');
+      expect(ENVIRONMENTS).toHaveLength(6);
+      const envIds = ENVIRONMENTS.map((e) => e.id);
+      expect(envIds).toEqual(['calm', 'rain', 'storm', 'night', 'snow', 'fog']);
+
+      ENVIRONMENTS.forEach((env) => {
+        expect(env.id).toBeDefined();
+        expect(env.label).toBeDefined();
+        expect(env.shortLabel).toBeDefined();
+        expect(env.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
+        expect(env.description).toBeTruthy();
+      });
+    });
+
+    it('exports living environment components without runtime initialization errors', () => {
+      const CinematicIntro = require('./components/CinematicIntro').default;
+      const LivingEnvironment = require('./components/LivingEnvironment').default;
+      const EnvironmentSelector = require('./components/EnvironmentSelector').default;
+      expect(typeof CinematicIntro).toBe('function');
+      expect(typeof LivingEnvironment).toBe('function');
+      expect(typeof EnvironmentSelector).toBe('function');
+    });
+  });
 });
