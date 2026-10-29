@@ -46,6 +46,13 @@ const AppLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isPublicStandalone =
+    location.pathname === '/login' ||
+    location.pathname === '/register' ||
+    location.pathname === '/forgot-password' ||
+    location.pathname === '/reset-password' ||
+    location.pathname === '/verify-email';
+
   // Cinematic Intro State: Plays on every fresh page load/reload, but does not repeat on SPA navigation
   const [showIntro, setShowIntro] = useState(() => {
     try {
@@ -147,13 +154,6 @@ const AppLayout = () => {
     setIsReplay(true);
     setShowIntro(true);
   };
-
-  const isPublicStandalone =
-    location.pathname === '/login' ||
-    location.pathname === '/register' ||
-    location.pathname === '/forgot-password' ||
-    location.pathname === '/reset-password' ||
-    location.pathname === '/verify-email';
 
   return (
     <div className="dc-app-layout">
