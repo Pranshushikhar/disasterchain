@@ -129,4 +129,50 @@ describe('DisasterChain Core Smoke Tests', () => {
       expect(html).toContain('dc-credit-author');
     });
   });
+
+  describe('MarkdownRenderer & Rich Text Parsing', () => {
+    it('renders headings and bold text cleanly without leaking raw markdown symbols', () => {
+      const MarkdownRenderer = require('./components/MarkdownRenderer').default;
+      const ReactDOMServer = require('react-dom/server');
+      const testContent = "### Weather Advisory\n\n• **Clothing:** Lightweight cotton.\n• **Precipitation:** 20% chance of rain.";
+      const html = ReactDOMServer.renderToStaticMarkup(<MarkdownRenderer content={testContent} />);
+
+      expect(html).toContain('dc-markdown-renderer');
+      expect(html).toContain('<h5 class="dc-md-h5">');
+      expect(html).toContain('Weather Advisory');
+      expect(html).not.toContain('###');
+      expect(html).toContain('<strong class="dc-md-bold">');
+      expect(html).toContain('Clothing:');
+      expect(html).not.toContain('**Clothing:**');
+      expect(html).toContain('<ul class="dc-md-ul">');
+      expect(html).toContain('<li class="dc-md-li">');
+    });
+  });
+
+  describe('Interactive Onboarding Tour', () => {
+    it('exports OnboardingTour component and all 10 structured steps', () => {
+      const { default: OnboardingTour, TOUR_STEPS } = require('./components/OnboardingTour');
+      expect(typeof OnboardingTour).toBe('function');
+      expect(TOUR_STEPS).toHaveLength(10);
+
+      const stepIds = TOUR_STEPS.map((s) => s.id);
+      expect(stepIds).toContain('welcome');
+      expect(stepIds).toContain('nav');
+      expect(stepIds).toContain('home');
+      expect(stepIds).toContain('weather');
+      expect(stepIds).toContain('map');
+      expect(stepIds).toContain('incidents');
+      expect(stepIds).toContain('safety');
+      expect(stepIds).toContain('weathergpt');
+      expect(stepIds).toContain('sos');
+      expect(stepIds).toContain('finish');
+
+      TOUR_STEPS.forEach((step) => {
+        expect(step.id).toBeDefined();
+        expect(step.title).toBeTruthy();
+        expect(step.description).toBeTruthy();
+        expect(step.badge).toBeTruthy();
+      });
+    });
+  });
 });

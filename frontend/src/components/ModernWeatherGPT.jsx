@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -6,8 +6,12 @@ import {
   X,
   Send,
   Loader2,
+  RotateCcw,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
 import { useWeatherGPT } from '../context/WeatherGPTContext';
+import MarkdownRenderer from './MarkdownRenderer';
 
 export default function ModernWeatherGPT() {
   const location = useLocation();
@@ -18,18 +22,28 @@ export default function ModernWeatherGPT() {
     messages,
     sendMessage,
     isLoading,
-    currentScreenContext,
+    clearMessages,
   } = useWeatherGPT();
 
   const [input, setInput] = useState('');
+  const chatBodyRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
-  // Auto-scroll messages
+  // Auto-scroll messages only when user is near bottom
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && shouldAutoScroll) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages, isLoading, isOpen, shouldAutoScroll]);
+
+  // Track if user scrolled up manually
+  const handleScroll = useCallback(() => {
+    if (!chatBodyRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatBodyRef.current;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 60;
+    setShouldAutoScroll(isNearBottom);
+  }, []);
 
   // Contextual chip prompts based on current page
   const contextualChips = React.useMemo(() => {
@@ -72,9 +86,25 @@ export default function ModernWeatherGPT() {
   const handleSend = (textToSend) => {
     const query = textToSend || input;
     if (!query.trim() || isLoading) return;
+    setShouldAutoScroll(true);
     sendMessage(query);
     setInput('');
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  // Find last user prompt for retry
+  const lastUserPrompt = React.useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') return messages[i].content;
+    }
+    return '';
+  }, [messages]);
 
   return (
     <>
@@ -83,13 +113,14 @@ export default function ModernWeatherGPT() {
         <motion.button
           id="dc-weathergpt-floating-btn"
           className="dc-weathergpt-floating-pill"
-          onClick={openWeatherGPT}
+          onClick={() => openWeatherGPT()}
           initial={{ scale: 0.9, opacity: 0, y: 10 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           whileHover={{ scale: 1.04, y: -2 }}
           whileTap={{ scale: 0.97 }}
           transition={{ duration: 0.2 }}
           aria-label="Open WeatherGPT Assistant"
+          title="Open WeatherGPT Intelligence Copilot"
         >
           <span className="dc-assistant-pulse-dot" />
           <span className="dc-assistant-pill-text">WeatherGPT</span>
@@ -105,6 +136,8 @@ export default function ModernWeatherGPT() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.96 }}
             transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+            role="dialog"
+            aria-label="WeatherGPT Earth Intelligence Copilot"
           >
             {/* Header */}
             <div className="dc-chat-header">
@@ -116,20 +149,36 @@ export default function ModernWeatherGPT() {
                 </div>
               </div>
 
-              <button
-                className="dc-chat-close-btn"
-                onClick={closeWeatherGPT}
-                aria-label="Close Assistant"
-              >
-                <X size={18} />
-              </button>
+              <div className="dc-chat-header-actions">
+                {messages.length > 0 && (
+                  <button
+                    type="button"
+                    className="dc-chat-header-btn"
+                    onClick={clearMessages}
+                    title="Clear conversation"
+                    aria-label="Clear conversation"
+                  >
+                    <RotateCcw size={15} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="dc-chat-close-btn"
+                  onClick={closeWeatherGPT}
+                  aria-label="Close Assistant"
+                  title="Close Assistant"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Contextual Suggestion Chips */}
-            <div className="dc-context-chips-bar">
+            <div className="dc-context-chips-bar" role="toolbar" aria-label="Suggested prompts">
               {contextualChips.map((chip, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   className="dc-context-chip"
                   onClick={() => handleSend(chip)}
                   disabled={isLoading}
@@ -140,7 +189,13 @@ export default function ModernWeatherGPT() {
             </div>
 
             {/* Chat Body */}
-            <div className="dc-chat-body">
+            <div
+              className="dc-chat-body"
+              ref={chatBodyRef}
+              onScroll={handleScroll}
+              role="log"
+              aria-live="polite"
+            >
               {messages.length === 0 ? (
                 <div className="dc-chat-empty-state">
                   <div className="dc-chat-empty-icon">
@@ -148,33 +203,66 @@ export default function ModernWeatherGPT() {
                   </div>
                   <h5>How can I assist your safety?</h5>
                   <p>
-                    Ask about real-time localized rainfall, drainage risks, safe
-                    evacuation corridors, or emergency protocols.
+                    Ask about localized rain, flood outlooks, road safety, evacuation corridors, or emergency go-bags.
                   </p>
                 </div>
               ) : (
-                messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`dc-chat-msg ${m.role === 'user' ? 'user' : 'assistant'}`}
-                  >
-                    <div className="dc-msg-bubble">
-                      <p className="dc-msg-text">{m.content}</p>
-                      {m.why && (
-                        <div className="dc-msg-why">
-                          <strong>Why: </strong>
-                          {m.why}
-                        </div>
-                      )}
-                      {m.whatToDo && (
-                        <div className="dc-msg-action">
-                          <strong>Action: </strong>
-                          {m.whatToDo}
-                        </div>
-                      )}
+                messages.map((m) => {
+                  const isError = m.id && String(m.id).startsWith('err_');
+                  return (
+                    <div
+                      key={m.id}
+                      className={`dc-chat-msg ${m.role === 'user' ? 'user' : 'assistant'} ${isError ? 'error' : ''}`}
+                    >
+                      <div className="dc-msg-bubble">
+                        {isError && (
+                          <div className="dc-msg-error-indicator">
+                            <AlertCircle size={15} />
+                            <span>Connection Disrupted</span>
+                          </div>
+                        )}
+
+                        {m.role === 'user' ? (
+                          <p className="dc-msg-text-user">{m.content}</p>
+                        ) : (
+                          <MarkdownRenderer
+                            content={m.content}
+                            className="dc-msg-text-markdown"
+                          />
+                        )}
+
+                        {m.why && (
+                          <div className="dc-msg-why">
+                            <strong className="dc-msg-label">Why: </strong>
+                            <span>{m.why}</span>
+                          </div>
+                        )}
+                        {m.whatToDo && (
+                          <div className="dc-msg-action">
+                            <strong className="dc-msg-label">Action: </strong>
+                            <span>{m.whatToDo}</span>
+                          </div>
+                        )}
+
+                        {isError && lastUserPrompt && (
+                          <button
+                            type="button"
+                            className="dc-chat-retry-btn"
+                            onClick={() => handleSend(lastUserPrompt)}
+                            disabled={isLoading}
+                          >
+                            <RefreshCw size={13} />
+                            <span>Retry inquiry</span>
+                          </button>
+                        )}
+
+                        {m.timestamp && (
+                          <div className="dc-msg-timestamp">{m.timestamp}</div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
 
               {isLoading && (
@@ -196,18 +284,21 @@ export default function ModernWeatherGPT() {
               }}
               className="dc-chat-input-bar"
             >
-              <input
-                type="text"
+              <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Ask about weather, risk, or emergency..."
                 className="dc-chat-input"
+                rows={1}
+                aria-label="Ask WeatherGPT a question"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
                 className="dc-chat-send-btn"
-                aria-label="Send query"
+                aria-label="Send message"
+                title="Send message (Enter)"
               >
                 <Send size={16} />
               </button>

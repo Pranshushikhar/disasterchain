@@ -724,16 +724,45 @@ function generateAnalyticalResponse({
     const temp = isTomorrow && target ? (target.maxTemp ?? target.tempMax ?? 25) : (current.temperature || 25);
     const rainProb = isTomorrow && target ? (target.precipitationProbabilityMax ?? target.precipitationProbability ?? 0) : (daily[0]?.precipitationProbabilityMax || 0);
     const uv = current.uvIndex || 3;
+    const timeframeWord = isTomorrow ? 'tomorrow' : 'today';
 
-    let clothes = 'Comfortable light cotton clothing';
-    if (temp >= 32) clothes = 'Lightweight, loose-fitting, breathable light-colored cotton or linen';
-    else if (temp <= 15) clothes = 'Warm layered garments with a light jacket or sweater';
-    else if (temp <= 8) clothes = 'Thermal innerwear, fleece, and a wind-resistant heavy jacket';
+    const isJacketQuery = /\b(jacket|coat|sweater|warm clothes|winter wear)\b/i.test(rawText);
+    const isUmbrellaQuery = /\b(umbrella|raincoat|rain gear|poncho)\b/i.test(rawText);
 
-    content = `### 👕 What To Wear ${isTomorrow ? 'Tomorrow' : 'Today'} in ${locationName} (${temp}°C)\n\n` +
-      `• **Clothing:** ${clothes}.\n` +
-      `• **Rain Gear:** ${rainProb >= 40 ? `Carry a compact umbrella or lightweight waterproof rain shell ${isTomorrow ? 'tomorrow' : 'today'} (rain probability: ${rainProb}%).` : `Rain gear is unlikely to be needed ${isTomorrow ? 'tomorrow' : 'today'} (rain probability: ${rainProb}%).`}\n` +
-      `• **Sun Protection:** ${uv >= 6 ? 'Wear sunglasses and apply SPF 30+ sunscreen if outdoors between 11 AM – 3 PM.' : 'Standard UV exposure.'}`;
+    let directLead = '';
+    if (isJacketQuery) {
+      if (temp >= 22) {
+        directLead = `Probably not. Temperatures ${timeframeWord} in **${locationName}** look fairly warm at around **${temp}°C**, so a light layer should be plenty.`;
+      } else if (temp >= 15) {
+        directLead = `A light layer or jacket is a good idea. Expected temperatures ${timeframeWord} in **${locationName}** are around **${temp}°C**.`;
+      } else {
+        directLead = `Yes, definitely wear a warm jacket. Expected temperatures ${timeframeWord} in **${locationName}** are quite cool at **${temp}°C**.`;
+      }
+    } else if (isUmbrellaQuery) {
+      if (rainProb >= 40) {
+        directLead = `Yes, keep an umbrella handy. The latest forecast shows a ${rainProb}% chance of rain in **${locationName}** ${timeframeWord}.`;
+      } else {
+        directLead = `Probably not. The chance of rain in **${locationName}** ${timeframeWord} is low at ${rainProb}%.`;
+      }
+    } else {
+      if (temp >= 32) {
+        directLead = `Comfortable, lightweight, and breathable clothing is best. Highs in **${locationName}** ${timeframeWord} will reach **${temp}°C**.`;
+      } else if (temp <= 12) {
+        directLead = `You will want warm, insulated clothing. Temperatures in **${locationName}** ${timeframeWord} are expected around **${temp}°C**.`;
+      } else {
+        directLead = `Comfortable everyday layers will be enough. Temperatures in **${locationName}** ${timeframeWord} are expected around **${temp}°C**.`;
+      }
+    }
+
+    const rainNote = rainProb >= 40
+      ? `Carry a compact umbrella or rain shell since there is a ${rainProb}% chance of rain.`
+      : `Rain gear is unlikely to be needed (${rainProb}% rain probability).`;
+
+    const uvNote = uv >= 6 ? ' Apply sunscreen or wear a cap during peak afternoon hours.' : '';
+
+    content = `${directLead}\n\n` +
+      `• **Clothing:** ${temp >= 30 ? 'Loose, breathable light fabrics' : (temp <= 15 ? 'Warm layered clothing with an outer jacket' : 'Comfortable light layers')}.\n` +
+      `• **Precipitation:** ${rainNote}${uvNote}`;
   }
 
   // 14. AGRICULTURE INTENT
@@ -916,7 +945,7 @@ function generateAnalyticalResponse({
         content = `### 📍 ${i18n.currentWeather} in ${locationName}\n\n` +
           `• **Temperature:** ${current.temperature}°C (Feels like: ${current.feelsLike}°C)\n` +
           `• **Conditions:** ${current.conditionDescription} (Cloud cover: ${current.cloudCover}%)\n` +
-          `• **Humidity & Pressure:** ${current.humidity}% | ${current.pressureHpa} hPa\n` +
+          `• **Humidity & Pressure:** ${current.humidity}% | ${current.pressureHpa || current.pressureMsl || 1013} hPa\n` +
           `• **Wind:** ${current.windSpeed} km/h (Gusts: ${current.windGusts || current.windSpeed} km/h)\n\n` +
           `**Immediate Trend:** ${trend.description}`;
       }

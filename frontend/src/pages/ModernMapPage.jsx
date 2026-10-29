@@ -128,6 +128,19 @@ export default function ModernMapPage() {
     },
   ]);
 
+  // Geolocation centering
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCenter([Number(pos.coords.latitude.toFixed(4)), Number(pos.coords.longitude.toFixed(4))]);
+        },
+        () => {},
+        { timeout: 7000 }
+      );
+    }
+  }, []);
+
   // Load real backend data
   useEffect(() => {
     const loadData = async () => {
@@ -139,57 +152,69 @@ export default function ModernMapPage() {
         ]);
 
         if (aRes.status === 'fulfilled' && Array.isArray(aRes.value) && aRes.value.length > 0) {
-          const mappedHazards = aRes.value.map((a, i) => ({
-            id: a._id || `h-${i}`,
-            type: 'hazard',
-            title: a.areaName || a.title || 'Hazard Perimeter',
-            severity: a.riskLevel || 'High',
-            category: a.hazardType || 'Flood',
-            location: a.district || 'Metro Region',
-            coords: [
-              a.coordinates?.lat || a.latitude || 28.61 + (i * 0.02),
-              a.coordinates?.lng || a.longitude || 77.20 + (i * 0.02),
-            ],
-            description: a.description || 'Active risk perimeter under operational observation.',
-            time: 'Live',
-          }));
-          setHazards(mappedHazards);
+          const mappedHazards = aRes.value
+            .map((a, i) => {
+              const lat = a.coordinates?.lat ?? a.latitude;
+              const lng = a.coordinates?.lng ?? a.longitude;
+              if (lat == null || lng == null) return null;
+              return {
+                id: a._id || `h-${i}`,
+                type: 'hazard',
+                title: a.areaName || a.title || 'Hazard Perimeter',
+                severity: a.riskLevel || 'High',
+                category: a.hazardType || 'Hazard',
+                location: a.district || 'Observed Sector',
+                coords: [lat, lng],
+                description: a.description || 'Active risk perimeter under operational observation.',
+                time: 'Live',
+              };
+            })
+            .filter(Boolean);
+          if (mappedHazards.length > 0) setHazards(mappedHazards);
         }
 
         if (iRes.status === 'fulfilled' && Array.isArray(iRes.value) && iRes.value.length > 0) {
-          const mappedIncidents = iRes.value.map((inc, i) => ({
-            id: inc._id || `i-${i}`,
-            type: 'incident',
-            title: inc.title || inc.category || 'Field Incident',
-            severity: inc.severity || 'Moderate',
-            category: inc.category || 'Incident',
-            location: inc.location?.address || 'Reported Location',
-            coords: [
-              inc.location?.coordinates?.[1] || 28.62 + (i * 0.015),
-              inc.location?.coordinates?.[0] || 77.21 + (i * 0.015),
-            ],
-            description: inc.description || 'Verified citizen field report.',
-            time: inc.createdAt ? new Date(inc.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent',
-          }));
-          setIncidents(mappedIncidents);
+          const mappedIncidents = iRes.value
+            .map((inc, i) => {
+              const lat = inc.location?.coordinates?.[1] ?? inc.latitude;
+              const lng = inc.location?.coordinates?.[0] ?? inc.longitude;
+              if (lat == null || lng == null) return null;
+              return {
+                id: inc._id || `i-${i}`,
+                type: 'incident',
+                title: inc.title || inc.category || 'Field Incident',
+                severity: inc.severity || 'Moderate',
+                category: inc.category || 'Incident',
+                location: inc.location?.address || 'Reported Location',
+                coords: [lat, lng],
+                description: inc.description || 'Verified citizen field report.',
+                time: inc.createdAt ? new Date(inc.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent',
+              };
+            })
+            .filter(Boolean);
+          if (mappedIncidents.length > 0) setIncidents(mappedIncidents);
         }
 
         if (sRes.status === 'fulfilled' && Array.isArray(sRes.value) && sRes.value.length > 0) {
-          const mappedShelters = sRes.value.map((s, i) => ({
-            id: s._id || `s-${i}`,
-            type: 'shelter',
-            title: s.name || 'Shelter Facility',
-            status: s.status || 'Open',
-            capacity: `${s.currentOccupancy || 80} / ${s.capacity || 200}`,
-            location: s.address || 'Public Facility',
-            coords: [
-              s.location?.coordinates?.[1] || 28.65 + (i * 0.01),
-              s.location?.coordinates?.[0] || 77.22 + (i * 0.01),
-            ],
-            description: s.services?.join(', ') || 'Shelter with bedding and emergency water.',
-            phone: s.contactPhone || '+91 112',
-          }));
-          setShelters(mappedShelters);
+          const mappedShelters = sRes.value
+            .map((s, i) => {
+              const lat = s.location?.coordinates?.[1] ?? s.latitude;
+              const lng = s.location?.coordinates?.[0] ?? s.longitude;
+              if (lat == null || lng == null) return null;
+              return {
+                id: s._id || `s-${i}`,
+                type: 'shelter',
+                title: s.name || 'Shelter Facility',
+                status: s.status || 'Verified Open',
+                capacity: s.capacity ? `${s.currentOccupancy || 0} / ${s.capacity} beds` : 'Verified on arrival',
+                location: s.address || 'Public Relief Facility',
+                coords: [lat, lng],
+                description: s.services?.join(', ') || 'Shelter with bedding, emergency rations, and potable water.',
+                phone: s.contactPhone || s.phone || '+91 112',
+              };
+            })
+            .filter(Boolean);
+          if (mappedShelters.length > 0) setShelters(mappedShelters);
         }
       } catch (err) {
         console.error('ModernMap data error:', err);

@@ -17,11 +17,12 @@ import {
   User,
   LogOut,
   Settings,
+  Compass,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import EnvironmentSelector from './EnvironmentSelector';
 
-export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) {
+export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, onStartTour }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
@@ -335,6 +336,19 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
                       </button>
                     )}
 
+                    {onStartTour && (
+                      <button
+                        className="dc-more-item dc-tour-item"
+                        onClick={() => {
+                          setIsMoreOpen(false);
+                          onStartTour();
+                        }}
+                      >
+                        <Compass size={15} />
+                        <span>Interactive Tour & Guide</span>
+                      </button>
+                    )}
+
                     <button
                       className="dc-more-item dc-replay-item"
                       onClick={() => {
@@ -386,6 +400,17 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal }) 
               <User size={15} />
               <span>Login</span>
             </NavLink>
+          )}
+
+          {onStartTour && (
+            <button
+              onClick={onStartTour}
+              className="dc-mobile-tour-pill"
+              aria-label="Interactive Website Tour"
+              title="Interactive Website Tour"
+            >
+              <Compass size={14} />
+            </button>
           )}
 
           <button

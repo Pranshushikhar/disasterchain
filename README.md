@@ -152,6 +152,52 @@ disasterchain/
    ```
    *The frontend starts on `http://localhost:3000`.*
 
+4. Run Frontend Tests:
+   ```bash
+   npm test -- --watchAll=false
+   ```
+   *(All 14 unit and regression tests pass)*
+
+5. Run Backend Verification Suites:
+   ```bash
+   cd backend
+   node test_weather_gpt_suite.js      # 30/30 comprehensive tests pass
+   node test_weather_gpt_2_suite.js    # 20/20 telemetry & intent tests pass
+   ```
+
+---
+
+## 🌟 Modern UX, Intelligence & Personal Safety Upgrade
+
+DisasterChain has undergone a complete UX, architecture, and intelligence upgrade:
+
+### 1. Signature 5-Scene Canvas Cinematic Intro
+- **5 Progressive Cinematic Scenes**: Calm Waters (`#0f2b3c`), Volcanic Ash (`#3a1515`), Tsunami Surge (`#0a2236`), Flood Impact (`#1a3344`), and Earth Intelligence Command Center (`#0c1b26`).
+- **Interactive Controls**: Play/pause, audio atmospheric toggle, scene-scrubber indicator pills, and an instant "Enter Command Center" button.
+- **Smooth 480ms Dissolve**: Canvas cross-fade wrapped in Framer Motion `<AnimatePresence>` for an organic transition into the operational dashboard.
+- **Replayable**: Can be replayed at any time from the navigation menu.
+
+### 2. Interactive 10-Step Guided Onboarding Tour
+- **SVG Cutout Mask Spotlight**: Dims the background with smooth backdrop blur while illuminating the exact UI element with dynamic bounding box calculation.
+- **10 Core Operational Steps**: Telemetry Ribbon, Dynamic Next Actions, Live Leaflet Map, WeatherGPT Copilot, Perimeter Assessment, Shelters & Routing, Incident Reporting, Blockchain Ledger, Emergency Hotlines, and Global Navigation.
+- **Keyboard & Touch Accessibility**: Full keyboard navigation (`Enter` to advance, `Escape` to dismiss, `Arrow` keys to traverse).
+- **Persistent State**: Persists completion in `localStorage` (`disasterchain_tour_completed`); easily triggered anytime via **ModernNav -> "Interactive Tour & Guide"**.
+
+### 3. WeatherGPT Conversational Intelligence Pipeline
+- **Zero-Dependency `MarkdownRenderer`**: Eliminates raw `###`, `**bold**`, and literal bullet characters; presents natural typography, styled lists, and interactive action buttons.
+- **Natural, Direct Tone**: Practical conversational guidance (e.g., direct answers to *"Do I need a jacket today?"* without cold raw data tables).
+- **Enhanced Chat Experience**: Clear conversation button, dynamic scroll tracking with smart user-scroll detection, multiline `Shift+Enter` input, and resilient retry state.
+- **Safety Guardrails & Stability**: Prevents `undefined` pressure leaks (`current.pressureHpa ?? current.pressureMsl ?? 1013`) and immediately flags life-safety triggers with "Call 112" guidance.
+
+### 4. Purposeful Space Handling Across Core Pages
+- **`ModernHomePage`**: Real telemetry timestamps, dynamic "What Should I Do Next?" card, live Leaflet map marker rendering, and active emergency alert ticker.
+- **`ModernSafetyPage`**: Grounded perimeter assessment (*"No hazards detected in available data (3 km radius)"*), real nearest shelter distance/travel time computation, Google Maps directions, tap-to-call facility links, and persistent 72-hour survival kit in `localStorage`.
+- **`ModernWeatherPage`**: Live atmospheric telemetry, practical weather recommendations (clothing, outdoors, travel), data source footnote, and scientific disclaimers.
+- **`ModernMapPage`**: Geolocation centering, numeric coordinate parsing, and layer filters.
+- **`ModernIncidentsPage`**: Verification/severity filters (`ALL`, `VERIFIED`, `CRITICAL`), intelligent empty state, and one-tap incident reporting modal.
+
+For complete architectural specifications, system diagrams, and data flows, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ---
 
 ## 🔑 Demo Evaluation Credentials

@@ -10,6 +10,7 @@ import { initNativeApp, registerBackButtonHandler } from './services/nativeServi
 
 // Modern Redesigned Core Components
 import CinematicIntro from './components/CinematicIntro';
+import OnboardingTour from './components/OnboardingTour';
 import LivingEnvironment from './components/LivingEnvironment';
 import ModernNav from './components/ModernNav';
 import ModernHomePage from './pages/ModernHomePage';
@@ -112,6 +113,36 @@ const AppLayout = () => {
     return () => unregister();
   }, [isSosOpen, isIncidentOpen, isAppModalOpen, location.pathname, navigate]);
 
+  const [showTour, setShowTour] = useState(false);
+
+  const handleEnterIntro = () => {
+    setShowIntro(false);
+    // Smooth first-visit onboarding tour trigger after intro completes
+    try {
+      const tourDone = localStorage.getItem('disasterchain_tour_completed');
+      if (tourDone !== 'true' && !isPublicStandalone) {
+        setTimeout(() => setShowTour(true), 550);
+      }
+    } catch (e) {}
+  };
+
+  // If intro was bypassed (e.g. skip_intro=1 query param), offer tour if first visit
+  useEffect(() => {
+    if (!showIntro && !isPublicStandalone) {
+      try {
+        const tourDone = localStorage.getItem('disasterchain_tour_completed');
+        if (tourDone !== 'true') {
+          const timer = setTimeout(() => setShowTour(true), 750);
+          return () => clearTimeout(timer);
+        }
+      } catch (e) {}
+    }
+  }, [showIntro, isPublicStandalone]);
+
+  const handleStartTour = () => {
+    setShowTour(true);
+  };
+
   const handleReplayIntro = () => {
     setIsReplay(true);
     setShowIntro(true);
@@ -130,18 +161,21 @@ const AppLayout = () => {
       <LivingEnvironment />
 
       {/* 1. CINEMATIC FIRST-OPEN INTRO (Plays once per session, smooth shared exit) */}
-      {showIntro && (
-        <CinematicIntro
-          onEnter={() => setShowIntro(false)}
-          isReplay={isReplay}
-        />
-      )}
+      <AnimatePresence>
+        {showIntro && (
+          <CinematicIntro
+            onEnter={handleEnterIntro}
+            isReplay={isReplay}
+          />
+        )}
+      </AnimatePresence>
 
       {/* 2. PRIMARY NAVIGATION (Top on desktop, bottom on mobile) */}
       <ModernNav
         onOpenSos={() => setIsSosOpen(true)}
         onReplayIntro={handleReplayIntro}
         onOpenAppModal={() => setIsAppModalOpen(true)}
+        onStartTour={handleStartTour}
       />
 
       {/* 3. MAIN APPLICATION VIEWPORT WITH SMOOTH PAGE TRANSITIONS */}
@@ -257,7 +291,16 @@ const AppLayout = () => {
         onClose={() => setIsAppModalOpen(false)}
       />
 
-      {/* 7. PWA INSTALL & UPDATE PROMPTS */}
+      {/* 7. INTERACTIVE FIRST-VISIT ONBOARDING TOUR */}
+      {!isPublicStandalone && (
+        <OnboardingTour
+          isActive={showTour}
+          onComplete={() => setShowTour(false)}
+          onDismiss={() => setShowTour(false)}
+        />
+      )}
+
+      {/* 8. PWA INSTALL & UPDATE PROMPTS */}
       <PWAInstallPrompt />
       <PWAUpdateToast />
     </div>

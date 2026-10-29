@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertTriangle,
@@ -67,6 +67,7 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
   ]);
 
   const [selectedIncident, setSelectedIncident] = useState(null);
+  const [filter, setFilter] = useState('ALL'); // 'ALL' | 'VERIFIED' | 'CRITICAL'
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -162,6 +163,16 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
     }
   };
 
+  const filteredIncidents = useMemo(() => {
+    if (filter === 'VERIFIED') return incidents.filter((i) => i.verified);
+    if (filter === 'CRITICAL') {
+      return incidents.filter(
+        (i) => i.severity.toLowerCase() === 'critical' || i.severity.toLowerCase() === 'high'
+      );
+    }
+    return incidents;
+  }, [incidents, filter]);
+
   return (
     <motion.div
       className="dc-incidents-container"
@@ -187,9 +198,46 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
           </button>
         </div>
 
-        {/* INCIDENT LIST */}
-        <div className="dc-incidents-list">
-          {incidents.map((inc) => (
+        {/* Filter Pills */}
+        <div className="dc-home-quick-strip" style={{ marginBottom: 16 }}>
+          <button
+            type="button"
+            className={`dc-hub-pill ${filter === 'ALL' ? 'active' : ''}`}
+            onClick={() => setFilter('ALL')}
+            style={filter === 'ALL' ? { backgroundColor: 'var(--dc-forest)', color: '#FFFDF8' } : {}}
+          >
+            All Reports ({incidents.length})
+          </button>
+          <button
+            type="button"
+            className={`dc-hub-pill ${filter === 'VERIFIED' ? 'active' : ''}`}
+            onClick={() => setFilter('VERIFIED')}
+            style={filter === 'VERIFIED' ? { backgroundColor: 'var(--dc-earth-green)', color: '#FFFDF8' } : {}}
+          >
+            Verified Only ({incidents.filter((i) => i.verified).length})
+          </button>
+          <button
+            type="button"
+            className={`dc-hub-pill ${filter === 'CRITICAL' ? 'active' : ''}`}
+            onClick={() => setFilter('CRITICAL')}
+            style={filter === 'CRITICAL' ? { backgroundColor: 'var(--dc-emergency)', color: '#FFFDF8' } : {}}
+          >
+            High / Critical ({incidents.filter((i) => i.severity.toLowerCase() === 'critical' || i.severity.toLowerCase() === 'high').length})
+          </button>
+        </div>
+
+        {/* INCIDENT LIST OR EMPTY STATE */}
+        {filteredIncidents.length === 0 ? (
+          <div className="dc-empty-shelter-card">
+            <AlertTriangle size={24} className="dc-empty-icon" />
+            <h4>No Reports Matching Current Filter</h4>
+            <p>
+              No active field reports match this filter criteria. If you observe waterlogging, downed power lines, or structural disruptions, submit a report to alert your sector.
+            </p>
+          </div>
+        ) : (
+          <div className="dc-incidents-list">
+            {filteredIncidents.map((inc) => (
             <div
               key={inc.id}
               className="dc-incident-card"
@@ -235,11 +283,11 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
                   </span>
                 </div>
               </div>
-
               <ChevronRight size={18} className="dc-incident-arrow" />
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* DETAIL MODAL */}

@@ -6244,4 +6244,617 @@ body.drawer-open {
   }
 }
 
+/* ==========================================================================
+   MARKDOWN RENDERER STYLING (WeatherGPT & Conversational Guidance)
+   ========================================================================== */
+.dc-markdown-renderer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  user-select: text;
+  word-break: break-word;
+}
+
+.dc-md-h4 {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--dc-text);
+  margin: 4px 0 2px 0;
+  letter-spacing: -0.01em;
+}
+
+.dc-md-h5 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--dc-text);
+  margin: 3px 0 1px 0;
+}
+
+.dc-md-p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.dc-md-ul,
+.dc-md-ol {
+  margin: 4px 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dc-md-li {
+  line-height: 1.45;
+}
+
+.dc-md-bold {
+  font-weight: 700;
+  color: var(--dc-text);
+}
+
+.dc-chat-msg.user .dc-md-bold {
+  color: #FFFDF8;
+}
+
+.dc-md-italic {
+  font-style: italic;
+}
+
+.dc-md-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background-color: rgba(30, 39, 37, 0.08);
+}
+
+.dc-md-link {
+  color: var(--dc-water);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ==========================================================================
+   WEATHERGPT CHAT UI ENHANCEMENTS (Header actions, retry, multiline input)
+   ========================================================================== */
+.dc-chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dc-chat-header-btn {
+  background: transparent;
+  border: none;
+  color: var(--dc-text-muted);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.dc-chat-header-btn:hover {
+  background-color: var(--dc-surface-2);
+  color: var(--dc-text);
+}
+
+.dc-msg-error-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dc-emergency);
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.dc-chat-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 10px;
+  background-color: var(--dc-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--dc-earth-green);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dc-chat-retry-btn:hover {
+  background-color: var(--dc-surface-2);
+  border-color: var(--dc-earth-green);
+}
+
+.dc-msg-timestamp {
+  font-size: 0.68rem;
+  color: var(--dc-text-muted);
+  margin-top: 5px;
+  text-align: right;
+}
+
+.dc-chat-input {
+  resize: none;
+  font-family: inherit;
+  line-height: 1.4;
+  max-height: 80px;
+  scrollbar-width: thin;
+}
+
+/* ==========================================================================
+   ONBOARDING TOUR COMPONENT STYLING
+   ========================================================================== */
+.dc-tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  pointer-events: none;
+}
+
+.dc-tour-svg-mask {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1990;
+}
+
+.dc-tour-spotlight-ring {
+  border: 2px solid var(--dc-sand);
+  box-shadow: 0 0 0 4px rgba(216, 185, 138, 0.25), 0 0 30px rgba(216, 185, 138, 0.35);
+  animation: dcSpotlightPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes dcSpotlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(216, 185, 138, 0.25), 0 0 25px rgba(216, 185, 138, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(216, 185, 138, 0.4), 0 0 35px rgba(216, 185, 138, 0.45);
+  }
+}
+
+.dc-tour-card {
+  width: calc(100% - 32px);
+  max-width: 420px;
+  background-color: var(--dc-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 24px 60px -12px rgba(14, 20, 18, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.4);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dc-tour-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dc-tour-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dc-tour-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: rgba(73, 107, 90, 0.12);
+  border: 1px solid rgba(73, 107, 90, 0.25);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--dc-earth-green);
+  text-transform: uppercase;
+}
+
+.dc-tour-step-counter {
+  font-size: 0.74rem;
+  color: var(--dc-text-muted);
+  font-weight: 600;
+}
+
+.dc-tour-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--dc-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.dc-tour-close-btn:hover {
+  background-color: var(--dc-surface-2);
+  color: var(--dc-text);
+}
+
+.dc-tour-progress-track {
+  width: 100%;
+  height: 3px;
+  background-color: var(--dc-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.dc-tour-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--dc-earth-green) 0%, var(--dc-sand) 100%);
+  transition: width 0.25s ease-out;
+}
+
+.dc-tour-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dc-tour-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--dc-text);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.dc-tour-desc {
+  font-size: 0.86rem;
+  color: var(--dc-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.dc-tour-tip {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--dc-surface);
+  border-radius: 8px;
+  font-size: 0.76rem;
+  color: var(--dc-text-muted);
+  line-height: 1.4;
+}
+
+.dc-tour-tip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--dc-sand);
+  flex-shrink: 0;
+}
+
+.dc-tour-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.dc-tour-btn-skip {
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  color: var(--dc-text-muted);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.dc-tour-btn-skip:hover {
+  color: var(--dc-text);
+  background-color: var(--dc-surface-2);
+}
+
+.dc-tour-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dc-tour-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: var(--dc-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--dc-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dc-tour-btn-back:hover {
+  background-color: var(--dc-surface-2);
+}
+
+.dc-tour-btn-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background-color: var(--dc-forest);
+  color: #FFFDF8;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(38, 63, 53, 0.28);
+  transition: all 0.18s ease;
+}
+
+.dc-tour-btn-next:hover {
+  background-color: var(--dc-earth-green);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   DASHBOARD REFINED SECTIONS (Alert Strip, Recommendations, Telemetry)
+   ========================================================================== */
+.dc-home-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dc-freshness-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--dc-text-muted);
+  font-weight: 600;
+}
+
+.dc-active-alert-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgba(201, 75, 75, 0.08);
+  border: 1px solid rgba(201, 75, 75, 0.28);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--dc-text);
+  font-size: 0.84rem;
+}
+
+.dc-alert-strip-icon {
+  color: var(--dc-emergency);
+  flex-shrink: 0;
+}
+
+.dc-alert-strip-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.dc-alert-strip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--dc-elevated);
+  border: 1px solid rgba(201, 75, 75, 0.3);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--dc-emergency);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dc-telemetry-micro-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  margin: 12px 0;
+  font-size: 0.78rem;
+  color: var(--dc-text-secondary);
+}
+
+.dc-telemetry-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dc-telemetry-icon {
+  color: var(--dc-earth-green);
+}
+
+.dc-recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dc-recommendation-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background-color: var(--dc-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: all 0.15s ease;
+}
+
+.dc-recommendation-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: 0 4px 14px rgba(30, 39, 37, 0.05);
+}
+
+.dc-recommendation-card.critical {
+  border-left: 3px solid var(--dc-emergency);
+}
+
+.dc-recommendation-card.high {
+  border-left: 3px solid var(--dc-warning);
+}
+
+.dc-recommendation-card.normal {
+  border-left: 3px solid var(--dc-earth-green);
+}
+
+.dc-recommendation-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: var(--dc-surface);
+  color: var(--dc-forest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dc-recommendation-content {
+  flex: 1;
+}
+
+.dc-recommendation-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--dc-text);
+  margin: 0 0 3px 0;
+}
+
+.dc-recommendation-text {
+  font-size: 0.82rem;
+  color: var(--dc-text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.dc-home-quick-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 16px 0;
+  scrollbar-width: none;
+}
+
+.dc-hub-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background-color: var(--dc-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--dc-text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.dc-hub-pill:hover {
+  background-color: var(--dc-surface-2);
+  border-color: var(--dc-earth-green);
+}
+
+/* Mobile Tour Trigger Pill in Header */
+.dc-mobile-tour-pill {
+  background: var(--dc-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--dc-earth-green);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Safety Page Nuances */
+.dc-status-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.dc-status-radius-tag,
+.dc-status-time-tag {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: rgba(30, 39, 37, 0.06);
+  color: var(--dc-text-muted);
+  font-weight: 600;
+}
+
+.dc-empty-shelter-card {
+  background-color: var(--dc-elevated);
+  border: 1px dashed var(--border-medium);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dc-empty-shelter-card h4 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--dc-text);
+  margin: 0;
+}
+
+.dc-empty-shelter-card p {
+  font-size: 0.82rem;
+  color: var(--dc-text-secondary);
+  line-height: 1.5;
+  max-width: 440px;
+  margin: 0;
+}
+
+.dc-weather-source-footnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.74rem;
+  color: var(--dc-text-muted);
+  line-height: 1.4;
+}
+
+
 

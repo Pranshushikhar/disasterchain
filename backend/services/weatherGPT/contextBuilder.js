@@ -272,6 +272,7 @@ function buildWeatherContext({
     weatherCode: curCode,
     cloudCover: current.cloudCover != null ? current.cloudCover : (hourly[0]?.cloudCover ?? 20),
     pressureMsl: current.pressureMsl != null ? Math.round(current.pressureMsl) : 1013,
+    pressureHpa: current.pressureHpa != null ? Math.round(current.pressureHpa) : (current.pressureMsl != null ? Math.round(current.pressureMsl) : 1013),
     uvIndex: current.uvIndex != null ? current.uvIndex : 4,
     isDay: current.isDay != null ? current.isDay : 1,
     source: 'Open-Meteo High-Resolution Numerical Model',

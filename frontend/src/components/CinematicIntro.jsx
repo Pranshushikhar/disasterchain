@@ -34,13 +34,16 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const handleEnterClick = useCallback(() => {
+    if (isEntering) return;
     setIsEntering(true);
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current);
-      animFrameRef.current = null;
-    }
-    onEnter();
-  }, [onEnter]);
+    setTimeout(() => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
+      }
+      onEnter();
+    }, 480);
+  }, [onEnter, isEntering]);
 
   // Keyboard navigation: Enter or Space triggers entry, Esc skips immediately
   useEffect(() => {

@@ -7,6 +7,7 @@ import {
   reverseGeocode,
 } from '../services/weatherApi';
 import './weathergpt.css';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 /**
  * WEATHERGPT — ATMOSPHERIC INTELLIGENCE DESK
@@ -495,9 +496,10 @@ export default function WeatherGPTPage() {
 
                 {/* Fallback text if intentCard not fully structured */}
                 {!card && msg.content && (
-                  <p className="wgpt-section-text" style={{ whiteSpace: 'pre-line' }}>
-                    {msg.content}
-                  </p>
+                  <MarkdownRenderer
+                    content={msg.content}
+                    className="wgpt-section-markdown"
+                  />
                 )}
 
                 {/* 4. Forecast Timeline (5-hour window with target hour highlighted) */}
