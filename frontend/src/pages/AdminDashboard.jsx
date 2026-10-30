@@ -286,15 +286,7 @@ const AdminDashboard = () => {
       )}
 
       {/* Admin Navigation Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '0.5rem',
-          borderBottom: '1px solid var(--border-subtle)',
-          marginBottom: '1.75rem',
-          overflowX: 'auto',
-        }}
-      >
+      <div className="dc-admin-tabs-bar">
         {[
           { id: 'overview', label: t('admin.systemHealth', 'System Analytics'), icon: 'activity' },
           { id: 'verification', label: t('admin.incidentVerification', 'Incident Verification'), icon: 'shield' },
@@ -312,12 +304,7 @@ const AdminDashboard = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`btn ${isTabActive ? 'btn-primary' : 'btn-ghost'}`}
-              style={{
-                padding: '0.65rem 1rem',
-                fontSize: '0.86rem',
-                whiteSpace: 'nowrap',
-              }}
+              className={`dc-admin-tab-btn ${isTabActive ? 'active' : ''}`}
             >
               <Icon name={tab.icon} size={16} />
               <span>{tab.label}</span>

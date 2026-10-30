@@ -79,7 +79,7 @@ const LoginPage = () => {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '3rem 1.5rem',
-        backgroundColor: 'var(--dc-bg, #F1EBDD)',
+        backgroundColor: 'var(--dc-bg, #0E1418)',
       }}
     >
       <div
@@ -87,10 +87,10 @@ const LoginPage = () => {
           maxWidth: '440px',
           width: '100%',
           padding: '2.5rem 2.25rem',
-          backgroundColor: 'var(--dc-elevated, #FFFDF8)',
-          border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+          backgroundColor: 'var(--dc-elevated, #1B272D)',
+          border: '1px solid var(--border-medium, #2C393E)',
           borderRadius: 'var(--radius-lg, 16px)',
-          boxShadow: 'var(--shadow-md, 0 4px 16px -2px rgba(30, 39, 37, 0.06))',
+          boxShadow: 'var(--shadow-md, 0 8px 32px rgba(0, 0, 0, 0.4))',
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
@@ -99,15 +99,15 @@ const LoginPage = () => {
               width: '52px',
               height: '52px',
               borderRadius: 'var(--radius-sm, 8px)',
-              background: 'rgba(73, 107, 90, 0.12)',
-              color: 'var(--dc-forest, #263F35)',
+              background: 'rgba(85, 201, 138, 0.15)',
+              color: 'var(--dc-earth-green, #55C98A)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '0.85rem',
             }}
           >
-            <Icon name="shield-check" size={26} color="var(--dc-forest, #263F35)" />
+            <Icon name="shield-check" size={26} color="var(--dc-earth-green, #55C98A)" />
           </div>
           <div
             style={{
@@ -116,7 +116,7 @@ const LoginPage = () => {
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: 'var(--dc-earth-green, #496B5A)',
+              color: 'var(--dc-earth-green, #55C98A)',
               marginBottom: '0.25rem',
             }}
           >
@@ -127,14 +127,14 @@ const LoginPage = () => {
               fontFamily: 'var(--font-display, inherit)',
               fontSize: '1.65rem',
               fontWeight: 800,
-              color: 'var(--dc-text, #1E2725)',
+              color: 'var(--dc-text, #F5F7F5)',
               marginBottom: '0.35rem',
               letterSpacing: '-0.02em',
             }}
           >
             {t('auth.loginTitle', 'Sign In to DisasterChain')}
           </h1>
-          <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.45 }}>
+          <p style={{ color: 'var(--dc-text-secondary, #AAB6B2)', fontSize: '0.86rem', lineHeight: 1.45 }}>
             Access real-time crisis intelligence, hazard dispatch, and community safety registries.
           </p>
         </div>
@@ -316,13 +316,13 @@ const LoginPage = () => {
               onClick={() => handleFillDemo('student')}
               disabled={loading}
               style={{
-                background: 'var(--dc-elevated, #FFFDF8)',
-                border: '1px solid var(--border-subtle, rgba(30, 39, 37, 0.08))',
-                borderRadius: '4px',
-                padding: '3px 8px',
-                fontSize: '0.74rem',
-                fontWeight: 600,
-                color: 'var(--dc-forest, #263F35)',
+                background: '#151E23',
+                border: '1px solid #2C393E',
+                borderRadius: '6px',
+                padding: '4px 10px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: 'var(--dc-text, #F5F7F5)',
                 cursor: 'pointer',
               }}
             >
@@ -333,13 +333,13 @@ const LoginPage = () => {
               onClick={() => handleFillDemo('admin')}
               disabled={loading}
               style={{
-                background: 'var(--dc-elevated, #FFFDF8)',
-                border: '1px solid var(--border-subtle, rgba(30, 39, 37, 0.08))',
-                borderRadius: '4px',
-                padding: '3px 8px',
-                fontSize: '0.74rem',
-                fontWeight: 600,
-                color: 'var(--dc-forest, #263F35)',
+                background: 'rgba(85, 201, 138, 0.15)',
+                border: '1px solid #55C98A',
+                borderRadius: '6px',
+                padding: '4px 10px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#55C98A',
                 cursor: 'pointer',
               }}
             >
