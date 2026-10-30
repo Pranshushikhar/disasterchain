@@ -22,13 +22,19 @@ const LIVE_URL = 'https://disasterchain.vercel.app';
     });
 
     console.log('Capturing Live Vercel Home Page...');
-    await page.goto(`${LIVE_URL}/?skip_intro=1`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto(`${LIVE_URL}/?skip_intro=1`, { waitUntil: 'domcontentloaded', timeout: 35000 });
     await new Promise((r) => setTimeout(r, 2000));
     await page.screenshot({ path: path.join(ARTIFACT_DIR, 'live_vercel_home_restored.png') });
     console.log('Saved live_vercel_home_restored.png');
 
+    console.log('Capturing Live Vercel Academy Catalog...');
+    await page.goto(`${LIVE_URL}/academy?skip_intro=1`, { waitUntil: 'domcontentloaded', timeout: 35000 });
+    await new Promise((r) => setTimeout(r, 2000));
+    await page.screenshot({ path: path.join(ARTIFACT_DIR, 'live_vercel_academy_catalog_restored.png') });
+    console.log('Saved live_vercel_academy_catalog_restored.png');
+
     console.log('Capturing Live Academy Course page...');
-    await page.goto(`${LIVE_URL}/academy/course/earthquake-safety?skip_intro=1`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto(`${LIVE_URL}/academy/course/earthquake-safety?skip_intro=1`, { waitUntil: 'domcontentloaded', timeout: 35000 });
     await new Promise((r) => setTimeout(r, 2000));
     await page.evaluate(() => {
       const box = document.querySelector('.dc-checkpoint-box');
