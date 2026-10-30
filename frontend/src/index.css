@@ -3688,7 +3688,10 @@ body.drawer-open {
 @media (min-width: 769px) {
   .dc-main-viewport {
     margin-left: var(--dc-sidebar-width, 260px);
-    transition: margin-left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    width: calc(100% - var(--dc-sidebar-width, 260px));
+    max-width: calc(100% - var(--dc-sidebar-width, 260px));
+    box-sizing: border-box;
+    transition: margin-left 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     min-height: 100vh;
     padding-bottom: 40px;
   }
@@ -3697,6 +3700,9 @@ body.drawer-open {
 @media (max-width: 768px) {
   .dc-main-viewport {
     margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     padding-top: 56px;
     padding-bottom: 80px;
   }
@@ -8501,15 +8507,18 @@ body.drawer-open {
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .dc-home-clean-container {
   width: 100%;
   max-width: 1040px;
-  margin: 0 auto;
+  margin-inline: auto;
+  margin-block: 0;
   padding: 40px 32px 72px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
