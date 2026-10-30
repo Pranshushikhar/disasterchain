@@ -11,7 +11,7 @@ import { useTranslation } from '../i18n/i18n';
 import { useDCLocation } from './LocationContext';
 import { useWeatherGPT } from './WeatherGPTContext';
 import { useEnvironment } from './EnvironmentContext';
-import { createSosRequest, sendConversationalChat } from '../services/api';
+import { createSosRequest, sendConversationalChat, sendVoiceTriage } from '../services/api';
 
 const VoiceAssistantContext = createContext(null);
 
@@ -361,14 +361,43 @@ export const VoiceAssistantProvider = ({
           }
         }
 
+        let triageDraft = null;
+        const lowerInput = userText.toLowerCase();
+        if (
+          lowerInput.includes('flooding') ||
+          lowerInput.includes('wheelchair') ||
+          lowerInput.includes('trapped') ||
+          lowerInput.includes('cannot leave') ||
+          lowerInput.includes('cannot walk') ||
+          lowerInput.includes('elderly') ||
+          lowerInput.includes('oxygen') ||
+          lowerInput.includes('report emergency') ||
+          lowerInput.includes('baby')
+        ) {
+          try {
+            const triageRes = await sendVoiceTriage({
+              transcript: userText,
+              language: currentLanguage,
+              clientCoordinates: coords ? { latitude: coords.lat, longitude: coords.lon } : null,
+            });
+            if (triageRes?.success && triageRes?.incidentDraft) {
+              triageDraft = triageRes.incidentDraft;
+              replyText = `🚨 **Emergency Incident Triage Generated**: I have structured your voice report and identified special accessibility needs. Please review and explicitly confirm below before emergency dispatch.`;
+            }
+          } catch (triageErr) {
+            console.warn('Voice Triage endpoint warning:', triageErr);
+          }
+        }
+
         const assistantMsgId = `ast_${Date.now()}`;
         const newAssistantMsg = {
           id: assistantMsgId,
           role: 'assistant',
           content: replyText,
           action: toolAction,
+          incidentDraft: triageDraft,
           timestamp: new Date().toISOString(),
-          isEmergency: Boolean(replyData?.isEmergency),
+          isEmergency: Boolean(replyData?.isEmergency || triageDraft),
         };
 
         setMessages((prev) => [...prev, newAssistantMsg]);
