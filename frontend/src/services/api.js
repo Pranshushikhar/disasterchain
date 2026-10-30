@@ -7,7 +7,7 @@ const isLocalBrowser = typeof window !== 'undefined' &&
   process.env.NODE_ENV !== 'production' &&
   !isNativeApp;
 
-export const API_BASE_URL =
+const API_BASE_URL =
   process.env.REACT_APP_API_URL ||
   (isLocalBrowser
     ? 'http://localhost:5000/api'
@@ -383,11 +383,6 @@ export const adminReopenIncident = async (incidentId, reason) => {
 
 export const fetchAdminVerificationStats = async () => {
   const res = await api.get('/incidents/admin/verification-stats');
-  return res.data;
-};
-
-export const sendVoiceTriage = async ({ transcript, language, clientCoordinates }) => {
-  const res = await api.post('/ai/voice-triage', { transcript, language, clientCoordinates });
   return res.data;
 };
 

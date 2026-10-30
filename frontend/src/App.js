@@ -31,15 +31,6 @@ import { VoiceAssistantProvider } from './context/VoiceAssistantContext';
 import CitySelectorModal from './components/CitySelectorModal';
 import Footer from './components/Footer';
 
-// DisasterChain 2.0 Flagship Capabilities
-import CrisisLabPage from './pages/CrisisLabPage';
-import DigitalTwinPage from './pages/DigitalTwinPage';
-import SatelliteEyePage from './pages/SatelliteEyePage';
-import RescueIntelligencePage from './pages/RescueIntelligencePage';
-import RescueNetworkPage from './pages/RescueNetworkPage';
-import GuidedDemoTourModal from './components/GuidedDemoTourModal';
-import { CrisisSimulationProvider } from './context/CrisisSimulationContext';
-
 // Existing Secondary Pages & Modals (Preserved functionality)
 import SheltersPage from './pages/SheltersPage';
 import DisasterGuidesPage from './pages/DisasterGuidesPage';
@@ -111,7 +102,6 @@ const AppLayout = () => {
   const [isSosOpen, setIsSosOpen] = useState(false);
   const [isIncidentOpen, setIsIncidentOpen] = useState(false);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
-  const [isDemoTourOpen, setIsDemoTourOpen] = useState(false);
   const [refreshCount, setRefreshCount] = useState(0);
 
   // Initialize native status bar and splash screen
@@ -205,7 +195,6 @@ const AppLayout = () => {
         onReplayIntro={handleReplayIntro}
         onOpenAppModal={() => setIsAppModalOpen(true)}
         onStartTour={handleStartTour}
-        onStartDemoTour={() => setIsDemoTourOpen(true)}
       />
 
       {/* 3. MAIN APPLICATION VIEWPORT WITH SMOOTH PAGE TRANSITIONS */}
@@ -272,13 +261,6 @@ const AppLayout = () => {
             <Route path="/offline" element={<ModernOfflineEmergencyPage />} />
             <Route path="/offline-mode" element={<ModernOfflineEmergencyPage />} />
 
-            {/* DisasterChain 2.0 Flagship Capabilities */}
-            <Route path="/crisis-lab" element={<CrisisLabPage />} />
-            <Route path="/digital-twin" element={<DigitalTwinPage />} />
-            <Route path="/satellite-eye" element={<SatelliteEyePage />} />
-            <Route path="/rescue-intelligence" element={<RescueIntelligencePage />} />
-            <Route path="/rescue-network" element={<RescueNetworkPage />} />
-
             {/* Secondary Operations & Resources */}
             <Route path="/shelters" element={<SheltersPage />} />
             <Route path="/guides" element={<DisasterGuidesPage />} />
@@ -337,12 +319,6 @@ const AppLayout = () => {
         onClose={() => setIsAppModalOpen(false)}
       />
 
-      {/* Guided Judge Demo Tour for DisasterChain 2.0 */}
-      <GuidedDemoTourModal
-        isOpen={isDemoTourOpen}
-        onClose={() => setIsDemoTourOpen(false)}
-      />
-
       {/* 7. GLOBAL CITY / LOCATION SELECTOR MODAL */}
       <CitySelectorModal />
 
@@ -383,11 +359,9 @@ export default function App() {
             <AuthProvider>
               <EnvironmentProvider>
                 <Router>
-                  <CrisisSimulationProvider>
-                    <WeatherGPTProvider>
-                      <AppLayout />
-                    </WeatherGPTProvider>
-                  </CrisisSimulationProvider>
+                  <WeatherGPTProvider>
+                    <AppLayout />
+                  </WeatherGPTProvider>
                 </Router>
               </EnvironmentProvider>
             </AuthProvider>

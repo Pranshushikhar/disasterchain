@@ -281,115 +281,6 @@ export default function GlobalVoiceAssistant() {
                     <div className="dc-voice-msg-bubble">
                       <p className="dc-voice-msg-text">{msg.content}</p>
 
-                      {/* Structured Voice Emergency Triage Draft Card */}
-                      {msg.incidentDraft && (
-                        <div
-                          style={{
-                            marginTop: 12,
-                            background: 'var(--dc-surface, #F8F5EE)',
-                            border: '1.5px solid var(--dc-emergency, #C94B4B)',
-                            borderRadius: 10,
-                            padding: '14px 16px',
-                            boxShadow: '0 4px 14px rgba(201, 75, 75, 0.1)',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                            <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '2px 8px', borderRadius: 4, background: 'rgba(201, 75, 75, 0.15)', color: 'var(--dc-emergency)' }}>
-                              UNCONFIRMED INCIDENT DRAFT
-                            </span>
-                            <span style={{ fontSize: '0.72rem', color: 'var(--dc-text-muted)' }}>
-                              Lang: {msg.incidentDraft.detectedLanguage || 'English'}
-                            </span>
-                          </div>
-
-                          <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--dc-forest)' }}>
-                            {msg.incidentDraft.emergencyType}
-                          </div>
-                          <div style={{ fontSize: '0.76rem', color: 'var(--dc-text-secondary)', marginTop: 2 }}>
-                            Location: <strong>{msg.incidentDraft.location}</strong> ({msg.incidentDraft.locationSource})
-                          </div>
-
-                          {/* Accessibility Needs Tags */}
-                          {msg.incidentDraft.accessibilityNeeds && msg.incidentDraft.accessibilityNeeds.length > 0 && (
-                            <div style={{ marginTop: 8 }}>
-                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--dc-clay)', textTransform: 'uppercase' }}>
-                                Extracted Accessibility Requirements:
-                              </span>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-                                {msg.incidentDraft.accessibilityNeeds.map((need, nIdx) => (
-                                  <span
-                                    key={nIdx}
-                                    style={{
-                                      fontSize: '0.74rem',
-                                      padding: '2px 8px',
-                                      borderRadius: 4,
-                                      background: 'rgba(184, 111, 82, 0.15)',
-                                      color: 'var(--dc-clay)',
-                                      fontWeight: 700,
-                                    }}
-                                  >
-                                    ♿ {need.label}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Recommended Capabilities */}
-                          {msg.incidentDraft.recommendedCapabilities && (
-                            <div style={{ marginTop: 8, fontSize: '0.74rem', color: 'var(--dc-text-secondary)' }}>
-                              Responder Gear: <strong>{msg.incidentDraft.recommendedCapabilities.join(' • ')}</strong>
-                            </div>
-                          )}
-
-                          {/* Mandatory Safety Notice */}
-                          <div style={{ fontSize: '0.72rem', color: 'var(--dc-emergency)', marginTop: 10, fontStyle: 'italic', lineHeight: 1.3 }}>
-                            {msg.incidentDraft.dispatchSafetyNotice}
-                          </div>
-
-                          {/* Explicit User Confirmation Controls */}
-                          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleSuggestionClick('Confirm SOS');
-                              }}
-                              style={{
-                                flex: 1,
-                                padding: '8px 12px',
-                                borderRadius: 6,
-                                background: 'var(--dc-emergency)',
-                                color: '#FFF',
-                                fontSize: '0.78rem',
-                                fontWeight: 800,
-                                border: 'none',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              ✓ Confirm & Submit SOS
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleSuggestionClick('Cancel');
-                              }}
-                              style={{
-                                padding: '8px 12px',
-                                borderRadius: 6,
-                                background: 'var(--dc-surface-2)',
-                                color: 'var(--dc-text)',
-                                fontSize: '0.78rem',
-                                fontWeight: 600,
-                                border: '1px solid var(--border-medium)',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Dismiss Draft
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
                       {/* Tool Action Badge */}
                       {msg.action && (
                         <div className="dc-voice-action-badge">
@@ -439,19 +330,11 @@ export default function GlobalVoiceAssistant() {
                   </div>
                 )}
 
-                {/* Quick Starter Suggestions */}
+                {/* Quick Starter Suggestions (when chat has only initial greeting) */}
                 {messages.length <= 1 && (
                   <div className="dc-voice-suggestions-wrap">
                     <span className="dc-voice-suggestions-title">Ask or try saying:</span>
                     <div className="dc-voice-suggestions-grid">
-                      <button
-                        type="button"
-                        onClick={() => handleSuggestionClick('My house is flooding. My mother uses a wheelchair and cannot leave the building.')}
-                        className="dc-voice-suggestion-chip"
-                        style={{ border: '1px solid rgba(201, 75, 75, 0.4)', background: 'rgba(201, 75, 75, 0.08)', fontWeight: 700, color: 'var(--dc-emergency)' }}
-                      >
-                        🚨 "My house is flooding, my mother uses a wheelchair"
-                      </button>
                       <button
                         type="button"
                         onClick={() => handleSuggestionClick('What can you help me with?')}

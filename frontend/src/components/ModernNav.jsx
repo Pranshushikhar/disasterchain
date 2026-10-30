@@ -29,11 +29,6 @@ import {
   Mic,
   GraduationCap,
   WifiOff,
-  Activity,
-  Building2,
-  Satellite,
-  Navigation,
-  Truck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeatherGPT } from '../context/WeatherGPTContext';
@@ -42,7 +37,7 @@ import { useTranslation } from '../i18n/i18n';
 
 const SIDEBAR_COLLAPSED_KEY = 'disasterchain_sidebar_collapsed';
 
-export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, onStartTour, onStartDemoTour }) {
+export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, onStartTour }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
@@ -185,87 +180,6 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                   </NavLink>
                 );
               })}
-            </nav>
-          </div>
-
-          {/* SECTION: DISASTER INTELLIGENCE 2.0 */}
-          <div className="dc-sidebar-section">
-            {!isCollapsed && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 8 }}>
-                <span className="dc-sidebar-section-title">INTELLIGENCE 2.0</span>
-                <span style={{ fontSize: '0.62rem', fontWeight: 800, background: 'var(--dc-earth-green)', color: '#FFF', padding: '1px 5px', borderRadius: 4 }}>
-                  SIM
-                </span>
-              </div>
-            )}
-            <nav className="dc-sidebar-items" aria-label="Disaster Intelligence 2.0">
-              <NavLink
-                to="/crisis-lab"
-                id="dc-sidebar-crisislab"
-                className={`dc-sidebar-link ${isCurrentActive('/crisis-lab') ? 'active' : ''}`}
-                title={isCollapsed ? 'CrisisLab Simulation' : undefined}
-              >
-                <Activity size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">CrisisLab Simulation</span>}
-                {isCurrentActive('/crisis-lab') && <span className="dc-sidebar-active-indicator" />}
-              </NavLink>
-
-              <NavLink
-                to="/digital-twin"
-                id="dc-sidebar-digital-twin"
-                className={`dc-sidebar-link ${isCurrentActive('/digital-twin') ? 'active' : ''}`}
-                title={isCollapsed ? '3D Digital Twin' : undefined}
-              >
-                <Building2 size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">3D Digital Twin</span>}
-                {isCurrentActive('/digital-twin') && <span className="dc-sidebar-active-indicator" />}
-              </NavLink>
-
-              <NavLink
-                to="/satellite-eye"
-                id="dc-sidebar-satellite-eye"
-                className={`dc-sidebar-link ${isCurrentActive('/satellite-eye') ? 'active' : ''}`}
-                title={isCollapsed ? 'Satellite Eye CV' : undefined}
-              >
-                <Satellite size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Satellite Eye CV</span>}
-                {isCurrentActive('/satellite-eye') && <span className="dc-sidebar-active-indicator" />}
-              </NavLink>
-
-              <NavLink
-                to="/rescue-intelligence"
-                id="dc-sidebar-rescue-intelligence"
-                className={`dc-sidebar-link ${isCurrentActive('/rescue-intelligence') ? 'active' : ''}`}
-                title={isCollapsed ? 'Rescue Routes' : undefined}
-              >
-                <Navigation size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Rescue Routes</span>}
-                {isCurrentActive('/rescue-intelligence') && <span className="dc-sidebar-active-indicator" />}
-              </NavLink>
-
-              <NavLink
-                to="/rescue-network"
-                id="dc-sidebar-rescue-network"
-                className={`dc-sidebar-link ${isCurrentActive('/rescue-network') ? 'active' : ''}`}
-                title={isCollapsed ? 'Rescue Fleet' : undefined}
-              >
-                <Truck size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Rescue Fleet</span>}
-                {isCurrentActive('/rescue-network') && <span className="dc-sidebar-active-indicator" />}
-              </NavLink>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onStartDemoTour) onStartDemoTour();
-                }}
-                className="dc-sidebar-link dc-sidebar-action-btn"
-                style={{ color: 'var(--dc-forest)', fontWeight: 700 }}
-                title={isCollapsed ? 'Guided Judge Tour' : undefined}
-              >
-                <Sparkles size={18} className="dc-sidebar-icon dc-sparkle-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Guided Judge Demo</span>}
-              </button>
             </nav>
           </div>
 
@@ -576,64 +490,6 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                       </NavLink>
                     );
                   })}
-                </nav>
-
-                <div className="dc-drawer-divider" />
-                {/* MOBILE DRAWER: INTELLIGENCE 2.0 */}
-                <span className="dc-sidebar-section-title">INTELLIGENCE 2.0</span>
-                <nav className="dc-drawer-nav">
-                  <NavLink
-                    to="/crisis-lab"
-                    onClick={() => setIsMobileDrawerOpen(false)}
-                    className="dc-drawer-link"
-                  >
-                    <Activity size={18} />
-                    <span>CrisisLab Simulation</span>
-                  </NavLink>
-                  <NavLink
-                    to="/digital-twin"
-                    onClick={() => setIsMobileDrawerOpen(false)}
-                    className="dc-drawer-link"
-                  >
-                    <Building2 size={18} />
-                    <span>3D Digital Twin</span>
-                  </NavLink>
-                  <NavLink
-                    to="/satellite-eye"
-                    onClick={() => setIsMobileDrawerOpen(false)}
-                    className="dc-drawer-link"
-                  >
-                    <Satellite size={18} />
-                    <span>Satellite Eye CV</span>
-                  </NavLink>
-                  <NavLink
-                    to="/rescue-intelligence"
-                    onClick={() => setIsMobileDrawerOpen(false)}
-                    className="dc-drawer-link"
-                  >
-                    <Navigation size={18} />
-                    <span>Rescue Routes</span>
-                  </NavLink>
-                  <NavLink
-                    to="/rescue-network"
-                    onClick={() => setIsMobileDrawerOpen(false)}
-                    className="dc-drawer-link"
-                  >
-                    <Truck size={18} />
-                    <span>Rescue Fleet</span>
-                  </NavLink>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMobileDrawerOpen(false);
-                      if (onStartDemoTour) onStartDemoTour();
-                    }}
-                    className="dc-drawer-link dc-drawer-btn"
-                    style={{ color: 'var(--dc-earth-green)', fontWeight: 700 }}
-                  >
-                    <Sparkles size={18} />
-                    <span>Guided Judge Demo</span>
-                  </button>
                 </nav>
 
                 <div className="dc-drawer-divider" />
