@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -7,429 +7,476 @@ import {
   MapPin,
   AlertTriangle,
   Shield,
-  LifeBuoy,
-  MoreHorizontal,
-  Download,
-  BookOpen,
-  HeartHandshake,
-  FileText,
-  RotateCcw,
+  PhoneCall,
+  Sparkles,
+  Compass,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X,
   User,
   LogOut,
-  Settings,
-  Compass,
+  Radio,
+  Download,
+  RotateCcw,
+  FileText,
+  Volume2,
+  VolumeX,
+  Check,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import EnvironmentSelector from './EnvironmentSelector';
+import { useWeatherGPT } from '../context/WeatherGPTContext';
+import { useEnvironment, ENVIRONMENTS } from '../context/EnvironmentContext';
+
+const SIDEBAR_COLLAPSED_KEY = 'disasterchain_sidebar_collapsed';
 
 export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, onStartTour }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const moreRef = useRef(null);
-  const accountRef = useRef(null);
+  const weatherGPT = useWeatherGPT();
+  const { environment, setEnvironment, currentMeta, isSoundEnabled, toggleSound } = useEnvironment();
 
-  // Close menus when clicking outside
+  // Collapsed state on desktop (persisted in localStorage)
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
+
+  // Mobile drawer & modal states
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isContactsOpen, setIsContactsOpen] = useState(false);
+
+  // Sync CSS variable --dc-sidebar-width to root document for smooth layout adaptation
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (moreRef.current && !moreRef.current.contains(e.target)) {
-        setIsMoreOpen(false);
-      }
-      if (accountRef.current && !accountRef.current.contains(e.target)) {
-        setIsAccountOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    const width = isCollapsed ? '72px' : '260px';
+    document.documentElement.style.setProperty('--dc-sidebar-width', width);
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, isCollapsed ? 'true' : 'false');
+    } catch (e) {}
+  }, [isCollapsed]);
 
-  // Primary 5 navigation items
-  const navItems = [
-    { to: '/', label: 'Home', icon: Home, exact: true },
-    { to: '/weather', label: 'Weather', icon: CloudRain },
-    { to: '/map', label: 'Map', icon: MapPin },
-    { to: '/incidents', label: 'Incidents', icon: AlertTriangle },
-    { to: '/safety', label: 'Safety', icon: Shield },
-  ];
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setIsMobileDrawerOpen(false);
+  }, [location.pathname]);
 
-  const isCurrentActive = (item) => {
-    if (item.exact) {
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => !prev);
+  };
+
+  const isCurrentActive = (path, exact = false) => {
+    if (exact) {
       return location.pathname === '/' || location.pathname === '/dashboard';
     }
-    if (item.to === '/map') {
+    if (path === '/map') {
       return location.pathname === '/map' || location.pathname === '/affected-areas';
     }
-    if (item.to === '/safety') {
+    if (path === '/safety') {
       return location.pathname === '/safety' || location.pathname === '/sos';
     }
-    return location.pathname.startsWith(item.to);
+    return location.pathname.startsWith(path);
   };
+
+  // Main 5 core navigation items
+  const mainItems = [
+    { to: '/', label: 'Home', icon: Home, exact: true, id: 'dc-sidebar-home' },
+    { to: '/weather', label: 'Weather', icon: CloudRain, id: 'dc-sidebar-weather' },
+    { to: '/map', label: 'Map', icon: MapPin, id: 'dc-sidebar-map' },
+    { to: '/incidents', label: 'Incidents', icon: AlertTriangle, id: 'dc-sidebar-incidents' },
+    { to: '/safety', label: 'Safety', icon: Shield, id: 'dc-sidebar-safety' },
+  ];
+
+  // Emergency Contacts quick registry
+  const emergencyContacts = [
+    { name: 'National Emergency Dispatch', number: '112', desc: 'Universal Police, Fire & Paramedic' },
+    { name: 'Disaster Cell Helpline (NDRF)', number: '1078', desc: 'National Disaster Management' },
+    { name: 'Ambulance & Trauma Cell', number: '108', desc: 'Emergency Medical Services' },
+    { name: 'Police Control Room', number: '100', desc: 'Citizen Safety & Law Enforcement' },
+  ];
 
   return (
     <>
       {/* =========================================================================
-          DESKTOP TOP NAVIGATION
+          DESKTOP & TABLET FIXED LEFT SIDEBAR
           ========================================================================= */}
-      <header className="dc-desktop-nav" role="banner">
-        <div className="dc-nav-container">
-          {/* Brand Wordmark & Earth Status */}
-          <div className="dc-brand-group">
-            <NavLink to="/" className="dc-brand-link">
-              <span className="dc-brand-earth-dot" />
-              <span className="dc-brand-title">
-                DISASTER<span className="dc-brand-accent">CHAIN</span>
-              </span>
-            </NavLink>
-            <span className="dc-brand-tag">Earth Intelligence</span>
+      <aside
+        className={`dc-sidebar ${isCollapsed ? 'collapsed' : ''}`}
+        aria-label="Main Navigation Sidebar"
+      >
+        {/* Sidebar Brand Header */}
+        <div className="dc-sidebar-header">
+          <NavLink to="/" className="dc-sidebar-brand" title="DisasterChain Home">
+            <span className="dc-brand-earth-dot" />
+            {!isCollapsed && (
+              <div className="dc-sidebar-brand-text">
+                <span className="dc-brand-title">
+                  DISASTER<span className="dc-brand-accent">CHAIN</span>
+                </span>
+                <span className="dc-brand-tag">Earth Intelligence</span>
+              </div>
+            )}
+          </NavLink>
+
+          <button
+            onClick={toggleCollapse}
+            className="dc-sidebar-toggle-btn"
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          </button>
+        </div>
+
+        {/* Scrollable Navigation Body */}
+        <div className="dc-sidebar-scroll-body dc-sidebar-nav">
+          {/* SECTION: MAIN */}
+          <div className="dc-sidebar-section">
+            {!isCollapsed && <span className="dc-sidebar-section-title">MAIN</span>}
+            <nav className="dc-sidebar-items" aria-label="Main Operations">
+              {mainItems.map((item) => {
+                const active = isCurrentActive(item.to, item.exact);
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.to}
+                    id={item.id}
+                    to={item.to}
+                    className={`dc-sidebar-link ${active ? 'active' : ''}`}
+                    title={isCollapsed ? item.label : undefined}
+                  >
+                    <Icon size={18} className="dc-sidebar-icon" />
+                    {!isCollapsed && <span className="dc-sidebar-label">{item.label}</span>}
+                    {active && <span className="dc-sidebar-active-indicator" />}
+                  </NavLink>
+                );
+              })}
+            </nav>
           </div>
 
-          {/* Primary Centered Navigation Pills */}
-          <nav className="dc-nav-links" role="navigation" aria-label="Main Navigation">
-            {navItems.map((item) => {
-              const active = isCurrentActive(item);
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={`dc-nav-tab ${active ? 'active' : ''}`}
-                >
-                  {active && (
-                    <motion.div
-                      layoutId="dc-active-pill"
-                      className="dc-active-pill-background"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                  <Icon size={16} className="dc-tab-icon" />
-                  <span className="dc-tab-label">{item.label}</span>
-                </NavLink>
-              );
-            })}
-          </nav>
+          {/* SECTION: RESOURCES */}
+          <div className="dc-sidebar-section">
+            {!isCollapsed && <span className="dc-sidebar-section-title">RESOURCES</span>}
+            <nav className="dc-sidebar-items" aria-label="Emergency Resources">
+              <NavLink
+                to="/shelters"
+                id="dc-sidebar-shelters"
+                className={`dc-sidebar-link ${isCurrentActive('/shelters') ? 'active' : ''}`}
+                title={isCollapsed ? 'Shelters' : undefined}
+              >
+                <Home size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && <span className="dc-sidebar-label">Shelters</span>}
+                {isCurrentActive('/shelters') && <span className="dc-sidebar-active-indicator" />}
+              </NavLink>
 
-          {/* Right Action Suite: [ Living Environment ] -> [ Login / Account ] -> [ SOS ] -> [ More ] */}
-          <div className="dc-nav-actions">
-            {/* Living Environment Selector */}
-            <EnvironmentSelector />
+              <button
+                type="button"
+                id="dc-sidebar-contacts"
+                onClick={() => setIsContactsOpen(true)}
+                className="dc-sidebar-link dc-sidebar-action-btn"
+                title={isCollapsed ? 'Emergency Contacts' : undefined}
+              >
+                <PhoneCall size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && <span className="dc-sidebar-label">Emergency Contacts</span>}
+              </button>
 
-            {/* Account / Login Action */}
+              <button
+                type="button"
+                id="dc-sidebar-weathergpt"
+                onClick={() => {
+                  if (weatherGPT?.openWeatherGPT) {
+                    weatherGPT.openWeatherGPT();
+                  } else {
+                    navigate('/weather');
+                  }
+                }}
+                className="dc-sidebar-link dc-sidebar-action-btn dc-sidebar-copilot-link"
+                title={isCollapsed ? 'WeatherGPT Copilot' : undefined}
+              >
+                <Sparkles size={18} className="dc-sidebar-icon dc-sparkle-icon" />
+                {!isCollapsed && (
+                  <div className="dc-sidebar-copilot-label">
+                    <span>WeatherGPT</span>
+                    <span className="dc-copilot-badge">AI</span>
+                  </div>
+                )}
+              </button>
+            </nav>
+          </div>
+
+          {/* SECTION: OTHER */}
+          <div className="dc-sidebar-section">
+            {!isCollapsed && <span className="dc-sidebar-section-title">OTHER</span>}
+            <nav className="dc-sidebar-items" aria-label="System Tools">
+              <button
+                type="button"
+                id="dc-sidebar-tour"
+                onClick={() => {
+                  if (onStartTour) onStartTour();
+                }}
+                className="dc-sidebar-link dc-sidebar-action-btn"
+                title={isCollapsed ? 'Help & Interactive Guide' : undefined}
+              >
+                <Compass size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && <span className="dc-sidebar-label">Help & Tour</span>}
+              </button>
+
+              <button
+                type="button"
+                id="dc-sidebar-settings"
+                onClick={() => setIsSettingsOpen(true)}
+                className="dc-sidebar-link dc-sidebar-action-btn"
+                title={isCollapsed ? 'Settings & Atmosphere' : undefined}
+              >
+                <Settings size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && <span className="dc-sidebar-label">Settings</span>}
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Sidebar Pinned Footer: SOS Action & Operator Status */}
+        <div className="dc-sidebar-footer">
+          {/* Emergency SOS Button */}
+          <button
+            type="button"
+            id="dc-sidebar-sos-btn"
+            onClick={onOpenSos}
+            className="dc-sidebar-sos-btn"
+            title="Emergency SOS Distress Dispatch"
+            aria-label="Broadcast Emergency SOS"
+          >
+            <Radio size={16} className="dc-pulse-icon" />
+            {!isCollapsed && <span>EMERGENCY SOS</span>}
+          </button>
+
+          {/* Operator / Account Row */}
+          <div className="dc-sidebar-account-row">
             {isAuthenticated ? (
-              <div className="dc-account-dropdown-wrap" ref={accountRef}>
-                <button
-                  id="dc-desktop-account-btn"
-                  className={`dc-nav-account-btn ${isAccountOpen ? 'open' : ''}`}
-                  onClick={() => setIsAccountOpen((prev) => !prev)}
-                  title="Operator Account"
-                  aria-haspopup="true"
-                  aria-expanded={isAccountOpen}
-                >
-                  <span className="dc-nav-avatar">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </span>
-                  <span className="dc-nav-username">
-                    {user?.name?.split(' ')[0] || 'Account'}
-                  </span>
-                </button>
-
-                <AnimatePresence>
-                  {isAccountOpen && (
-                    <motion.div
-                      className="dc-more-menu-panel dc-account-menu-panel"
-                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                      transition={{ duration: 0.18, ease: 'easeOut' }}
+              <div className="dc-sidebar-user-info" title={user?.email || 'Logged In'}>
+                <div className="dc-sidebar-avatar">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                {!isCollapsed && (
+                  <div className="dc-sidebar-user-meta">
+                    <span className="dc-sidebar-username">{user?.name?.split(' ')[0] || 'Operator'}</span>
+                    <button
+                      onClick={() => {
+                        logout();
+                        navigate('/');
+                      }}
+                      className="dc-sidebar-signout-btn"
+                      title="Sign Out"
                     >
-                      <div className="dc-account-panel-header">
-                        <div className="dc-account-panel-name">{user?.name || 'Operator'}</div>
-                        <div className="dc-account-panel-email">{user?.email || ''}</div>
-                        <span className="dc-account-panel-badge">{user?.role?.toUpperCase() || 'CITIZEN'}</span>
-                      </div>
-
-                      <div className="dc-more-divider" />
-
-                      <button
-                        className="dc-more-item"
-                        onClick={() => {
-                          setIsAccountOpen(false);
-                          navigate('/profile');
-                        }}
-                      >
-                        <User size={15} />
-                        <span>Profile & Settings</span>
-                      </button>
-
-                      {user?.role === 'admin' && (
-                        <button
-                          className="dc-more-item"
-                          onClick={() => {
-                            setIsAccountOpen(false);
-                            navigate('/admin');
-                          }}
-                        >
-                          <Settings size={15} />
-                          <span>Admin Console</span>
-                        </button>
-                      )}
-
-                      <div className="dc-more-divider" />
-
-                      <button
-                        className="dc-more-item dc-logout-item"
-                        onClick={() => {
-                          setIsAccountOpen(false);
-                          logout();
-                          navigate('/');
-                        }}
-                      >
-                        <LogOut size={14} />
-                        <span>Sign Out</span>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      <LogOut size={12} />
+                      <span>Exit</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <NavLink
                 to="/login"
-                id="dc-desktop-login-btn"
-                className={`dc-nav-auth-btn ${location.pathname === '/login' || location.pathname === '/register' ? 'active' : ''}`}
-                title="Sign In to DisasterChain"
+                className="dc-sidebar-login-link"
+                title={isCollapsed ? 'Sign In / Operator' : undefined}
               >
-                <User size={15} />
-                <span>Login</span>
+                <User size={16} />
+                {!isCollapsed && <span>Sign In</span>}
               </NavLink>
             )}
-
-            {/* SOS Emergency Button (Dominant Emergency Action) */}
-            <button
-              id="dc-desktop-sos-btn"
-              onClick={onOpenSos}
-              className="dc-nav-sos-button"
-              title="Immediate Emergency Assistance"
-            >
-              <LifeBuoy size={16} />
-              <span>SOS</span>
-            </button>
-
-            {/* More Menu Dropdown */}
-            <div className="dc-more-dropdown-wrap" ref={moreRef}>
-              <button
-                className={`dc-more-toggle-btn ${isMoreOpen ? 'open' : ''}`}
-                onClick={() => setIsMoreOpen((prev) => !prev)}
-                title="More resources & tools"
-                aria-haspopup="true"
-                aria-expanded={isMoreOpen}
-              >
-                <MoreHorizontal size={18} />
-              </button>
-
-              <AnimatePresence>
-                {isMoreOpen && (
-                  <motion.div
-                    className="dc-more-menu-panel"
-                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                  >
-                    <div className="dc-more-header">Operations & Resources</div>
-
-                    {/* Account Access in More Menu */}
-                    {isAuthenticated ? (
-                      <button
-                        className="dc-more-item"
-                        onClick={() => {
-                          setIsMoreOpen(false);
-                          navigate('/profile');
-                        }}
-                      >
-                        <User size={15} />
-                        <span>Account Profile</span>
-                      </button>
-                    ) : (
-                      <button
-                        className="dc-more-item"
-                        onClick={() => {
-                          setIsMoreOpen(false);
-                          navigate('/login');
-                        }}
-                      >
-                        <User size={15} />
-                        <span>Operator Login</span>
-                      </button>
-                    )}
-
-                    <button
-                      className="dc-more-item"
-                      onClick={() => {
-                        setIsMoreOpen(false);
-                        navigate('/shelters');
-                      }}
-                    >
-                      <MapPin size={15} />
-                      <span>Shelters Directory</span>
-                    </button>
-
-                    <button
-                      className="dc-more-item"
-                      onClick={() => {
-                        setIsMoreOpen(false);
-                        navigate('/guides');
-                      }}
-                    >
-                      <BookOpen size={15} />
-                      <span>Disaster Preparedness</span>
-                    </button>
-
-                    <button
-                      className="dc-more-item"
-                      onClick={() => {
-                        setIsMoreOpen(false);
-                        navigate('/donations');
-                      }}
-                    >
-                      <HeartHandshake size={15} />
-                      <span>Aid & Resources</span>
-                    </button>
-
-                    <button
-                      className="dc-more-item"
-                      onClick={() => {
-                        setIsMoreOpen(false);
-                        navigate('/transparency');
-                      }}
-                    >
-                      <FileText size={15} />
-                      <span>Transparency Ledger</span>
-                    </button>
-
-                    {onOpenAppModal && (
-                      <button
-                        className="dc-more-item"
-                        onClick={() => {
-                          setIsMoreOpen(false);
-                          onOpenAppModal();
-                        }}
-                      >
-                        <Download size={15} />
-                        <span>Android App (APK)</span>
-                      </button>
-                    )}
-
-                    <div className="dc-more-divider" />
-
-                    {isAuthenticated && (
-                      <button
-                        className="dc-more-item dc-logout-item"
-                        onClick={() => {
-                          setIsMoreOpen(false);
-                          logout();
-                          navigate('/');
-                        }}
-                      >
-                        <LogOut size={14} />
-                        <span>Sign Out</span>
-                      </button>
-                    )}
-
-                    {onStartTour && (
-                      <button
-                        className="dc-more-item dc-tour-item"
-                        onClick={() => {
-                          setIsMoreOpen(false);
-                          onStartTour();
-                        }}
-                      >
-                        <Compass size={15} />
-                        <span>Interactive Tour & Guide</span>
-                      </button>
-                    )}
-
-                    <button
-                      className="dc-more-item dc-replay-item"
-                      onClick={() => {
-                        setIsMoreOpen(false);
-                        if (onReplayIntro) onReplayIntro();
-                      }}
-                    >
-                      <RotateCcw size={14} />
-                      <span>Replay Cinematic Intro</span>
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
         </div>
-      </header>
+      </aside>
 
       {/* =========================================================================
-          MOBILE TOP APP HEADER
+          MOBILE TOP HEADER (< 768px)
           ========================================================================= */}
-      <header className="dc-mobile-header">
+      <header className="dc-mobile-header" role="banner">
+        <button
+          type="button"
+          onClick={() => setIsMobileDrawerOpen(true)}
+          className="dc-mobile-menu-btn"
+          aria-label="Open Navigation Menu"
+        >
+          <Menu size={20} />
+        </button>
+
         <NavLink to="/" className="dc-mobile-brand">
           <span className="dc-brand-earth-dot" />
-          <span className="dc-brand-title">DISASTER<span className="dc-brand-accent">CHAIN</span></span>
+          <span className="dc-brand-title">
+            DISASTER<span className="dc-brand-accent">CHAIN</span>
+          </span>
         </NavLink>
 
-        <div className="dc-mobile-header-actions">
-          {/* Mobile Environment Selector */}
-          <EnvironmentSelector compact={true} />
-
-          {/* Mobile Login / Account Button */}
-          {isAuthenticated ? (
-            <NavLink
-              to="/profile"
-              className="dc-mobile-auth-btn authenticated"
-              title="My Account"
-            >
-              <span className="dc-mobile-avatar">
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-              </span>
-            </NavLink>
-          ) : (
-            <NavLink
-              to="/login"
-              className="dc-mobile-auth-btn"
-              title="Sign In"
-            >
-              <User size={15} />
-              <span>Login</span>
-            </NavLink>
-          )}
-
-          {onStartTour && (
-            <button
-              onClick={onStartTour}
-              className="dc-mobile-tour-pill"
-              aria-label="Interactive Website Tour"
-              title="Interactive Website Tour"
-            >
-              <Compass size={14} />
-            </button>
-          )}
-
-          <button
-            onClick={onOpenSos}
-            className="dc-mobile-sos-pill"
-            aria-label="Emergency SOS"
-          >
-            <LifeBuoy size={14} />
-            <span>SOS</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          id="dc-mobile-sos-btn"
+          onClick={onOpenSos}
+          className="dc-mobile-sos-header-btn"
+          title="Emergency SOS"
+          aria-label="Broadcast Emergency SOS"
+        >
+          <Radio size={14} className="dc-pulse-icon" />
+          <span>SOS</span>
+        </button>
       </header>
 
       {/* =========================================================================
-          MOBILE BOTTOM NAVIGATION (5 Primary Tabs)
+          MOBILE OFF-CANVAS DRAWER (< 768px)
           ========================================================================= */}
-      <nav className="dc-mobile-bottom-nav" aria-label="Mobile Navigation">
-        {navItems.map((item) => {
-          const active = isCurrentActive(item);
+      <AnimatePresence>
+        {isMobileDrawerOpen && (
+          <>
+            <motion.div
+              className="dc-mobile-drawer-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileDrawerOpen(false)}
+            />
+
+            <motion.div
+              className="dc-mobile-drawer"
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation Drawer"
+            >
+              <div className="dc-drawer-header">
+                <div className="dc-sidebar-brand-text">
+                  <span className="dc-brand-title">
+                    DISASTER<span className="dc-brand-accent">CHAIN</span>
+                  </span>
+                  <span className="dc-brand-tag">Earth Intelligence</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileDrawerOpen(false)}
+                  className="dc-drawer-close-btn"
+                  aria-label="Close menu"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="dc-drawer-content">
+                <span className="dc-sidebar-section-title">MAIN OPERATIONS</span>
+                <nav className="dc-drawer-nav">
+                  {mainItems.map((item) => {
+                    const active = isCurrentActive(item.to, item.exact);
+                    const Icon = item.icon;
+                    return (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setIsMobileDrawerOpen(false)}
+                        className={`dc-drawer-link ${active ? 'active' : ''}`}
+                      >
+                        <Icon size={18} />
+                        <span>{item.label}</span>
+                      </NavLink>
+                    );
+                  })}
+                </nav>
+
+                <div className="dc-drawer-divider" />
+                <span className="dc-sidebar-section-title">RESOURCES</span>
+                <nav className="dc-drawer-nav">
+                  <NavLink
+                    to="/shelters"
+                    onClick={() => setIsMobileDrawerOpen(false)}
+                    className="dc-drawer-link"
+                  >
+                    <Home size={18} />
+                    <span>Shelters Directory</span>
+                  </NavLink>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileDrawerOpen(false);
+                      setIsContactsOpen(true);
+                    }}
+                    className="dc-drawer-link dc-drawer-btn"
+                  >
+                    <PhoneCall size={18} />
+                    <span>Emergency Contacts</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileDrawerOpen(false);
+                      if (weatherGPT?.openWeatherGPT) weatherGPT.openWeatherGPT();
+                    }}
+                    className="dc-drawer-link dc-drawer-btn dc-copilot-link"
+                  >
+                    <Sparkles size={18} className="dc-sparkle-icon" />
+                    <span>WeatherGPT Copilot</span>
+                  </button>
+                </nav>
+
+                <div className="dc-drawer-divider" />
+                <span className="dc-sidebar-section-title">SYSTEM TOOLS</span>
+                <nav className="dc-drawer-nav">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileDrawerOpen(false);
+                      if (onStartTour) onStartTour();
+                    }}
+                    className="dc-drawer-link dc-drawer-btn"
+                  >
+                    <Compass size={18} />
+                    <span>Help & Tour</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileDrawerOpen(false);
+                      setIsSettingsOpen(true);
+                    }}
+                    className="dc-drawer-link dc-drawer-btn"
+                  >
+                    <Settings size={18} />
+                    <span>Atmospheric Settings</span>
+                  </button>
+                </nav>
+              </div>
+
+              <div className="dc-drawer-footer">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileDrawerOpen(false);
+                    onOpenSos();
+                  }}
+                  className="dc-sidebar-sos-btn"
+                >
+                  <Radio size={16} className="dc-pulse-icon" />
+                  <span>EMERGENCY SOS</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* =========================================================================
+          MOBILE BOTTOM NAVIGATION (< 768px)
+          ========================================================================= */}
+      <nav className="dc-mobile-bottom-nav" role="navigation" aria-label="Mobile Navigation">
+        {mainItems.map((item) => {
+          const active = isCurrentActive(item.to, item.exact);
           const Icon = item.icon;
           return (
             <NavLink
@@ -437,21 +484,245 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
               to={item.to}
               className={`dc-mobile-tab ${active ? 'active' : ''}`}
             >
-              <div className="dc-mobile-tab-icon-wrap">
-                <Icon size={20} />
-                {active && (
-                  <motion.span
-                    layoutId="dc-mobile-active-dot"
-                    className="dc-mobile-active-dot"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-              </div>
+              <Icon size={18} className="dc-mobile-tab-icon" />
               <span className="dc-mobile-tab-label">{item.label}</span>
+              {active && <span className="dc-mobile-tab-indicator" />}
             </NavLink>
           );
         })}
       </nav>
+
+      {/* =========================================================================
+          EMERGENCY CONTACTS MODAL
+          ========================================================================= */}
+      <AnimatePresence>
+        {isContactsOpen && (
+          <div className="dc-modal-overlay" onClick={() => setIsContactsOpen(false)}>
+            <motion.div
+              className="dc-contacts-modal"
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="dc-contacts-modal-title"
+            >
+              <div className="dc-modal-header">
+                <div>
+                  <h3 id="dc-contacts-modal-title" className="dc-modal-title">
+                    National Emergency Contacts
+                  </h3>
+                  <span className="dc-modal-subtitle">
+                    Direct helplines for urgent life safety and crisis dispatch
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsContactsOpen(false)}
+                  className="dc-modal-close-btn"
+                  aria-label="Close contacts"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="dc-contacts-modal-body">
+                {emergencyContacts.map((c) => (
+                  <a
+                    key={c.number}
+                    href={`tel:${c.number}`}
+                    className="dc-contact-modal-card"
+                    title={`Dial ${c.name} (${c.number})`}
+                  >
+                    <div className="dc-contact-modal-info">
+                      <span className="dc-contact-modal-name">{c.name}</span>
+                      <span className="dc-contact-modal-desc">{c.desc}</span>
+                    </div>
+                    <div className="dc-contact-modal-dial">
+                      <PhoneCall size={15} />
+                      <span>{c.number}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              <div className="dc-modal-footer">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsContactsOpen(false);
+                    onOpenSos();
+                  }}
+                  className="dc-contacts-sos-action-btn"
+                >
+                  <Radio size={14} />
+                  <span>Broadcast SOS Distress Beacon</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* =========================================================================
+          SETTINGS & ATMOSPHERE MODAL
+          ========================================================================= */}
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <div className="dc-modal-overlay" onClick={() => setIsSettingsOpen(false)}>
+            <motion.div
+              className="dc-settings-modal"
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="dc-settings-modal-title"
+            >
+              <div className="dc-modal-header">
+                <div>
+                  <h3 id="dc-settings-modal-title" className="dc-modal-title">
+                    Platform Settings & Atmosphere
+                  </h3>
+                  <span className="dc-modal-subtitle">
+                    Customize environmental ambiance, sound effects, and preferences
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsSettingsOpen(false)}
+                  className="dc-modal-close-btn"
+                  aria-label="Close settings"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="dc-settings-modal-body">
+                {/* 1. Atmospheric Canvas Environment */}
+                <div className="dc-settings-section">
+                  <span className="dc-settings-section-title">Living Atmosphere Canvas</span>
+                  <div className="dc-env-chips-grid">
+                    {ENVIRONMENTS.map((env) => {
+                      const isSelected = environment === env.id;
+                      return (
+                        <button
+                          key={env.id}
+                          type="button"
+                          onClick={() => setEnvironment(env.id)}
+                          className={`dc-env-chip ${isSelected ? 'active' : ''}`}
+                        >
+                          <span
+                            className="dc-env-color-dot"
+                            style={{ backgroundColor: env.color }}
+                          />
+                          <span>{env.label}</span>
+                          {isSelected && <Check size={14} className="dc-env-check" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Audio Effects */}
+                <div className="dc-settings-section dc-settings-row-between">
+                  <div>
+                    <span className="dc-settings-row-label">Ambient Atmospheric Sound</span>
+                    <span className="dc-settings-row-desc">
+                      Subtle procedural background wind and rain textures
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={toggleSound}
+                    className={`dc-sound-toggle-btn ${isSoundEnabled ? 'enabled' : ''}`}
+                  >
+                    {isSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                    <span>{isSoundEnabled ? 'Sound On' : 'Muted'}</span>
+                  </button>
+                </div>
+
+                {/* 3. Replay Intro */}
+                {onReplayIntro && (
+                  <div className="dc-settings-section dc-settings-row-between">
+                    <div>
+                      <span className="dc-settings-row-label">Cinematic Intro Experience</span>
+                      <span className="dc-settings-row-desc">
+                        Re-experience the 5-scene Earth Intelligence prologue
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSettingsOpen(false);
+                        onReplayIntro();
+                      }}
+                      className="dc-settings-action-btn"
+                    >
+                      <RotateCcw size={14} />
+                      <span>Replay Intro</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* 4. Android APK */}
+                {onOpenAppModal && (
+                  <div className="dc-settings-section dc-settings-row-between">
+                    <div>
+                      <span className="dc-settings-row-label">Android Mobile Application</span>
+                      <span className="dc-settings-row-desc">
+                        Direct download for Android APK / TWA installer
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSettingsOpen(false);
+                        onOpenAppModal();
+                      }}
+                      className="dc-settings-action-btn"
+                    >
+                      <Download size={14} />
+                      <span>Download APK</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* 5. Transparency Ledger */}
+                <div className="dc-settings-section dc-settings-row-between">
+                  <div>
+                    <span className="dc-settings-row-label">Audit & Transparency Ledger</span>
+                    <span className="dc-settings-row-desc">
+                      Cryptographic immutable ledger for relief resources
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSettingsOpen(false);
+                      navigate('/transparency');
+                    }}
+                    className="dc-settings-action-btn"
+                  >
+                    <FileText size={14} />
+                    <span>View Ledger</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="dc-modal-footer">
+                <button
+                  type="button"
+                  onClick={() => setIsSettingsOpen(false)}
+                  className="dc-modal-done-btn"
+                >
+                  Done
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
