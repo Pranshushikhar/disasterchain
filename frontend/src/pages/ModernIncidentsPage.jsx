@@ -13,8 +13,10 @@ import {
   Loader2,
 } from 'lucide-react';
 import { fetchIncidents, createIncident } from '../services/api';
+import { useTranslation } from '../i18n/i18n';
 
 export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncident }) {
+  const { t } = useTranslation();
   const [incidents, setIncidents] = useState([
     {
       id: 'inc-1',
@@ -185,8 +187,8 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
         {/* Header with Prominent Primary Action */}
         <div className="dc-incidents-header">
           <div>
-            <span className="dc-section-subtitle">COMMUNITY & FIELD REPORTS</span>
-            <h1 className="dc-page-title">Incidents Near You</h1>
+            <span className="dc-section-subtitle">{t('incidents.communityReports', 'COMMUNITY & FIELD REPORTS')}</span>
+            <h1 className="dc-page-title">{t('incidents.title', 'Incidents Near You')}</h1>
           </div>
           <button
             id="dc-report-incident-btn"
@@ -194,7 +196,7 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
             className="dc-btn-primary"
           >
             <Plus size={18} />
-            <span>Report incident</span>
+            <span>{t('incidents.reportIncident', 'Report incident')}</span>
           </button>
         </div>
 
@@ -206,7 +208,7 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
             onClick={() => setFilter('ALL')}
             style={filter === 'ALL' ? { backgroundColor: 'var(--dc-forest)', color: '#FFFDF8' } : {}}
           >
-            All Reports ({incidents.length})
+            {t('incidents.allReports', 'All Reports')} ({incidents.length})
           </button>
           <button
             type="button"
@@ -214,7 +216,7 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
             onClick={() => setFilter('VERIFIED')}
             style={filter === 'VERIFIED' ? { backgroundColor: 'var(--dc-earth-green)', color: '#FFFDF8' } : {}}
           >
-            Verified Only ({incidents.filter((i) => i.verified).length})
+            {t('incidents.verifiedOnly', 'Verified Only')} ({incidents.filter((i) => i.verified).length})
           </button>
           <button
             type="button"
@@ -222,7 +224,7 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
             onClick={() => setFilter('CRITICAL')}
             style={filter === 'CRITICAL' ? { backgroundColor: 'var(--dc-emergency)', color: '#FFFDF8' } : {}}
           >
-            High / Critical ({incidents.filter((i) => i.severity.toLowerCase() === 'critical' || i.severity.toLowerCase() === 'high').length})
+            {t('incidents.criticalHigh', 'High / Critical')} ({incidents.filter((i) => i.severity.toLowerCase() === 'critical' || i.severity.toLowerCase() === 'high').length})
           </button>
         </div>
 
@@ -262,7 +264,7 @@ export default function ModernIncidentsPage({ onOpenIncident: externalOpenIncide
                   {inc.verified && (
                     <span className="dc-verified-badge" title="Verified by field responder">
                       <CheckCircle2 size={13} />
-                      <span>Verified</span>
+                      <span>{t('incidents.verified', 'Verified')}</span>
                     </span>
                   )}
                 </div>

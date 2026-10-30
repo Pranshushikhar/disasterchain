@@ -647,7 +647,7 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
               </div>
 
               <div className="dc-settings-modal-body">
-                {/* 0. Global Language Selector (20 Indian Regional Languages + Hinglish + English) */}
+                {/* 0. Global Language Selector (20 Supported Languages) */}
                 <div className="dc-settings-section">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span className="dc-settings-section-title" style={{ margin: 0 }}>
@@ -663,7 +663,7 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                       type="text"
                       value={langSearch}
                       onChange={(e) => setLangSearch(e.target.value)}
-                      placeholder={t('common.searchLanguage', 'Search language (e.g. Hindi, Punjabi, Bengali, Hinglish)...')}
+                      placeholder={t('common.searchLanguage', 'Search language (e.g. Hindi, Punjabi, Bengali, Tamil)...')}
                       style={{
                         width: '100%',
                         padding: '7px 12px 7px 32px',
@@ -689,6 +689,7 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                           <button
                             key={lang.code}
                             type="button"
+                            data-lang-code={lang.code}
                             onClick={() => setLanguage(lang.code)}
                             className={`dc-lang-card-btn ${isSelected ? 'active' : ''}`}
                           >

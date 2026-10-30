@@ -52,72 +52,41 @@ export default function ModernWeatherGPT() {
 
   // Contextual chip prompts based on current page and language
   const contextualChips = React.useMemo(() => {
-    const isHinglish = chatLanguage === 'hinglish';
     const path = location.pathname;
     if (path === '/' || path === '/dashboard') {
-      return isHinglish
-        ? [
-            'Mere aas-paas kya ho raha hai?',
-            'Kya local roads safe hain right now?',
-            'Aaj rain kab tak expect karein?',
-          ]
-        : [
-            'What is happening near me?',
-            'Are local roads safe right now?',
-            'When is rain expected today?',
-          ];
+      return [
+        t('weatherGpt.chips.nearMe', 'What is happening near me?'),
+        t('weatherGpt.chips.roadsSafe', 'Are local roads safe right now?'),
+        t('weatherGpt.chips.rainExpected', 'When is rain expected today?'),
+      ];
     }
     if (path === '/weather') {
-      return isHinglish
-        ? [
-            'Kya aaj heavy rain hogi?',
-            '3-day flood outlook kaisa hai?',
-            'Air quality travel ke liye safe hai?',
-          ]
-        : [
-            'Will it rain heavily today?',
-            'What is the 3-day flood outlook?',
-            'Is air quality safe for travel?',
-          ];
+      return [
+        t('weatherGpt.chips.heavyRain', 'Will it rain heavily today?'),
+        t('weatherGpt.chips.floodOutlook', 'What is the 3-day flood outlook?'),
+        t('weatherGpt.chips.airQuality', 'Is air quality safe for travel?'),
+      ];
     }
     if (path === '/map' || path === '/affected-areas') {
-      return isHinglish
-        ? [
-            'Yeh active warnings kya hain?',
-            'Safest route dikhayein',
-            'Pass ka relief camp kahan hai?',
-          ]
-        : [
-            'What are these active warnings?',
-            'Show safest transit corridor',
-            'Where is the closest relief camp?',
-          ];
+      return [
+        t('weatherGpt.chips.activeWarnings', 'What are these active warnings?'),
+        t('weatherGpt.chips.safestRoute', 'Show safest transit corridor'),
+        t('weatherGpt.chips.closestCamp', 'Where is the closest relief camp?'),
+      ];
     }
     if (path === '/safety' || path === '/sos') {
-      return isHinglish
-        ? [
-            'Abhi mujhe kya karna chahiye?',
-            'Emergency go-bag mein kya rakhein?',
-            'Rising water report kaise karein?',
-          ]
-        : [
-            'What should I do right now?',
-            'What items go into a go-bag?',
-            'How do I report rising water?',
-          ];
+      return [
+        t('weatherGpt.chips.whatToDo', 'What should I do right now?'),
+        t('weatherGpt.chips.goBag', 'What items go into a go-bag?'),
+        t('weatherGpt.chips.reportWater', 'How do I report rising water?'),
+      ];
     }
-    return isHinglish
-      ? [
-          'Mere area ka mausam kaisa hai?',
-          'Mera sector kitna safe hai?',
-          'Nearest available shelter',
-        ]
-      : [
-          'What is happening near me?',
-          'How safe is my sector?',
-          'Nearest available shelter',
-        ];
-  }, [location.pathname, chatLanguage]);
+    return [
+      t('weatherGpt.chips.weatherArea', 'What is the weather in my area?'),
+      t('weatherGpt.chips.safeSector', 'How safe is my sector?'),
+      t('weatherGpt.chips.nearestShelter', 'Nearest available shelter'),
+    ];
+  }, [location.pathname, t]);
 
   const handleSend = (textToSend) => {
     const query = textToSend || input;
@@ -190,7 +159,7 @@ export default function ModernWeatherGPT() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <Globe size={13} style={{ color: 'var(--text-muted)' }} />
                   <select
-                    value={chatLanguage || 'hinglish'}
+                    value={chatLanguage || 'en'}
                     onChange={(e) => setChatLanguage(e.target.value)}
                     aria-label="WeatherGPT Language"
                     style={{
@@ -205,10 +174,9 @@ export default function ModernWeatherGPT() {
                       outline: 'none',
                     }}
                   >
-                    <option value="hinglish">Hinglish</option>
                     <option value="en">English</option>
                     {languages
-                      .filter((l) => l.code !== 'en' && l.code !== 'hinglish')
+                      .filter((l) => l.code !== 'en')
                       .map((l) => (
                         <option key={l.code} value={l.code}>
                           {l.nativeName} ({l.name})
@@ -269,14 +237,10 @@ export default function ModernWeatherGPT() {
                     <Sparkles size={24} />
                   </div>
                   <h5>
-                    {chatLanguage === 'hinglish'
-                      ? 'Main aapki safety mein kaise help kar sakta hoon?'
-                      : t('weatherGpt.greeting', 'How can I assist your safety?')}
+                    {t('weatherGpt.greeting', 'How can I assist your safety?')}
                   </h5>
                   <p>
-                    {chatLanguage === 'hinglish'
-                      ? 'Localized rain, flood outlook, road safety, evacuation corridors ya emergency go-bags ke baare mein poochein.'
-                      : t('weatherGpt.emptyPrompt', 'Ask about localized rain, flood outlooks, road safety, evacuation corridors, or emergency go-bags.')}
+                    {t('weatherGpt.emptyPrompt', 'Ask about localized rain, flood outlooks, road safety, evacuation corridors, or emergency go-bags.')}
                   </p>
                 </div>
               ) : (
@@ -361,11 +325,7 @@ export default function ModernWeatherGPT() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={
-                  chatLanguage === 'hinglish'
-                    ? 'Mausam, baarish, route ya emergency safety ke baare mein poochein...'
-                    : t('weatherGpt.placeholder', 'Ask about weather, risk, or emergency...')
-                }
+                placeholder={t('weatherGpt.placeholder', 'Ask about weather, risk, or emergency...')}
                 className="dc-chat-input"
                 rows={1}
                 aria-label="Ask WeatherGPT a question"

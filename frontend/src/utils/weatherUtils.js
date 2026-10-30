@@ -274,3 +274,66 @@ export function evaluateAtmosphericRisk(currentWeather, airQuality, activeCyclon
     disclaimer: disclaimerText,
   };
 }
+
+/**
+ * Translates raw Open-Meteo or weather condition text dynamically into active language
+ */
+export function translateWeatherConditionText(text, t = null) {
+  if (!text) return t ? t('weather.conditions.clear', 'Clear') : 'Clear';
+  if (!t) return text;
+  const lower = String(text).toLowerCase();
+  if (lower.includes('thunder') || lower.includes('storm') || lower.includes('hail')) {
+    return t('weather.conditions.thunderstorm', 'Thunderstorm');
+  }
+  if (lower.includes('heavy rain')) {
+    return t('weather.conditions.heavyRain', 'Heavy Rain');
+  }
+  if (lower.includes('rain') || lower.includes('drizzle') || lower.includes('shower')) {
+    return t('weather.conditions.rain', 'Rain');
+  }
+  if (lower.includes('snow') || lower.includes('blizzard') || lower.includes('ice')) {
+    return t('weather.conditions.snow', 'Snow');
+  }
+  if (lower.includes('fog') || lower.includes('mist') || lower.includes('haze')) {
+    return t('weather.conditions.fog', 'Foggy');
+  }
+  if (lower.includes('overcast')) {
+    return t('weather.conditions.overcast', 'Overcast');
+  }
+  if (lower.includes('partly')) {
+    return t('weather.conditions.partlyCloudy', 'Partly Cloudy');
+  }
+  if (lower.includes('cloud')) {
+    return t('weather.conditions.cloudy', 'Cloudy');
+  }
+  if (lower.includes('clear') || lower.includes('sunny')) {
+    return t('weather.conditions.clear', 'Clear Sky');
+  }
+  return text;
+}
+
+/**
+ * Translates air quality status labels into active language
+ */
+export function translateAqiStatus(status, t = null) {
+  if (!status) return '';
+  if (!t) return status;
+  const lower = String(status).toLowerCase();
+  if (lower.includes('very poor') || lower.includes('hazardous')) {
+    return t('weather.aqi.veryPoor', 'VERY POOR');
+  }
+  if (lower.includes('poor') || lower.includes('unhealthy')) {
+    return t('weather.aqi.poor', 'POOR');
+  }
+  if (lower.includes('moderate')) {
+    return t('weather.aqi.moderate', 'MODERATE');
+  }
+  if (lower.includes('fair') || lower.includes('acceptable')) {
+    return t('weather.aqi.fair', 'FAIR');
+  }
+  if (lower.includes('good') || lower.includes('satisfactory')) {
+    return t('weather.aqi.good', 'GOOD');
+  }
+  return status;
+}
+

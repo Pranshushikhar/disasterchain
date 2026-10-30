@@ -14,6 +14,7 @@ import { fetchShelters, fetchAlerts } from '../services/api';
 import { fetchCompleteWeather } from '../services/weatherApi';
 import { useDCLocation } from '../context/LocationContext';
 import { useTranslation } from '../i18n/i18n';
+import { translateWeatherConditionText } from '../utils/weatherUtils';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -144,17 +145,17 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
   const riskStatus = useMemo(() => {
     if (primaryAlert && (primaryAlert.severity === 'Critical' || primaryAlert.severity === 'Warning')) {
       return {
-        label: 'Advisory Active',
+        label: t('weather.risk.advisoryConditions', 'Advisory Active'),
         className: 'elevated',
-        summary: 'Official weather advisory active in your regional corridor.',
+        summary: t('weather.moderateRiskDesc', 'Official weather advisory active in your regional corridor.'),
       };
     }
     return {
-      label: 'Normal Perimeter',
+      label: t('weather.stableTitle', 'Normal Perimeter'),
       className: 'normal',
-      summary: 'Atmospheric telemetry is calm. Perimeter conditions standard.',
+      summary: t('weather.noHazards', 'Atmospheric telemetry is calm. Perimeter conditions standard.'),
     };
-  }, [primaryAlert]);
+  }, [primaryAlert, t]);
 
   return (
     <div className="dc-home-clean-page">
@@ -211,7 +212,7 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
               <div className="dc-weather-temp-block">
                 <span className="dc-clean-temp-value">{Math.round(currentTemp)}°</span>
                 <div className="dc-clean-condition-meta">
-                  <span className="dc-clean-condition-text">{currentCondition}</span>
+                  <span className="dc-clean-condition-text">{translateWeatherConditionText(currentCondition, t)}</span>
                   <span className="dc-clean-feels-like">
                     {t('weather.feelsLike', 'Feels like')} {feelsLike}°C
                   </span>
@@ -254,19 +255,19 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
               <div className="dc-alert-header-row">
                 <div className="dc-alert-badge-group">
                   <span className="dc-alert-priority-tag">
-                    {primaryAlert.priority || primaryAlert.severity || 'Notice'} Priority
+                    {primaryAlert.priority || primaryAlert.severity || t('alerts.notice', 'Notice')} {t('alerts.priority', 'Priority')}
                   </span>
                   {primaryAlert.target && (
-                    <span className="dc-alert-target-tag">Target: {primaryAlert.target}</span>
+                    <span className="dc-alert-target-tag">{t('alerts.target', 'Target')}: {primaryAlert.target}</span>
                   )}
                 </div>
-                <span className="dc-alert-source-tag">Official Civil Watch</span>
+                <span className="dc-alert-source-tag">{t('alerts.officialWatch', 'Official Civil Watch')}</span>
               </div>
 
               <h2 className="dc-alert-title">{primaryAlert.title}</h2>
               <p className="dc-alert-desc">
                 {primaryAlert.description ||
-                  'Official advisory issued for your administrative corridor. Monitor surroundings and adhere to safety directives.'}
+                  t('alerts.standardDirective', 'Official advisory issued for your administrative corridor. Monitor surroundings and adhere to safety directives.')}
               </p>
 
               <div className="dc-alert-footer-row">
@@ -275,7 +276,7 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
                   onClick={() => navigate('/weather')}
                   className="dc-alert-action-btn"
                 >
-                  <span>View Advisory Details</span>
+                  <span>{t('alerts.viewDetails', 'View Advisory Details')}</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
@@ -284,7 +285,7 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
         ) : (
           <div className="dc-clean-calm-banner">
             <ShieldCheck size={16} className="dc-calm-icon" />
-            <span>All regional systems normal. No active emergency bulletins for your perimeter.</span>
+            <span>{t('alerts.noActiveAlerts', 'All regional systems normal. No active emergency bulletins for your perimeter.')}</span>
           </div>
         )}
 
@@ -297,9 +298,9 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
         >
           <div className="dc-map-preview-header">
             <div className="dc-map-header-left">
-              <h2 className="dc-map-preview-title">Regional Map Preview</h2>
+              <h2 className="dc-map-preview-title">{t('map.regionalMap', 'Regional Map Preview')}</h2>
               <span className="dc-map-preview-sub">
-                {coords.lat.toFixed(4)}°N, {coords.lon.toFixed(4)}°E · Live GIS overview
+                {coords.lat.toFixed(4)}°N, {coords.lon.toFixed(4)}°E · {t('map.liveGisOverview', 'Live GIS overview')}
               </span>
             </div>
 

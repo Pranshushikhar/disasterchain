@@ -170,25 +170,245 @@ const I18N_DICTIONARY = {
     noReliableData: 'આ ક્ષણે વિશ્વસનીય ડેટા ઉપલબ્ધ નથી.',
     disasterChainQualifier: 'નીચાણવાળા વિસ્તારોમાં પાણી ભરાવાની શક્યતા રહી શકે છે.',
   },
-  hinglish: {
-    currentWeather: 'Abhi ka Mausam',
-    forecast: 'Mausam Forecast',
-    riskAssessment: 'Risk Assessment',
-    recommendation: 'Recommendation',
-    observed: 'Observed Telemetry',
-    aiInterpretation: 'AI Risk Interpretation',
-    officialAlert: 'Official Alert',
-    dataSource: 'Data Source',
-    updated: 'Updated',
-    noRain: 'Baarish ka chance bahut kam hai',
-    rainLikely: 'Baarish hone ka poora chance hai',
-    carryUmbrella: 'Chhata ya raincoat saath rakhna behtar rahega.',
-    safetyFirst: 'Kripya apni immediate safety ko pehli priority dein.',
-    callEmergency: 'Emergency situation mein turant 112 par call karein ya disaster helpline se contact karein.',
-    askTravelTime: 'Agar aap apne travel ka time ya route batayein, toh main exact hourly conditions bata sakta hoon.',
-    askLocation: 'Aap kis sheher ya area ka mausam jaanna chahte hain?',
-    noReliableData: 'Abhi is specific metric ka reliable live telemetry available nahi hai.',
-    disasterChainQualifier: 'Low-lying areas mein paani bharne (waterlogging) ka risk ho sakta hai.',
+  kn: {
+    currentWeather: 'ಪ್ರಸ್ತುತ ಹವಾಮಾನ',
+    forecast: 'ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ',
+    riskAssessment: 'ಅಪಾಯ ಮೌಲ್ಯಮಾಪನ',
+    recommendation: 'ಶಿಫಾರಸು',
+    observed: 'ಗಮನಿಸಿದ ಮಾಹಿತಿ',
+    aiInterpretation: 'ಹವಾಮಾನ ಅಪಾಯ ವಿಶ್ಲೇಷಣೆ',
+    officialAlert: 'ಅಧಿಕೃತ ಎಚ್ಚರಿಕೆ',
+    dataSource: 'ಮೂಲ',
+    updated: 'ನವೀಕರಿಸಲಾಗಿದೆ',
+    noRain: 'ಮಳೆಯ ಸಾಧ್ಯತೆ ಕಡಿಮೆ ಇದೆ',
+    rainLikely: 'ಮಳೆ ಬೀಳುವ ಸಾಧ್ಯತೆಯಿದೆ',
+    carryUmbrella: 'ಛತ್ರಿ ಅಥವಾ ರೇನ್‌ಕೋಟ್ ಜೊತೆಗೆ ಇರಿಸಿಕೊಳ್ಳಲು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ.',
+    safetyFirst: 'ದಯವಿಟ್ಟು ನಿಮ್ಮ ವೈಯಕ್ತಿಕ ಸುರಕ್ಷತೆಗೆ ಆದ್ಯತೆ ನೀಡಿ.',
+    callEmergency: 'ತುರ್ತು ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ 112 ಗೆ ಕರೆ ಮಾಡಿ.',
+    askTravelTime: 'ನಿಮ್ಮ ಪ್ರಯಾಣದ ಸಮಯವನ್ನು ತಿಳಿಸಿದರೆ ಸೂಕ್ತ ಮುನ್ಸೂಚನೆ ನೀಡಬಹುದು.',
+    askLocation: 'ಯಾವ ಸ್ಥಳದ ಹವಾಮಾನ ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ?',
+    noReliableData: 'ಪ್ರಸ್ತುತ ಈ ಮಾನದಂಡಕ್ಕೆ ವಿಶ್ವಾಸಾರ್ಹ ಲೈವ್ ಡೇಟಾ ಲಭ್ಯವಿಲ್ಲ.',
+    disasterChainQualifier: 'ತಗ್ಗು ಪ್ರದೇಶಗಳಲ್ಲಿ ನೀರು ನಿಲ್ಲುವ ಸಾಧ್ಯತೆಯಿದೆ.',
+  },
+  ml: {
+    currentWeather: 'നിലവിലെ കാലാവസ്ഥ',
+    forecast: 'കാലാവസ്ഥാ പ്രവചനം',
+    riskAssessment: 'അപകടസാധ്യതാ വിലയിരുത്തൽ',
+    recommendation: 'നിർദ്ദേശം',
+    observed: 'നിരീക്ഷിച്ച വിവരങ്ങൾ',
+    aiInterpretation: 'കാലാവസ്ഥാ വിശകലനം',
+    officialAlert: 'ഔദ്യോഗിക മുന്നറിയിപ്പ്',
+    dataSource: 'ഉറവിടം',
+    updated: 'പുതുക്കിയത്',
+    noRain: 'മഴയ്ക്ക് സാധ്യത കുറവാണ്',
+    rainLikely: 'മഴ പെയ്യാൻ സാധ്യതയുണ്ട്',
+    carryUmbrella: 'ഒരു കുടയോ റെയിൻകോട്ടോ കൂടെ കരുതുന്നത് നല്ലതാണ്.',
+    safetyFirst: 'ദയവായി നിങ്ങളുടെ സുരക്ഷയ്ക്ക് മുൻഗണന നൽകുക.',
+    callEmergency: 'അടിയന്തിര ഘട്ടങ്ങളിൽ 112 എന്ന നമ്പറിൽ ബന്ധപ്പെടുക.',
+    askTravelTime: 'യാത്രാ സമയം വ്യക്തമാക്കിയാൽ കൂടുതൽ കൃത്യമായ വിവരങ്ങൾ നൽകാം.',
+    askLocation: 'ഏത് സ്ഥലത്തെ കാലാവസ്ഥയാണ് അറിയേണ്ടത്?',
+    noReliableData: 'നിലവിൽ തത്സമയ വിവരങ്ങൾ ലഭ്യമല്ല.',
+    disasterChainQualifier: 'താഴ്ന്ന പ്രദേശങ്ങളിൽ വെള്ളക്കെട്ടിന് സാധ്യതയുണ്ട്.',
+  },
+  pa: {
+    currentWeather: 'ਮੌਜੂਦਾ ਮੌਸਮ',
+    forecast: 'ਮੌਸਮ ਪੂਰਵ-ਅਨੁਮਾਨ',
+    riskAssessment: 'ਜੋਖਮ ਮੁਲਾਂਕਣ',
+    recommendation: 'ਸਿਫ਼ਾਰਸ਼',
+    observed: 'ਨਿਰੀਖਣ ਕੀਤਾ ਡਾਟਾ',
+    aiInterpretation: 'ਮੌਸਮੀ ਜੋਖਮ ਵਿਸ਼ਲੇਸ਼ਣ',
+    officialAlert: 'ਅਧਿਕਾਰਤ ਚੇਤਾਵਨੀ',
+    dataSource: 'ਸਰੋਤ',
+    updated: 'ਅੱਪਡੇਟ ਕੀਤਾ',
+    noRain: 'ਮੀਂਹ ਪੈਣ ਦੀ ਸੰਭਾਵਨਾ ਬਹੁਤ ਘੱਟ ਹੈ',
+    rainLikely: 'ਮੀਂਹ ਪੈਣ ਦੀ ਸੰਭਾਵਨਾ ਹੈ',
+    carryUmbrella: 'ਇੱਕ ਛਤਰੀ ਜਾਂ ਰੇਨਕੋਟ ਨਾਲ ਰੱਖਣ ਦੀ ਸਲਾਹ ਦਿੱਤੀ ਜਾਂਦੀ ਹੈ।',
+    safetyFirst: 'ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਸੁਰੱਖਿਆ ਨੂੰ ਪਹਿਲ ਦਿਓ।',
+    callEmergency: 'ਕਿਸੇ ਵੀ ਐਮਰਜੈਂਸੀ ਲਈ 112 ਡਾਇਲ ਕਰੋ।',
+    askTravelTime: 'ਜੇਕਰ ਤੁਸੀਂ ਯਾਤਰਾ ਦਾ ਸਮਾਂ ਦੱਸੋਗੇ ਤਾਂ ਸਹੀ ਅਨੁਮਾਨ ਮਿਲੇਗਾ।',
+    askLocation: 'ਤੁਸੀਂ ਕਿਸ ਸਥਾਨ ਦਾ ਮੌਸਮ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ?',
+    noReliableData: 'ਇਸ ਵੇਲੇ ਕੋਈ ਭਰੋਸੇਯੋਗ ਲਾਈਵ ਡਾਟਾ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।',
+    disasterChainQualifier: 'ਹੇਠਲੇ ਇਲਾਕਿਆਂ ਵਿੱਚ ਪਾਣੀ ਭਰਨ ਦਾ ਖ਼ਤਰਾ ਹੋ ਸਕਦਾ ਹੈ।',
+  },
+  or: {
+    currentWeather: 'ବର୍ତ୍ତମାନର ପାଣିପାଗ',
+    forecast: 'ପାଣିପାଗ ପୂର୍ବାନୁମାନ',
+    riskAssessment: 'ବିପଦ ମୂଲ୍ୟାଙ୍କନ',
+    recommendation: 'ପରାମର୍ଶ',
+    observed: 'ପ୍ରତ୍ୟକ୍ଷ ତଥ୍ୟ',
+    aiInterpretation: 'ପାଣିପାଗ ବିପଦ ବିଶ୍ଳେଷଣ',
+    officialAlert: 'ସରକାରୀ ସତର୍କତା',
+    dataSource: 'ଉତ୍ସ',
+    updated: 'ଅଦ୍ୟତନ ହୋଇଛି',
+    noRain: 'ବର୍ଷା ହେବାର ସମ୍ଭାବନା ବହୁତ କମ୍',
+    rainLikely: 'ବର୍ଷା ହେବାର ସମ୍ଭାବନା ଅଛି',
+    carryUmbrella: 'ଗୋଟିଏ ଛତା କିମ୍ବା ରେନକୋଟ୍ ସାଙ୍ଗରେ ରଖିବା ଭଲ।',
+    safetyFirst: 'ଦୟାକରି ଆପଣଙ୍କ ବ୍ୟକ୍ତିଗତ ସୁରକ୍ଷାକୁ ପ୍ରାଥମିକତା ଦିଅନ୍ତୁ।',
+    callEmergency: 'ଜରୁରୀକାଳୀନ ସ୍ଥିତିରେ 112 ରେ କଲ୍ କରନ୍ତୁ।',
+    askTravelTime: 'ଯାତ୍ରା ସମୟ ଜଣାଇଲେ ସଠିକ୍ ପୂର୍ବାନୁମାନ ଦେଇହେବ।',
+    askLocation: 'ଆପଣ କେଉଁ ସ୍ଥାନର ପାଣିପାଗ ଜାଣିବାକୁ ଚାହାଁନ୍ତି?',
+    noReliableData: 'ଏହି ମାପଦଣ୍ଡ ପାଇଁ ଏବେ କୌଣସି ଲାଇଭ୍ ତଥ୍ୟ ଉପଲବ୍ଧ ନାହିଁ।',
+    disasterChainQualifier: 'ତଳିଆ ଅଞ୍ଚଳରେ ଜଳବନ୍ଦୀ ହେବାର ସମ୍ଭାବନା ରହିଛି।',
+  },
+  as: {
+    currentWeather: 'বৰ্তমানৰ বতৰ',
+    forecast: 'বতৰৰ পূৰ্বাভাস',
+    riskAssessment: 'বিপদ মূল্যায়ন',
+    recommendation: 'পৰামৰ্শ',
+    observed: 'পৰ্যবেক্ষিত তথ্য',
+    aiInterpretation: 'বতৰৰ বিপদ বিশ্লেষণ',
+    officialAlert: 'চৰকাৰী সতৰ্কবাণী',
+    dataSource: 'উৎস',
+    updated: 'আপডেট কৰা হৈছে',
+    noRain: 'বৰষুণ হোৱাৰ সম্ভাৱনা অতি কম',
+    rainLikely: 'বৰষুণ হোৱাৰ সম্ভাৱনা আছে',
+    carryUmbrella: 'এটা ছাতি বা ৰেইনকোট লগত ৰখাৰ পৰামৰ্শ দিয়া হৈছে।',
+    safetyFirst: 'অনুগ্ৰহ কৰি আপোনাৰ সুৰক্ষাক অগ্ৰাধিকাৰ দিয়ক।',
+    callEmergency: 'জৰুৰীকালীন সাহায্যৰ বাবে 112 নম্বৰত কল কৰক।',
+    askTravelTime: 'যাত্ৰাৰ সময় উল্লেখ কৰিলে সঠিক তথ্য দিয়া সম্ভৱ হ’ব।',
+    askLocation: 'আপুনি কোন ঠাইৰ বতৰ জানিব বিচাৰিছে?',
+    noReliableData: 'এই সময়ত কোনো লাইভ তথ্য উপলব্ধ নহয়।',
+    disasterChainQualifier: 'নিম্ন অঞ্চল সমূহত পানী জমা হোৱাৰ সম্ভাৱনা থাকিব পাৰে।',
+  },
+  sa: {
+    currentWeather: 'वर्तमानर्तुः',
+    forecast: 'ऋतुपूर्वानुमानम्',
+    riskAssessment: 'संकटमूल्याङ्कनम्',
+    recommendation: 'परामर्शः',
+    observed: 'निरीक्षितदत्तांशः',
+    aiInterpretation: 'ऋतुसंकटविश्लेषणम्',
+    officialAlert: 'शासकीयचेतावनी',
+    dataSource: 'मूलम्',
+    updated: 'नवीकृतम्',
+    noRain: 'वृष्टेः सम्भावना अतीव न्यूना वर्तते',
+    rainLikely: 'वृष्टेः सम्भावना वर्तते',
+    carryUmbrella: 'छत्रं वर्षारक्षकं वा धारयतु इति परामर्शः।',
+    safetyFirst: 'कृपया स्वीयरक्षां प्रथमतः विचारयतु।',
+    callEmergency: 'आत्ययिकस्थितौ 112 सम्पर्कं कुर्वन्तु।',
+    askTravelTime: 'यात्रासमयसूचनेन सटीकं विश्लेषणं सम्भवम्।',
+    askLocation: 'कस्य स्थानस्य वातावरणं ज्ञातुम् इच्छति?',
+    noReliableData: 'सम्प्रति अस्य सूचकस्य विश्वसनीयदत्तांशः नास्ति।',
+    disasterChainQualifier: 'निम्नक्षेत्रेषु जलावरोधस्य सम्भावना भवितुम् अर्हति।',
+  },
+  ks: {
+    currentWeather: 'موٗجوٗدٕ موسم',
+    forecast: 'موسمٕچ پؠش گوئی',
+    riskAssessment: 'خطرُک اندازٕ',
+    recommendation: 'مشورٕ',
+    observed: 'رِکارڈ کٔرمٕژ معلوٗمات',
+    aiInterpretation: 'موسمی خطرہٕ تجزِیہٕ',
+    officialAlert: 'سَرکٲری خَطاب',
+    dataSource: 'ذریعہٕ',
+    updated: 'اپ ڈیٹ گومُت',
+    noRain: 'روٗد پؠنُک امکان چُھنہٕ',
+    rainLikely: 'روٗد پؠنُک امکان چُھ',
+    carryUmbrella: 'چھتری یا رین کوٹ پانہٕ سٟتؠ تھاوُن چُھ صٔحیح۔',
+    safetyFirst: 'مہرَبٲنی کٔرِتھ پنُن بچاو رٲکِھو گوڈنیک ترجیح۔',
+    callEmergency: 'ایمرجنسی حالتَس منٛز ڈایل کرِو 112۔',
+    askTravelTime: 'سفرُک وقت ونِو تاکہِ سٔحیح معلوٗمات مِلو۔',
+    askLocation: 'تُہہِ کمہِ جاے ہُند موسم چھُو زانُن؟',
+    noReliableData: 'اَتھ وقتہٕ چھُنہٕ کانٛہہ پۆختہٕ لائیو ڈیٹا موٗجوٗد۔',
+    disasterChainQualifier: 'نیبرِم یا بۄنِمین جاین پیٚٹھ ہیٚکہِ آب جمع گژھِتھ۔',
+  },
+  kok: {
+    currentWeather: 'सध्याचें हवामान',
+    forecast: 'हवामानाचो अंदाज',
+    riskAssessment: 'धोको मूल्यमापन',
+    recommendation: 'सल्ला',
+    observed: 'निरीक्षीत डेटा',
+    aiInterpretation: 'हवामान धोको विस्लेषण',
+    officialAlert: 'सरकारी शिटकावणी',
+    dataSource: 'मूळ',
+    updated: 'अद्ययावत केला',
+    noRain: 'पावस पडपाची शक्यताय खूप उणी आसा',
+    rainLikely: 'पावस पडपाची शक्यताय आसा',
+    carryUmbrella: 'सांगाता सात्री वा रेनकोट दवरपाचो सल्लो दिला.',
+    safetyFirst: 'उपकार करून पयलीं स्वताची सुरक्षा पळयात.',
+    callEmergency: 'तात्काळ आदार मेळोवपाक 112 चेर फोन करात.',
+    askTravelTime: 'प्रवासाची वेळ सांगल्यार अचूक अंदाज मेळटलो.',
+    askLocation: 'तुकां खंयच्या जाग्याचें हवामान जाणून घेवपाचें आसा?',
+    noReliableData: 'ह्या खातीर सध्या खात्रीशीर लायल डेटा उपलब्ध ना.',
+    disasterChainQualifier: 'खालट्या वाठारांनी उदक सांचपाची शक्यताय आसा.',
+  },
+  mai: {
+    currentWeather: 'वर्तमान मौसम',
+    forecast: 'मौसम पूर्वानुमान',
+    riskAssessment: 'जोखिम मूल्यांकन',
+    recommendation: 'परामर्श',
+    observed: 'निरीक्षित डेटा',
+    aiInterpretation: 'मौसम जोखिम विश्लेषण',
+    officialAlert: 'सरकारी चेतावनी',
+    dataSource: 'स्रोत',
+    updated: 'अपडेट कएल गेल',
+    noRain: 'बरखाक सम्भावना नगण्य अछि',
+    rainLikely: 'बरखा होयबाक सम्भावना अछि',
+    carryUmbrella: 'छतरी अथवा रेनकोट संग राखब उचित रहत।',
+    safetyFirst: 'कृपा कऽ पहिने अपन सुरक्षा पर ध्यान दिअ।',
+    callEmergency: 'आपातकालीन स्थितिक लेल 112 पर फोन करू।',
+    askTravelTime: 'यात्राक समय बतएला पर सटीक जानकारी भेटत।',
+    askLocation: 'अहाँ कोन स्थानक मौसम जनय चाहैत छी?',
+    noReliableData: 'एहि मीट्रिकक कोनो विश्वसनीय लाइव डेटा उपलब्ध नहि अछि।',
+    disasterChainQualifier: 'निचुलका इलाका सब मे पनिजमावक समस्या भऽ सकैत अछि।',
+  },
+  ne: {
+    currentWeather: 'हालको मौसम',
+    forecast: 'मौसम पूर्वानुमान',
+    riskAssessment: 'जोखिम मूल्याङ्कन',
+    recommendation: 'सुझाव',
+    observed: 'अवलोकन गरिएको डेटा',
+    aiInterpretation: 'मौसम जोखिम विश्लेषण',
+    officialAlert: 'आधिकारिक चेतावनी',
+    dataSource: 'स्रोत',
+    updated: 'अद्यावधिक गरिएको',
+    noRain: 'वर्षा हुने सम्भावना ज्यादै न्यून छ',
+    rainLikely: 'वर्षा हुने सम्भावना छ',
+    carryUmbrella: 'छाता वा रेनकोट साथमा राख्न सिफारिस गरिन्छ।',
+    safetyFirst: 'कृपया आफ्नो व्यक्तिगत सुरक्षालाई पहिलो प्राथमिकता दिनुहोस्।',
+    callEmergency: 'आपतकालीन अवस्थामा ११२ मा सम्पर्क गर्नुहोस्।',
+    askTravelTime: 'यात्राको समय बताउनुभएमा सही जानकारी उपलब्ध गराउन सकिन्छ।',
+    askLocation: 'कुन ठाउँको मौसम बारे जान्न चाहनुहुन्छ?',
+    noReliableData: 'हाल यो विवरणको लागि कुनै भरपर्दो प्रत्यक्ष डेटा उपलब्ध छैन।',
+    disasterChainQualifier: 'होचा क्षेत्रहरूमा पानी जम्ने जोखिम रहन सक्छ।',
+  },
+  sd: {
+    currentWeather: 'موجوده موسم',
+    forecast: 'موسم جي اڳڪٿي',
+    riskAssessment: 'خطري جو اندازو',
+    recommendation: 'صلاح',
+    observed: 'مشاهدو ڪيل ڊيٽا',
+    aiInterpretation: 'موسمي خطري جو تجزيو',
+    officialAlert: 'سرڪاري الرٽ',
+    dataSource: 'ذريعو',
+    updated: 'اپڊيٽ ٿيل',
+    noRain: 'برسات جو امڪان تمام گهٽ آهي',
+    rainLikely: 'برسات جو امڪان آهي',
+    carryUmbrella: 'ڇٽي يا رين ڪوٽ گڏ رکڻ جو مشورو ڏنو وڃي ٿو۔',
+    safetyFirst: 'مهرباني ڪري پنهنجي حفاظت کي ترجيح ڏيو۔',
+    callEmergency: 'ڪنهن به هنگامي حالت ۾ 112 تي ڪال ڪريو۔',
+    askTravelTime: 'سفر جو وقت ٻڌايو ته جيئن صحيح ڄاڻ ڏئي سگهجي۔',
+    askLocation: 'توهان ڪهڙي هنڌ جي موسم ڄاڻڻ چاهيو ٿا؟',
+    noReliableData: 'هن وقت ڪو به معتبر لائيو ڊيٽا موجود ناهي۔',
+    disasterChainQualifier: 'هيٺاهين وارن علائقن ۾ پاڻي بيهڻ جو امڪان ٿي سگهي ٿو۔',
+  },
+  mni: {
+    currentWeather: 'হৌজিক্কী নুংশিৎ-নোংগী ফীভম',
+    forecast: 'মাংজৌননা খঙহনবা',
+    riskAssessment: 'খুদোংথীবগী চাং য়েংশিনবা',
+    recommendation: 'পাউতাক',
+    observed: 'খঙদোক্লবা ঈপাউ',
+    aiInterpretation: 'নুংশিৎ-নোংগী অশোয়-অঙাম নৈনবা',
+    officialAlert: 'লৈঙাক্কী চেকশিনৱা',
+    dataSource: 'হৌরকফম',
+    updated: 'অনৌবা তৌখ্রবা',
+    noRain: 'নোং চুগদবা চাং য়াম্না নেম্মী',
+    rainLikely: 'নোং চুরকপগী চাং লৈ',
+    carryUmbrella: 'চৎপা মতমদা পে অমসুং রেনকোট লৌমন্নবা পাউতাক পীরি।',
+    safetyFirst: 'অনৌবা ওইনা নহাক্কী মশাগী ঙাক-শেনবু অহানবা থৌداং ওইনা লৌবীয়ু।',
+    callEmergency: 'অশোক-অপন নত্রগা খুদোংথীবদা 112 দা কোল তৌবীয়ু।',
+    askTravelTime: 'खोঙচৎকী মতম হায়রক্লবদি অচুম্বা ঈপাউ পীবা ঙমগনি।',
+    askLocation: 'নহাক্না করম্বা মফমগী নুংশিৎ-নোংগী ঈপাউ খঙবা পাম্বগে?',
+    noReliableData: 'হৌজিক্কী মতমদা থাজবা য়াবা লাইভ ডাটা লৈতে।',
+    disasterChainQualifier: 'নেম্বা মফমশিংদা ঈশিং তুমখৎলকপগী অশোয়-অঙাম লৈবা য়াই।',
   },
 };
 
@@ -377,25 +597,14 @@ function generateAnalyticalResponse({
   // 1. EMERGENCY INTENT
   if (primaryIntent === 'EMERGENCY') {
     format = 'EMERGENCY';
-    if (language === 'hinglish') {
-      content = `🚨 LIFE-SAFETY ALERT\n\n` +
-        `⚠️ **${i18n.safetyFirst}**\n\n` +
-        `Agar aap ya aapke aas-paas koi immediate danger mein hai, toh turant national emergency services **112** ya state disaster helpline se contact karein.\n\n` +
-        `• **Hazards se door rahein**: Agar paani badh raha hai, toh turant unche floor ya elevated surakshit ground par shift ho jayein. Tezi se behte floodwater mein chalne ya gaadi chalane ki koshish bilkul na karein.\n` +
-        `• **Electrical safety**: Submerged electrical panels aur toote utility wires se door rahein.\n` +
-        `• **Communications open rakhein**: Mobile phone battery bachayein aur emergency teams ko apni exact location share karein.\n\n` +
-        `*(Current local weather in ${locationName}: ${current.temperature}°C, ${current.conditionDescription}, Wind: ${current.windSpeed} km/h)*\n\n` +
-        `Safety Protection Note:\nWeatherGPT automatic SOS units dispatch nahi karta. Kripya emergency SOS broadcast karne se pehle apni situation verify kar lein.`;
-    } else {
-      content = `🚨 LIFE-SAFETY ALERT\n\n` +
-        `⚠️ **${i18n.safetyFirst}**\n\n` +
-        `If you or someone around you is in immediate danger, please immediately contact emergency services at **112** or your state disaster management helpline.\n\n` +
-        `• **Move away from hazards**: If water is rising, ascend immediately to higher floors or elevated sturdy ground. Never attempt to wade or swim through fast-moving floodwater.\n` +
-        `• **Electrical safety**: Disconnect or stay away from submerged electrical panels and downed utility wires.\n` +
-        `• **Keep communications open**: Conserve mobile phone battery and alert neighbors or emergency responders of your exact coordinates.\n\n` +
-        `*(Current local weather in ${locationName}: ${current.temperature}°C, ${current.conditionDescription}, Wind: ${current.windSpeed} km/h)*\n\n` +
-        `Safety Protection Note:\nWeatherGPT does not dispatch emergency units automatically. Please verify your situation before submitting an SOS request.`;
-    }
+    content = `🚨 LIFE-SAFETY ALERT\n\n` +
+      `⚠️ **${i18n.safetyFirst}**\n\n` +
+      `If you or someone around you is in immediate danger, please immediately contact emergency services at **112** or your state disaster management helpline.\n\n` +
+      `• **Move away from hazards**: If water is rising, ascend immediately to higher floors or elevated sturdy ground. Never attempt to wade or swim through fast-moving floodwater.\n` +
+      `• **Electrical safety**: Disconnect or stay away from submerged electrical panels and downed utility wires.\n` +
+      `• **Keep communications open**: Conserve mobile phone battery and alert neighbors or emergency responders of your exact coordinates.\n\n` +
+      `*(Current local weather in ${locationName}: ${current.temperature}°C, ${current.conditionDescription}, Wind: ${current.windSpeed} km/h)*\n\n` +
+      `Safety Protection Note:\nWeatherGPT does not dispatch emergency units automatically. Please verify your situation before submitting an SOS request.`;
   }
 
   // 2. OFF_TOPIC INTENT
@@ -405,8 +614,6 @@ function generateAnalyticalResponse({
       content = 'मैं WeatherGPT हूँ। मैं मौसम, पूर्वानुमान, वायु गुणवत्ता (AQI), चक्रवात, बाढ़, गंभीर मौसम चेतावनियों और आपदा सुरक्षा मार्गदर्शन में आपकी सहायता कर सकता हूँ।';
     } else if (language === 'ur') {
       content = 'میں ویدر جی پی ٹی ہوں۔ میں موسم، پیش گوئی، ہوا کے معیار (AQI)، طوفان، سیلاب، شدید موسم کے انتباہات اور ہنگامی حفاظتی رہنمائی میں آپ کی مدد کر سکتا ہوں۔';
-    } else if (language === 'hinglish') {
-      content = 'Main WeatherGPT hoon. Main mausam, forecast, air quality (AQI), baarish, toofan aur emergency disaster safety guidance mein aapki madad kar sakta hoon.';
     } else {
       content = "I’m WeatherGPT. I can help with weather, forecasts, air quality, severe-weather alerts, and weather-related safety.";
     }
@@ -915,13 +1122,6 @@ function generateAnalyticalResponse({
           (peak?.hasSignificantRain ? `• **बारिश का समय:** सबसे अधिक संभावना **${peak.window}** के दौरान है (लगभग **${peak.maxProb}%**)।\n` : '') +
           `• **हवा की गति:** लगभग ${windSpeed} km/h।\n\n` +
           `**विश्लेषण:** ${prob >= 50 ? 'कल बारिश होने की प्रबल संभावना है। छाता या रेनकोट साथ रखना उचित रहेगा।' : 'कल मौसम मुख्य रूप से शुष्क और सामान्य रहने का अनुमान है।'}`;
-      } else if (language === 'hinglish') {
-        content = `### 📅 ${locationName} mein Kal ka Mausam Forecast\n\n` +
-          `• **Temperature:** Maximum lagbhag **${tMax}°C** aur minimum **${tMin}°C** rehne ka chance hai.\n` +
-          `• **Baarish ka chance:** **${prob}%** (${cond}).\n` +
-          (peak?.hasSignificantRain ? `• **Baarish ka time:** Sabse zyada probability **${peak.window}** ke dauraan hai (lagbhag **${peak.maxProb}%**).\n` : '') +
-          `• **Hawa ki speed:** Lagbhag ${windSpeed} km/h.\n\n` +
-          `**Analysis:** ${prob >= 50 ? 'Kal baarish hone ka poora chance hai. Bahar jaate waqt sawdhani rakhein aur chhata saath rakhein.' : 'Kal mausam mostly saaf aur general outdoor plans ke liye stable rehne ki ummeed hai.'}`;
       } else {
         content = `### 📅 Tomorrow's Forecast for ${locationName}\n\n` +
           `• **Temperature:** Expected high of **${tMax}°C** and low of **${tMin}°C**.\n` +
@@ -961,8 +1161,6 @@ function generateAnalyticalResponse({
         content = `**${locationName}** में वर्तमान तापमान **${current.temperature}°C** है (महसूस: **${current.feelsLike}°C**)।`;
       } else if (language === 'ur') {
         content = `**${locationName}** میں موجودہ درجہ حرارت **${current.temperature}°C** ہے (محسوس: **${current.feelsLike}°C**)۔`;
-      } else if (language === 'hinglish') {
-        content = `**${locationName}** mein abhi current temperature **${current.temperature}°C** hai (feels like: **${current.feelsLike}°C**).`;
       } else {
         content = `The temperature in **${locationName}** is **${current.temperature}°C** (feels like **${current.feelsLike}°C**) with ${current.conditionDescription.toLowerCase()}.`;
       }
@@ -983,13 +1181,6 @@ function generateAnalyticalResponse({
           `• **نمی اور دباؤ:** ${current.humidity}% | ${current.pressureHpa} hPa\n` +
           `• **ہوا کی رفتار:** ${current.windSpeed} km/h\n\n` +
           `**رجحان:** ${trend.description}`;
-      } else if (language === 'hinglish') {
-        content = `### 📍 ${locationName} mein ${i18n.currentWeather}\n\n` +
-          `• **Temperature:** ${current.temperature}°C (Feels like: ${current.feelsLike}°C)\n` +
-          `• **Mausam ki sthiti:** ${current.conditionDescription} (Cloud cover: ${current.cloudCover}%)\n` +
-          `• **Humidity & Pressure:** ${current.humidity}% | ${current.pressureHpa || current.pressureMsl || 1013} hPa\n` +
-          `• **Hawa ki speed:** ${current.windSpeed} km/h (Gusts: ${current.windGusts || current.windSpeed} km/h)\n\n` +
-          `**Immediate Trend:** ${trend.description}`;
       } else {
         content = `### 📍 ${i18n.currentWeather} in ${locationName}\n\n` +
           `• **Temperature:** ${current.temperature}°C (Feels like: ${current.feelsLike}°C)\n` +

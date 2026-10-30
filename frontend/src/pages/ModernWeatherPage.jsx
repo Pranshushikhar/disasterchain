@@ -21,6 +21,10 @@ import {
 import { fetchCompleteWeather } from '../services/weatherApi';
 import { useDCLocation } from '../context/LocationContext';
 import { useTranslation } from '../i18n/i18n';
+import {
+  translateWeatherConditionText,
+  translateAqiStatus,
+} from '../utils/weatherUtils';
 
 export default function ModernWeatherPage() {
   const { t } = useTranslation();
@@ -272,7 +276,7 @@ export default function ModernWeatherPage() {
           <div className="dc-weather-temp-display">
             <span className="dc-weather-big-temp">{current.temp}°C</span>
             <div className="dc-weather-condition-col">
-              <span className="dc-weather-condition-title">{current.condition}</span>
+              <span className="dc-weather-condition-title">{translateWeatherConditionText(current.condition, t)}</span>
               <span className="dc-weather-feels">
                 {t('weather.feelsLike', 'Feels like')} {current.feelsLike}°C
               </span>
@@ -286,7 +290,7 @@ export default function ModernWeatherPage() {
             <h2 className="dc-section-title">
               {t('weather.hourlyForecast', "Today's Hourly Timeline")}
             </h2>
-            <span className="dc-contacts-caption">Next 8 Hours</span>
+            <span className="dc-contacts-caption">{t('weather.next8Hours', 'Next 8 Hours')}</span>
           </div>
           <div className="dc-timeline-scroll">
             {timeline.map((slot, idx) => (
@@ -413,7 +417,7 @@ export default function ModernWeatherPage() {
               </span>
               <div className="dc-aqi-number-row">
                 <span className="dc-aqi-number">{current.aqi}</span>
-                <span className="dc-aqi-label">{current.aqiStatus}</span>
+                <span className="dc-aqi-label">{translateAqiStatus(current.aqiStatus, t)}</span>
               </div>
               <p className="dc-stat-desc">
                 {current.aqi <= 50
@@ -475,9 +479,9 @@ export default function ModernWeatherPage() {
                 <span className="dc-forecast-day">{item.day}</span>
                 <div className="dc-forecast-condition">
                   <CloudRain size={15} className="dc-forecast-icon" />
-                  <span>{item.condition}</span>
+                  <span>{translateWeatherConditionText(item.condition, t)}</span>
                 </div>
-                <span className="dc-forecast-rain">{item.rainProb}% rain</span>
+                <span className="dc-forecast-rain">{item.rainProb}% {t('weather.rain', 'rain')}</span>
                 <div className="dc-forecast-temps">
                   <span className="dc-temp-high">{item.high}°</span>
                   <span className="dc-temp-low">{item.low}°</span>

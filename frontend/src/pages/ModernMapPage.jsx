@@ -246,28 +246,28 @@ export default function ModernMapPage() {
           className={`dc-map-pill ${filter === 'ALL' ? 'active' : ''}`}
           onClick={() => setFilter('ALL')}
         >
-          All Layers
+          {t('map.allLayers', 'All Layers')}
         </button>
         <button
           className={`dc-map-pill red ${filter === 'HAZARDS' ? 'active' : ''}`}
           onClick={() => setFilter('HAZARDS')}
         >
           <span className="dc-pill-dot red" />
-          <span>Hazards ({hazards.length})</span>
+          <span>{t('map.layerDisasters', 'Hazards')} ({hazards.length})</span>
         </button>
         <button
           className={`dc-map-pill clay ${filter === 'INCIDENTS' ? 'active' : ''}`}
           onClick={() => setFilter('INCIDENTS')}
         >
           <span className="dc-pill-dot clay" />
-          <span>Incidents ({incidents.length})</span>
+          <span>{t('incidents.title', 'Incidents')} ({incidents.length})</span>
         </button>
         <button
           className={`dc-map-pill green ${filter === 'SHELTERS' ? 'active' : ''}`}
           onClick={() => setFilter('SHELTERS')}
         >
           <span className="dc-pill-dot green" />
-          <span>Shelters ({shelters.length})</span>
+          <span>{t('map.layerShelters', 'Shelters')} ({shelters.length})</span>
         </button>
       </div>
 
@@ -383,7 +383,7 @@ export default function ModernMapPage() {
               {selectedEntity.capacity && (
                 <span className="dc-meta-item">
                   <Home size={14} />
-                  <span>Capacity: {selectedEntity.capacity}</span>
+                  <span>{t('shelters.capacity', 'Capacity')}: {selectedEntity.capacity}</span>
                 </span>
               )}
             </div>
@@ -398,14 +398,14 @@ export default function ModernMapPage() {
                 className="dc-btn-primary"
               >
                 <Navigation size={15} />
-                <span>Get Directions</span>
+                <span>{t('common.directions', 'Get Directions')}</span>
               </a>
               {selectedEntity.phone && (
                 <a
                   href={`tel:${selectedEntity.phone}`}
                   className="dc-btn-secondary"
                 >
-                  <span>Call {selectedEntity.phone}</span>
+                  <span>{t('common.call', 'Call')} {selectedEntity.phone}</span>
                 </a>
               )}
             </div>

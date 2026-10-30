@@ -233,8 +233,8 @@ export default function ModernSafetyPage({ onOpenSos }) {
         {/* Page Header */}
         <header className="dc-safety-page-header">
           <div>
-            <span className="dc-section-subtitle">PERSONAL DEFENSE & PREPAREDNESS</span>
-            <h1 className="dc-page-title">My Safety</h1>
+            <span className="dc-section-subtitle">{t('emergency.emergencyServices', 'PERSONAL DEFENSE & PREPAREDNESS')}</span>
+            <h1 className="dc-page-title">{t('nav.safety', 'My Safety')}</h1>
           </div>
           <button
             onClick={onOpenSos}
@@ -286,12 +286,12 @@ export default function ModernSafetyPage({ onOpenSos }) {
             ===================================================================== */}
         <section className="dc-safety-section">
           <div className="dc-section-header-row">
-            <h2 className="dc-section-title">Nearest Relief Shelter</h2>
+            <h2 className="dc-section-title">{t('shelters.shelterDirectory', 'Nearest Relief Shelter')}</h2>
             <button
               onClick={() => navigate('/shelters')}
               className="dc-text-link"
             >
-              <span>All Shelters ({shelters.length})</span>
+              <span>{t('shelters.viewAll', 'All Shelters')} ({shelters.length})</span>
               <ExternalLink size={14} />
             </button>
           </div>
@@ -336,7 +336,7 @@ export default function ModernSafetyPage({ onOpenSos }) {
                   title="Open driving / walking directions"
                 >
                   <Navigation size={15} />
-                  <span>Directions</span>
+                  <span>{t('common.directions', 'Directions')}</span>
                 </a>
                 <a
                   href={`tel:${nearestShelter.contactPhone || nearestShelter.phone || '112'}`}
@@ -344,14 +344,14 @@ export default function ModernSafetyPage({ onOpenSos }) {
                   title="Call facility"
                 >
                   <PhoneCall size={14} />
-                  <span>Call Facility</span>
+                  <span>{t('common.call', 'Call Facility')}</span>
                 </a>
               </div>
             </div>
           ) : (
             <div className="dc-empty-shelter-card">
               <MapPin size={24} className="dc-empty-icon" />
-              <h4>No Verified Shelter Recorded Within Range</h4>
+              <h4>{t('shelters.noSheltersFound', 'No Verified Shelter Recorded Within Range')}</h4>
               <p>
                 No active shelter facilities are presently mapped in this sector directory. For official relocation routing, dial <strong>112</strong> immediately.
               </p>
@@ -359,7 +359,7 @@ export default function ModernSafetyPage({ onOpenSos }) {
                 onClick={() => navigate('/shelters')}
                 className="dc-btn-secondary"
               >
-                <span>Browse Full Directory</span>
+                <span>{t('shelters.browseAll', 'Browse Full Directory')}</span>
               </button>
             </div>
           )}
@@ -370,8 +370,8 @@ export default function ModernSafetyPage({ onOpenSos }) {
             ===================================================================== */}
         <section className="dc-safety-section">
           <div className="dc-section-header-row">
-            <h2 className="dc-section-title">Verified Emergency Helplines</h2>
-            <span className="dc-contacts-caption">Tap to dial instantly</span>
+            <h2 className="dc-section-title">{t('landing.civilDefenseHotlines', 'Verified Emergency Helplines')}</h2>
+            <span className="dc-contacts-caption">{t('safety.tapToDial', 'Tap to dial instantly')}</span>
           </div>
           <div className="dc-contacts-grid">
             {emergencyContacts.map((contact, idx) => (
@@ -399,8 +399,8 @@ export default function ModernSafetyPage({ onOpenSos }) {
             ===================================================================== */}
         <section className="dc-safety-section">
           <div className="dc-section-header-row">
-            <h2 className="dc-section-title">Saved Locations</h2>
-            <span className="dc-contacts-caption">Monitored Sectors</span>
+            <h2 className="dc-section-title">{t('safety.savedLocations', 'Saved Locations')}</h2>
+            <span className="dc-contacts-caption">{t('safety.monitoredSectors', 'Monitored Sectors')}</span>
           </div>
           <div className="dc-saved-places-list">
             {savedPlaces.map((place) => {
@@ -422,7 +422,7 @@ export default function ModernSafetyPage({ onOpenSos }) {
                     </div>
                   </div>
                   <span className="dc-place-status-pill safe">
-                    Perimeter Monitored
+                    {t('safety.perimeterMonitored', 'Perimeter Monitored')}
                   </span>
                 </div>
               );
@@ -435,9 +435,9 @@ export default function ModernSafetyPage({ onOpenSos }) {
             ===================================================================== */}
         <section className="dc-safety-section">
           <div className="dc-section-header-row">
-            <h2 className="dc-section-title">72-Hour Preparedness Checklist</h2>
+            <h2 className="dc-section-title">{t('safety.checklistTitle', '72-Hour Preparedness Checklist')}</h2>
             <span className="dc-checklist-counter">
-              {checklist.filter((c) => c.checked).length} of {checklist.length} Complete
+              {checklist.filter((c) => c.checked).length} {t('common.of', 'of')} {checklist.length} {t('common.complete', 'Complete')}
             </span>
           </div>
           <div className="dc-checklist-box">

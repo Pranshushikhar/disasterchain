@@ -23,7 +23,7 @@ export const WeatherGPTProvider = ({ children }) => {
   // Assistant Window State (Persistent across navigation)
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [chatLanguage, setChatLanguage] = useState(() => currentLanguage || 'hinglish');
+  const [chatLanguage, setChatLanguage] = useState(() => currentLanguage || 'en');
 
   // Keep chat language in sync when global language changes
   useEffect(() => {
@@ -177,7 +177,7 @@ export const WeatherGPTProvider = ({ children }) => {
         const placeLabel = globalCity || globalLocationName || locationName.city || locationName.displayName || 'Operations Area';
         const activeLat = coords?.lat ?? locationCoordinates.latitude;
         const activeLon = coords?.lon ?? locationCoordinates.longitude;
-        const activeLang = chatLanguage || currentLanguage || 'hinglish';
+        const activeLang = chatLanguage || currentLanguage || 'en';
 
         const res = await sendWeatherGPTChat({
           message: text,

@@ -14,6 +14,7 @@ import {
   Sparkles,
   ExternalLink,
 } from 'lucide-react';
+import { useTranslation } from '../i18n/i18n';
 
 const TOUR_STORAGE_KEY = 'disasterchain_tour_completed';
 
@@ -128,6 +129,7 @@ export default function OnboardingTour({
   onComplete,
   onDismiss,
 }) {
+  const { t } = useTranslation();
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
   const [targetRect, setTargetRect] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0, placement: 'center' });
@@ -390,10 +392,10 @@ export default function OnboardingTour({
             <div className="dc-tour-badge-row">
               <span className="dc-tour-badge">
                 <StepIcon size={13} className="dc-tour-badge-icon" />
-                <span>{step.badge}</span>
+                <span>{t(`tour.${step.id}.badge`, step.badge)}</span>
               </span>
               <span className="dc-tour-step-counter">
-                Step {currentStepIdx + 1} of {TOUR_STEPS.length}
+                {t('common.step', 'Step')} {currentStepIdx + 1} {t('common.of', 'of')} {TOUR_STEPS.length}
               </span>
             </div>
 
@@ -420,12 +422,12 @@ export default function OnboardingTour({
 
           {/* Title & Description */}
           <div className="dc-tour-card-body">
-            <h3 className="dc-tour-title">{step.title}</h3>
-            <p className="dc-tour-desc">{step.description}</p>
+            <h3 className="dc-tour-title">{t(`tour.${step.id}.title`, step.title)}</h3>
+            <p className="dc-tour-desc">{t(`tour.${step.id}.desc`, step.description)}</p>
             {step.tip && (
               <div className="dc-tour-tip">
                 <span className="dc-tour-tip-dot" />
-                <span>{step.tip}</span>
+                <span>{t(`tour.${step.id}.tip`, step.tip)}</span>
               </div>
             )}
           </div>
@@ -437,7 +439,7 @@ export default function OnboardingTour({
               className="dc-tour-btn-skip"
               onClick={handleSkip}
             >
-              Skip tour
+              {t('common.skip', 'Skip tour')}
             </button>
 
             <div className="dc-tour-btn-group">
@@ -449,7 +451,7 @@ export default function OnboardingTour({
                   aria-label="Previous step"
                 >
                   <ArrowLeft size={15} />
-                  <span>Back</span>
+                  <span>{t('common.back', 'Back')}</span>
                 </button>
               )}
 
@@ -459,7 +461,7 @@ export default function OnboardingTour({
                 onClick={handleNext}
                 autoFocus
               >
-                <span>{step.actionText || (isLastStep ? 'Finish' : 'Next')}</span>
+                <span>{step.actionText ? t('tour.finish.action', step.actionText) : (isLastStep ? t('common.finish', 'Finish') : t('common.next', 'Next'))}</span>
                 {!isLastStep && <ArrowRight size={15} />}
                 {isLastStep && <CheckCircle size={15} />}
               </button>

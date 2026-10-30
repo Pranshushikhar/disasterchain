@@ -29,7 +29,6 @@ import ks from './locales/ks.json';
 import mai from './locales/mai.json';
 import sd from './locales/sd.json';
 import mni from './locales/mni.json';
-import hinglish from './locales/hinglish.json';
 
 const LOCALES = {
   en,
@@ -52,7 +51,6 @@ const LOCALES = {
   mai,
   sd,
   mni,
-  hinglish,
 };
 
 // Set of warned missing keys to avoid spamming console

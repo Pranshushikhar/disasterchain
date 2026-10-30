@@ -10,8 +10,10 @@ import {
   Loader2,
 } from 'lucide-react';
 import { createSosRequest } from '../services/api';
+import { useTranslation } from '../i18n/i18n';
 
 export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
+  const { t } = useTranslation();
   const [coords, setCoords] = useState({ lat: 28.6139, lon: 77.209 });
   const [beaconStatus, setBeaconStatus] = useState('idle'); // 'idle' | 'sending' | 'sent'
 
@@ -91,10 +93,10 @@ export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
         {/* Header */}
         <div className="dc-sos-header">
           <div className="dc-sos-title-group">
-            <span className="dc-sos-tag">EMERGENCY PROTOCOL</span>
-            <h2 className="dc-sos-title">Immediate SOS Assistance</h2>
+            <span className="dc-sos-tag">{t('emergency.emergencyServices', 'EMERGENCY PROTOCOL')}</span>
+            <h2 className="dc-sos-title">{t('emergency.sosTitle', 'Immediate SOS Assistance')}</h2>
           </div>
-          <button className="dc-sos-close-btn" onClick={onClose} aria-label="Close">
+          <button className="dc-sos-close-btn" onClick={onClose} aria-label={t('common.close', 'Close')}>
             <X size={20} />
           </button>
         </div>
@@ -103,7 +105,7 @@ export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
         <div className="dc-sos-coords-pill">
           <MapPin size={14} />
           <span>
-            Current GPS: {coords.lat}°N, {coords.lon}°E
+            {t('emergency.yourLocation', 'Current GPS')}: {coords.lat}°N, {coords.lon}°E
           </span>
         </div>
 
@@ -111,8 +113,8 @@ export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
         <a href="tel:112" className="dc-sos-action-btn emergency">
           <PhoneCall size={24} />
           <div className="dc-sos-action-text">
-            <span className="dc-sos-primary-label">CALL 112</span>
-            <span className="dc-sos-sub-label">National Universal Emergency Dispatch</span>
+            <span className="dc-sos-primary-label">{t('emergency.call112', 'CALL 112')}</span>
+            <span className="dc-sos-sub-label">{t('offline.nationalEmergency', 'National Universal Emergency Dispatch')}</span>
           </div>
         </a>
 
@@ -123,8 +125,8 @@ export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
         >
           <Share2 size={22} />
           <div className="dc-sos-action-text">
-            <span className="dc-sos-primary-label">SHARE LIVE GPS LOCATION</span>
-            <span className="dc-sos-sub-label">Transmit coordinates via WhatsApp / SMS / System</span>
+            <span className="dc-sos-primary-label">{t('emergency.enterLocation', 'SHARE LIVE GPS LOCATION')}</span>
+            <span className="dc-sos-sub-label">{t('offline.smsDistressDesc', 'Transmit coordinates via WhatsApp / SMS / System')}</span>
           </div>
         </button>
 
@@ -144,13 +146,13 @@ export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
           <div className="dc-sos-action-text">
             <span className="dc-sos-primary-label">
               {beaconStatus === 'sending'
-                ? 'BROADCASTING DISTRESS BEACON...'
+                ? t('sos.acquiringGps', 'BROADCASTING DISTRESS BEACON...')
                 : beaconStatus === 'sent'
-                ? 'BEACON TRANSMITTED TO RESCUE LOG'
-                : 'BROADCAST DISTRESS BEACON'}
+                ? t('sos.beaconBroadcasted', 'BEACON TRANSMITTED TO RESCUE LOG')
+                : t('emergency.broadcastSos', 'BROADCAST DISTRESS BEACON')}
             </span>
             <span className="dc-sos-sub-label">
-              Notifies nearby disaster responders & relief teams
+              {t('sos.confirmDesc', 'Notifies nearby disaster responders & relief teams')}
             </span>
           </div>
         </button>
@@ -158,16 +160,16 @@ export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
         {/* Direct Quick Lines */}
         <div className="dc-sos-lines-grid">
           <a href="tel:100" className="dc-sos-line-pill">
-            Police: 100
+            {t('common.police', 'Police')}: 100
           </a>
           <a href="tel:108" className="dc-sos-line-pill">
-            Ambulance: 108
+            {t('common.ambulance', 'Ambulance')}: 108
           </a>
           <a href="tel:101" className="dc-sos-line-pill">
-            Fire: 101
+            {t('common.fire', 'Fire')}: 101
           </a>
           <a href="tel:1078" className="dc-sos-line-pill">
-            Disaster: 1078
+            {t('common.disaster', 'Disaster')}: 1078
           </a>
         </div>
       </motion.div>
