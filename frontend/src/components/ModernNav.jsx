@@ -26,6 +26,7 @@ import {
   Check,
   Globe,
   Search,
+  Mic,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeatherGPT } from '../context/WeatherGPTContext';
@@ -70,6 +71,18 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
   useEffect(() => {
     setIsMobileDrawerOpen(false);
   }, [location.pathname]);
+
+  // Listen for voice-triggered modal openings
+  useEffect(() => {
+    const handleOpenContacts = () => setIsContactsOpen(true);
+    const handleOpenSettings = () => setIsSettingsOpen(true);
+    window.addEventListener('dc:openContacts', handleOpenContacts);
+    window.addEventListener('dc:openSettings', handleOpenSettings);
+    return () => {
+      window.removeEventListener('dc:openContacts', handleOpenContacts);
+      window.removeEventListener('dc:openSettings', handleOpenSettings);
+    };
+  }, []);
 
   const toggleCollapse = () => {
     setIsCollapsed((prev) => !prev);
@@ -248,6 +261,22 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                 <Compass size={18} className="dc-sidebar-icon" />
                 {!isCollapsed && (
                   <span className="dc-sidebar-label">{t('nav.helpTour', 'Help & Tour')}</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                id="dc-sidebar-voice-btn"
+                onClick={() => {
+                  const voiceBtn = document.getElementById('dc-global-voice-assistant-btn');
+                  if (voiceBtn) voiceBtn.click();
+                }}
+                className="dc-sidebar-link dc-sidebar-action-btn"
+                title={isCollapsed ? 'Voice Control (Alt+V)' : undefined}
+              >
+                <Mic size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && (
+                  <span className="dc-sidebar-label">Voice Control</span>
                 )}
               </button>
 

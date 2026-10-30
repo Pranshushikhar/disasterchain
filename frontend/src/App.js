@@ -21,6 +21,8 @@ import ModernIncidentsPage from './pages/ModernIncidentsPage';
 import ModernSafetyPage from './pages/ModernSafetyPage';
 import ModernWeatherGPT from './components/ModernWeatherGPT';
 import ModernSosModal from './components/ModernSosModal';
+import GlobalVoiceAssistant from './components/GlobalVoiceAssistant';
+import { VoiceAssistantProvider } from './context/VoiceAssistantContext';
 import CitySelectorModal from './components/CitySelectorModal';
 import Footer from './components/Footer';
 
@@ -158,7 +160,14 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="dc-app-layout">
+    <VoiceAssistantProvider
+      onOpenSos={() => setIsSosOpen(true)}
+      onCloseSos={() => setIsSosOpen(false)}
+      onOpenIncident={() => setIsIncidentOpen(true)}
+      onOpenContacts={() => window.dispatchEvent(new CustomEvent('dc:openContacts'))}
+      onOpenSettings={() => window.dispatchEvent(new CustomEvent('dc:openSettings'))}
+    >
+      <div className="dc-app-layout">
       {/* 0. LIVING ENVIRONMENT ATMOSPHERIC CANVAS */}
       <LivingEnvironment />
 
@@ -274,6 +283,9 @@ const AppLayout = () => {
       {/* 4. PERSISTENT WEATHERGPT FLOATING ASSISTANT */}
       {!isPublicStandalone && <ModernWeatherGPT />}
 
+      {/* 4.5. PERSISTENT GLOBAL VOICE ASSISTANT */}
+      {!isPublicStandalone && <GlobalVoiceAssistant />}
+
       {/* 5. PERSISTENT EMERGENCY SOS MODAL */}
       <ModernSosModal
         isOpen={isSosOpen}
@@ -309,6 +321,7 @@ const AppLayout = () => {
       <PWAInstallPrompt />
       <PWAUpdateToast />
     </div>
+    </VoiceAssistantProvider>
   );
 };
 

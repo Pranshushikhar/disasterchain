@@ -10,14 +10,20 @@ import {
   RefreshCw,
   AlertCircle,
   Globe,
+  Mic,
+  Volume2,
+  Square,
+  Radio,
 } from 'lucide-react';
 import { useWeatherGPT } from '../context/WeatherGPTContext';
 import { useTranslation } from '../i18n/i18n';
+import { useVoiceAssistant } from '../context/VoiceAssistantContext';
+import { cleanTextForSpeech } from '../services/voiceService';
 import MarkdownRenderer from './MarkdownRenderer';
 
 export default function ModernWeatherGPT() {
   const location = useLocation();
-  const { t, languages } = useTranslation();
+  const { t, languages, currentLanguage } = useTranslation();
   const {
     isOpen,
     openWeatherGPT,
@@ -30,10 +36,27 @@ export default function ModernWeatherGPT() {
     setChatLanguage,
   } = useWeatherGPT();
 
+  const {
+    isListening,
+    isSpeaking,
+    startListening,
+    stopListening,
+    speakText,
+    cancelSpeech,
+    isMuted,
+    setIsMuted,
+    isVoiceConversationActive,
+    setIsVoiceConversationActive,
+    transcript,
+    interimTranscript,
+  } = useVoiceAssistant();
+
   const [input, setInput] = useState('');
   const chatBodyRef = useRef(null);
   const messagesEndRef = useRef(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const [speakingMessageId, setSpeakingMessageId] = useState(null);
+  const lastSpokenMessageIdRef = useRef(null);
 
   // Auto-scroll messages only when user is near bottom
   useEffect(() => {
@@ -49,6 +72,43 @@ export default function ModernWeatherGPT() {
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 60;
     setShouldAutoScroll(isNearBottom);
   }, []);
+
+  // Sync spoken transcript to input field when WeatherGPT is open
+  useEffect(() => {
+    if (isOpen && isListening) {
+      if (interimTranscript) {
+        setInput(interimTranscript);
+      } else if (transcript) {
+        setInput(transcript);
+      }
+    }
+  }, [isOpen, isListening, interimTranscript, transcript]);
+
+  // Auto-speak newly received assistant messages when in voice mode or when user spoke
+  useEffect(() => {
+    if (!isOpen || messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+
+    if (
+      lastMsg &&
+      lastMsg.role === 'assistant' &&
+      lastMsg.id !== lastSpokenMessageIdRef.current &&
+      (isVoiceConversationActive || isListening || lastMsg.id.startsWith('a_'))
+    ) {
+      lastSpokenMessageIdRef.current = lastMsg.id;
+
+      // Speak text if voice mode is on or user used voice
+      if (isVoiceConversationActive && !isMuted) {
+        const textToSpeak = cleanTextForSpeech(lastMsg.content);
+        setSpeakingMessageId(lastMsg.id);
+        speakText(textToSpeak, {
+          lang: chatLanguage || currentLanguage || 'en',
+          onEnd: () => setSpeakingMessageId(null),
+          onError: () => setSpeakingMessageId(null),
+        });
+      }
+    }
+  }, [messages, isOpen, isVoiceConversationActive, isMuted, speakText, chatLanguage, currentLanguage, isListening]);
 
   // Contextual chip prompts based on current page and language
   const contextualChips = React.useMemo(() => {
@@ -92,6 +152,7 @@ export default function ModernWeatherGPT() {
     const query = textToSend || input;
     if (!query.trim() || isLoading) return;
     setShouldAutoScroll(true);
+    cancelSpeech();
     sendMessage(query);
     setInput('');
   };
@@ -100,6 +161,31 @@ export default function ModernWeatherGPT() {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const toggleMicInsideWeatherGPT = () => {
+    cancelSpeech();
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  const handlePlayMessageAudio = (msg) => {
+    if (speakingMessageId === msg.id && isSpeaking) {
+      cancelSpeech();
+      setSpeakingMessageId(null);
+    } else {
+      cancelSpeech();
+      setSpeakingMessageId(msg.id);
+      const text = cleanTextForSpeech(msg.content);
+      speakText(text, {
+        lang: chatLanguage || currentLanguage || 'en',
+        onEnd: () => setSpeakingMessageId(null),
+        onError: () => setSpeakingMessageId(null),
+      });
     }
   };
 
@@ -155,6 +241,34 @@ export default function ModernWeatherGPT() {
               </div>
 
               <div className="dc-chat-header-actions">
+                {/* Voice Conversation Mode Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setIsVoiceConversationActive(!isVoiceConversationActive)}
+                  className={`dc-chat-header-btn ${isVoiceConversationActive ? 'active-voice' : ''}`}
+                  title={
+                    isVoiceConversationActive
+                      ? 'Two-Way Voice Conversation Active (Click to disable)'
+                      : 'Enable Hands-Free Voice Conversation Mode'
+                  }
+                  aria-label="Toggle voice conversation mode"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    padding: '3px 8px',
+                    borderRadius: 6,
+                    background: isVoiceConversationActive ? 'rgba(88, 214, 141, 0.2)' : 'transparent',
+                    border: isVoiceConversationActive ? '1px solid #58D68D' : '1px solid transparent',
+                    color: isVoiceConversationActive ? '#58D68D' : 'var(--text-muted)',
+                  }}
+                >
+                  <Radio size={13} className={isVoiceConversationActive ? 'dc-pulse-fast' : ''} />
+                  <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>
+                    {isVoiceConversationActive ? 'Voice Mode' : 'Voice'}
+                  </span>
+                </button>
+
                 {/* Language Switcher Dropdown inside WeatherGPT */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <Globe size={13} style={{ color: 'var(--text-muted)' }} />
@@ -199,7 +313,10 @@ export default function ModernWeatherGPT() {
                 <button
                   type="button"
                   className="dc-chat-close-btn"
-                  onClick={closeWeatherGPT}
+                  onClick={() => {
+                    cancelSpeech();
+                    closeWeatherGPT();
+                  }}
                   aria-label="Close Assistant"
                   title="Close Assistant"
                 >
@@ -224,28 +341,27 @@ export default function ModernWeatherGPT() {
             </div>
 
             {/* Chat Body */}
-            <div
-              className="dc-chat-body"
-              ref={chatBodyRef}
-              onScroll={handleScroll}
-              role="log"
-              aria-live="polite"
-            >
+            <div className="dc-chat-body" ref={chatBodyRef} onScroll={handleScroll}>
               {messages.length === 0 ? (
                 <div className="dc-chat-empty-state">
-                  <div className="dc-chat-empty-icon">
-                    <Sparkles size={24} />
+                  <div className="dc-empty-icon-wrap">
+                    <Sparkles size={28} className="dc-sparkle-icon" />
                   </div>
-                  <h5>
-                    {t('weatherGpt.greeting', 'How can I assist your safety?')}
+                  <h5 className="dc-empty-title">
+                    {t('weatherGpt.emptyTitle', 'Operational Atmospheric Copilot')}
                   </h5>
-                  <p>
-                    {t('weatherGpt.emptyPrompt', 'Ask about localized rain, flood outlooks, road safety, evacuation corridors, or emergency go-bags.')}
+                  <p className="dc-empty-desc">
+                    {t(
+                      'weatherGpt.emptyDesc',
+                      'Ask about rainfall telemetry, cyclonic trajectories, flood risk, or shelter accessibility in any of 20 languages.'
+                    )}
                   </p>
                 </div>
               ) : (
                 messages.map((m) => {
-                  const isError = m.id && String(m.id).startsWith('err_');
+                  const isError = m.intentCard?.badge === 'TELEMETRY DISRUPTION';
+                  const isThisSpeaking = speakingMessageId === m.id && isSpeaking;
+
                   return (
                     <div
                       key={m.id}
@@ -281,6 +397,46 @@ export default function ModernWeatherGPT() {
                           </div>
                         )}
 
+                        {/* Assistant Message Audio & Timestamp Controls */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginTop: 6,
+                            gap: 8,
+                          }}
+                        >
+                          {m.role === 'assistant' && !isError && (
+                            <button
+                              type="button"
+                              onClick={() => handlePlayMessageAudio(m)}
+                              className="dc-msg-audio-btn"
+                              title={isThisSpeaking ? 'Stop speech' : 'Listen to response'}
+                              aria-label={isThisSpeaking ? 'Stop speech' : 'Listen to response'}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                background: isThisSpeaking ? 'rgba(88, 214, 141, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                                border: '1px solid var(--border-subtle)',
+                                borderRadius: 4,
+                                padding: '2px 6px',
+                                fontSize: '0.7rem',
+                                color: isThisSpeaking ? '#58D68D' : 'var(--text-secondary)',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {isThisSpeaking ? <Square size={11} /> : <Volume2 size={11} />}
+                              <span>{isThisSpeaking ? 'Stop' : 'Listen'}</span>
+                            </button>
+                          )}
+
+                          {m.timestamp && (
+                            <div className="dc-msg-timestamp">{m.timestamp}</div>
+                          )}
+                        </div>
+
                         {isError && lastUserPrompt && (
                           <button
                             type="button"
@@ -291,10 +447,6 @@ export default function ModernWeatherGPT() {
                             <RefreshCw size={13} />
                             <span>Retry inquiry</span>
                           </button>
-                        )}
-
-                        {m.timestamp && (
-                          <div className="dc-msg-timestamp">{m.timestamp}</div>
                         )}
                       </div>
                     </div>
@@ -325,11 +477,46 @@ export default function ModernWeatherGPT() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={t('weatherGpt.placeholder', 'Ask about weather, risk, or emergency...')}
-                className="dc-chat-input"
+                placeholder={
+                  isListening
+                    ? 'Listening... speak your question...'
+                    : t('weatherGpt.placeholder', 'Ask about weather, risk, or emergency...')
+                }
+                className={`dc-chat-input ${isListening ? 'listening-active' : ''}`}
                 rows={1}
                 aria-label="Ask WeatherGPT a question"
               />
+
+              {/* In-chat Microphone Button */}
+              <button
+                type="button"
+                id="dc-weathergpt-mic-btn"
+                onClick={toggleMicInsideWeatherGPT}
+                className={`dc-chat-mic-btn ${isListening ? 'listening' : ''}`}
+                aria-label={isListening ? 'Stop listening' : 'Speak to WeatherGPT'}
+                title={isListening ? 'Stop listening' : 'Speak to WeatherGPT'}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  border: isListening ? '1px solid #E74C3C' : '1px solid var(--border-subtle)',
+                  background: isListening ? 'rgba(231, 76, 60, 0.25)' : 'var(--dc-surface)',
+                  color: isListening ? '#E74C3C' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {isListening ? (
+                  <Mic size={16} className="dc-pulse-fast" />
+                ) : (
+                  <Mic size={16} />
+                )}
+              </button>
+
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}

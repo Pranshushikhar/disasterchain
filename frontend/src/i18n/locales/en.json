@@ -1036,5 +1036,33 @@
     "prevBlockHash": "PREVIOUS BLOCK HASH",
     "digitalSignature": "DIGITAL SIGNATURE",
     "verifiedLedger": "100% Cryptographic Verification"
+  },
+  "voice": {
+    "voiceControl": "Voice Control",
+    "listening": "Listening for commands...",
+    "listeningState": "Listening...",
+    "speaking": "Speaking...",
+    "speakingState": "Speaking...",
+    "processing": "Processing command...",
+    "processingState": "Working...",
+    "ready": "Voice Assistant",
+    "sayCommand": "Speak naturally... e.g. \"Open shelters\", \"What is the weather today?\", or \"SOS\"",
+    "idleHint": "Click microphone or press Alt+V to speak.",
+    "sosTitle": "Emergency Assistance Requested",
+    "sosInstruction": "Your location has been locked. Say \"Confirm SOS\" or click confirm below to dispatch emergency rescue.",
+    "sosAnnounce": "Emergency assistance protocol initiated. Your GPS location has been detected. Say \"Confirm SOS\" to transmit distress beacon, or say \"Cancel SOS\" to abort.",
+    "sosConfirmed": "Emergency distress beacon has been transmitted with your coordinates. Relief dispatch has been alerted.",
+    "sosLocalAlert": "Emergency SOS broadcast recorded locally. Keep device powered and proceed to designated safety corridor.",
+    "sosCancelled": "Emergency SOS cancelled. Standing down.",
+    "navHome": "Returning to Home Command Center.",
+    "navWeather": "Opening Weather Intelligence.",
+    "navShelters": "Opening Emergency Shelters directory.",
+    "navMap": "Opening Regional Spatial Map.",
+    "navIncidents": "Opening Incident Reports.",
+    "navSafety": "Opening Disaster Safety Guidelines.",
+    "navContacts": "Showing Emergency Helplines.",
+    "navSettings": "Opening Platform Settings.",
+    "navBack": "Navigating back.",
+    "navWeatherGpt": "Opening WeatherGPT Copilot."
   }
 }
