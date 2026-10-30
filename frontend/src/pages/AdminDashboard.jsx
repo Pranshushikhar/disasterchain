@@ -286,7 +286,16 @@ const AdminDashboard = () => {
       )}
 
       {/* Admin Navigation Tabs */}
-      <div className="dc-admin-tabs-bar">
+      <div
+        style={{
+          display: 'flex',
+          gap: '0.5rem',
+          borderBottom: '1px solid var(--border-subtle)',
+          marginBottom: '1.75rem',
+          overflowX: 'auto',
+          paddingBottom: '0.5rem',
+        }}
+      >
         {[
           { id: 'overview', label: t('admin.systemHealth', 'System Analytics'), icon: 'activity' },
           { id: 'verification', label: t('admin.incidentVerification', 'Incident Verification'), icon: 'shield' },
@@ -304,7 +313,12 @@ const AdminDashboard = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`dc-admin-tab-btn ${isTabActive ? 'active' : ''}`}
+              className={`btn ${isTabActive ? 'btn-primary' : 'btn-ghost'}`}
+              style={{
+                padding: '0.65rem 1rem',
+                fontSize: '0.86rem',
+                whiteSpace: 'nowrap',
+              }}
             >
               <Icon name={tab.icon} size={16} />
               <span>{tab.label}</span>
@@ -396,7 +410,7 @@ const AdminDashboard = () => {
           <div className="grid-cols-2" style={{ marginBottom: '1.75rem' }}>
             {/* SOS by Severity Breakdown */}
             <div className="glass-card">
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: 'var(--dc-text, #1E2725)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Icon name="sos" size={18} color="#ff334b" />
                 <span>SOS Requests by Severity Breakdown</span>
               </h3>
@@ -409,10 +423,10 @@ const AdminDashboard = () => {
                   return (
                     <div key={sev}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
-                        <span style={{ color: '#ffffff', fontWeight: 600 }}>{sev} Severity</span>
+                        <span style={{ color: 'var(--dc-text, #1E2725)', fontWeight: 600 }}>{sev} Severity</span>
                         <strong style={{ color }}>{count} ({pct}%)</strong>
                       </div>
-                      <div style={{ width: '100%', height: '8px', background: '#1e293b', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: '8px', background: 'var(--border-medium, rgba(30, 39, 37, 0.14))', borderRadius: '4px', overflow: 'hidden' }}>
                         <div style={{ width: `${pct}%`, height: '100%', background: color }} />
                       </div>
                     </div>
@@ -423,7 +437,7 @@ const AdminDashboard = () => {
 
             {/* Shelter Occupancy Distribution */}
             <div className="glass-card">
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: 'var(--dc-text, #1E2725)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Icon name="home" size={18} color="#10b981" />
                 <span>Shelter Occupancy Status</span>
               </h3>
@@ -433,10 +447,10 @@ const AdminDashboard = () => {
                   return (
                     <div key={sh._id}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
-                        <span style={{ color: '#ffffff', fontWeight: 600 }}>{sh.name}</span>
+                        <span style={{ color: 'var(--dc-text, #1E2725)', fontWeight: 600 }}>{sh.name}</span>
                         <strong style={{ color: pct >= 100 ? '#ff6b7e' : '#34d399' }}>{sh.occupancy} / {sh.capacity} ({pct}%)</strong>
                       </div>
-                      <div style={{ width: '100%', height: '8px', background: '#1e293b', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: '8px', background: 'var(--border-medium, rgba(30, 39, 37, 0.14))', borderRadius: '4px', overflow: 'hidden' }}>
                         <div style={{ width: `${pct}%`, height: '100%', background: pct >= 100 ? '#ff334b' : 'linear-gradient(90deg, #10b981, #06b6d4)' }} />
                       </div>
                     </div>
@@ -470,9 +484,9 @@ const AdminDashboard = () => {
             <tbody>
               {sosList.map((sos) => (
                 <tr key={sos._id}>
-                  <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#ffffff' }}>{sos.requestId}</td>
+                  <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--dc-text, #1E2725)' }}>{sos.requestId}</td>
                   <td>
-                    <strong style={{ color: '#ffffff' }}>{sos.emergencyType}</strong>
+                    <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{sos.emergencyType}</strong>
                     <div><span className={`badge badge-${sos.severity?.toLowerCase()}`}>{sos.severity}</span></div>
                   </td>
                   <td>{sos.location}</td>
@@ -518,9 +532,9 @@ const AdminDashboard = () => {
             <tbody>
               {incidents.map((inc) => (
                 <tr key={inc._id}>
-                  <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#ffffff' }}>{inc.incidentId}</td>
+                  <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--dc-text, #1E2725)' }}>{inc.incidentId}</td>
                   <td>
-                    <strong style={{ color: '#ffffff' }}>{inc.title}</strong>
+                    <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{inc.title}</strong>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{inc.type}</div>
                   </td>
                   <td>{inc.location}</td>
@@ -552,7 +566,7 @@ const AdminDashboard = () => {
       {activeTab === 'shelters' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
           <div className="glass-card">
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: 'var(--dc-text, #1E2725)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Icon name="home" size={18} color="#10b981" />
               <span>Register Emergency Shelter</span>
             </h3>
@@ -624,7 +638,7 @@ const AdminDashboard = () => {
                 {shelters.map((s) => (
                   <tr key={s._id}>
                     <td>
-                      <strong style={{ color: '#ffffff' }}>{s.name}</strong>
+                      <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{s.name}</strong>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.address}</div>
                     </td>
                     <td>{s.occupancy} / {s.capacity}</td>
@@ -642,7 +656,7 @@ const AdminDashboard = () => {
       {activeTab === 'alerts' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.5rem' }}>
           <div className="glass-card">
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: 'var(--dc-text, #1E2725)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Icon name="bell" size={18} color="#ff334b" />
               <span>{t('alerts.broadcastEmergencyAlert', 'Broadcast Emergency Alert')}</span>
             </h3>
@@ -722,11 +736,11 @@ const AdminDashboard = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>{t('admin.activeBroadcasts', 'Active Broadcasts')}</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)' }}>{t('admin.activeBroadcasts', 'Active Broadcasts')}</h3>
             {alerts.map((a) => (
               <div key={a._id} className="glass-card" style={{ padding: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                  <strong style={{ fontSize: '0.95rem', color: '#ffffff' }}>{a.title}</strong>
+                  <strong style={{ fontSize: '0.95rem', color: 'var(--dc-text, #1E2725)' }}>{a.title}</strong>
                   <span className={`badge badge-${a.severity?.toLowerCase()}`}>{a.severity}</span>
                 </div>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{a.message}</p>
@@ -743,7 +757,7 @@ const AdminDashboard = () => {
             <span className="badge badge-blockchain" style={{ marginBottom: '0.4rem' }}>
               ⛓️ MINT TO LEDGER
             </span>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '1.15rem', color: 'var(--dc-text, #1E2725)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Icon name="box" size={18} color="#818cf8" />
               <span>Log Relief Aid Donation</span>
             </h3>
@@ -833,7 +847,7 @@ const AdminDashboard = () => {
               <tbody>
                 {donations.map((d) => (
                   <tr key={d._id}>
-                    <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#ffffff' }}>{d.donationId}</td>
+                    <td style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--dc-text, #1E2725)' }}>{d.donationId}</td>
                     <td>{d.donor}</td>
                     <td>{d.quantity} {d.unit} &bull; {d.resourceName}</td>
                     <td>{d.destination}</td>
@@ -868,7 +882,7 @@ const AdminDashboard = () => {
               {blockchainRecords.map((r) => (
                 <tr key={r._id}>
                   <td style={{ fontWeight: 700, color: '#818cf8', fontFamily: 'var(--font-mono)' }}>#{r.blockNumber || 1001}</td>
-                  <td style={{ fontFamily: 'var(--font-mono)', color: '#ffffff' }}>{r.transactionId}</td>
+                  <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--dc-text, #1E2725)' }}>{r.transactionId}</td>
                   <td><span className="badge badge-info">{r.entityType || 'Donation'}</span></td>
                   <td>{r.quantity} {r.unit} {r.resourceName}</td>
                   <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#38bdf8' }}>
@@ -906,7 +920,7 @@ const AdminDashboard = () => {
             }}
           >
             <div>
-              <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', margin: '0 0 0.25rem 0' }}>
+              <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', margin: '0 0 0.25rem 0' }}>
                 Personnel & Operator Management
               </h2>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
@@ -947,7 +961,7 @@ const AdminDashboard = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                   <span style={{ fontSize: '1.25rem' }}>⏳</span>
                   <div>
-                    <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.05rem', fontWeight: 800 }}>
+                    <h3 style={{ margin: 0, color: 'var(--dc-text, #1E2725)', fontSize: '1.05rem', fontWeight: 800 }}>
                       PENDING VERIFICATIONS
                     </h3>
                     <span style={{ fontSize: '0.75rem', color: 'var(--amber)' }}>
@@ -980,7 +994,7 @@ const AdminDashboard = () => {
                         .map((u) => (
                           <tr key={u._id}>
                             <td>
-                              <strong style={{ color: '#ffffff' }}>{u.name}</strong>
+                              <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{u.name}</strong>
                             </td>
                             <td style={{ color: 'var(--text-secondary)' }}>{u.email}</td>
                             <td>
@@ -1052,7 +1066,7 @@ const AdminDashboard = () => {
                     .map((u) => (
                       <tr key={u._id}>
                         <td>
-                          <strong style={{ color: '#ffffff' }}>{u.name}</strong>
+                          <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{u.name}</strong>
                         </td>
                         <td style={{ color: 'var(--text-secondary)' }}>{u.email}</td>
                         <td>
@@ -1127,7 +1141,7 @@ const AdminDashboard = () => {
             }}
           >
             <div>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.25rem' }}>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.25rem' }}>
                 Password Recovery Verification Grid
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', margin: 0 }}>
@@ -1180,7 +1194,7 @@ const AdminDashboard = () => {
               style={{ textAlign: 'center', padding: '3rem 1.5rem', color: 'var(--text-secondary)' }}
             >
               <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🛡️</div>
-              <h3 style={{ color: '#ffffff', fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+              <h3 style={{ color: 'var(--dc-text, #1E2725)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.35rem' }}>
                 No Recovery Requests Found
               </h3>
               <p style={{ fontSize: '0.85rem', maxWidth: '400px', margin: '0 auto' }}>
@@ -1223,7 +1237,7 @@ const AdminDashboard = () => {
                           }}
                         >
                           <td style={{ padding: '1rem' }}>
-                            <div style={{ fontWeight: 700, color: '#ffffff' }}>
+                            <div style={{ fontWeight: 700, color: 'var(--dc-text, #1E2725)' }}>
                               {userObj?.name || req.email}
                             </div>
                             <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
@@ -1346,7 +1360,7 @@ const AdminDashboard = () => {
                           <td style={{ padding: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                             {reviewerObj && (
                               <div>
-                                <strong style={{ color: '#ffffff' }}>By:</strong> {reviewerObj.name || reviewerObj.email}
+                                <strong style={{ color: 'var(--dc-text, #1E2725)' }}>By:</strong> {reviewerObj.name || reviewerObj.email}
                               </div>
                             )}
                             {req.reviewedAt && <div>{new Date(req.reviewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>}
@@ -1457,7 +1471,7 @@ const AdminDashboard = () => {
                 <Icon name="key" size={22} color="#ffffff" />
               </div>
               <div>
-                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.2rem', fontWeight: 800 }}>
+                <h3 style={{ margin: 0, color: 'var(--dc-text, #1E2725)', fontSize: '1.2rem', fontWeight: 800 }}>
                   Single-Use Recovery Code Generated
                 </h3>
                 <span style={{ fontSize: '0.75rem', color: 'var(--cyan)', fontWeight: 700 }}>
@@ -1565,7 +1579,7 @@ const AdminDashboard = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
               <span style={{ fontSize: '1.5rem' }}>⚠️</span>
               <div>
-                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.15rem', fontWeight: 800 }}>
+                <h3 style={{ margin: 0, color: 'var(--dc-text, #1E2725)', fontSize: '1.15rem', fontWeight: 800 }}>
                   Reject Password Recovery
                 </h3>
                 <span style={{ fontSize: '0.75rem', color: '#f43f5e', fontWeight: 700 }}>
@@ -1575,7 +1589,7 @@ const AdminDashboard = () => {
             </div>
 
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', lineHeight: 1.5, marginBottom: '1rem' }}>
-              Deny password recovery request for <strong style={{ color: '#ffffff' }}>{rejectionModalTarget.email}</strong>?
+              Deny password recovery request for <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{rejectionModalTarget.email}</strong>?
             </p>
 
             <div className="form-group" style={{ marginBottom: '1.5rem' }}>
@@ -1640,7 +1654,7 @@ const AdminDashboard = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
               <span style={{ fontSize: '1.5rem' }}>🛡️</span>
               <div>
-                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.15rem', fontWeight: 800 }}>
+                <h3 style={{ margin: 0, color: 'var(--dc-text, #1E2725)', fontSize: '1.15rem', fontWeight: 800 }}>
                   Administrator User Approval
                 </h3>
                 <span style={{ fontSize: '0.75rem', color: 'var(--cyan)' }}>{t('admin.manualVerification', 'MANUAL OPERATOR VERIFICATION')}</span>
@@ -1662,13 +1676,13 @@ const AdminDashboard = () => {
               }}
             >
               <div style={{ marginBottom: '0.35rem' }}>
-                <strong style={{ color: '#ffffff' }}>{t('admin.operator', 'Operator')}:</strong> {confirmVerifyUser.name}
+                <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{t('admin.operator', 'Operator')}:</strong> {confirmVerifyUser.name}
               </div>
               <div style={{ marginBottom: '0.35rem' }}>
-                <strong style={{ color: '#ffffff' }}>{t('auth.email', 'Email')}:</strong> {confirmVerifyUser.email}
+                <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{t('auth.email', 'Email')}:</strong> {confirmVerifyUser.email}
               </div>
               <div>
-                <strong style={{ color: '#ffffff' }}>{t('auth.role', 'Role')}:</strong>{' '}
+                <strong style={{ color: 'var(--dc-text, #1E2725)' }}>{t('auth.role', 'Role')}:</strong>{' '}
                 <span style={{ textTransform: 'capitalize', color: 'var(--cyan)', fontWeight: 700 }}>
                   {confirmVerifyUser.role}
                 </span>

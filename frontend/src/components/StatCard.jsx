@@ -4,39 +4,45 @@ import Icon from './Icons';
 const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
   const colorMap = {
     red: {
-      text: '#EF5350',
-      bg: 'rgba(239, 83, 80, 0.12)',
-      border: 'rgba(239, 83, 80, 0.35)',
+      text: 'var(--crimson)',
+      bg: 'rgba(255, 46, 77, 0.1)',
+      border: 'var(--border-red)',
+      glow: 'var(--glow-crimson)',
       badgeClass: 'badge-critical',
     },
     amber: {
-      text: '#F2A541',
-      bg: 'rgba(242, 165, 65, 0.12)',
-      border: 'rgba(242, 165, 65, 0.35)',
+      text: 'var(--amber)',
+      bg: 'rgba(245, 158, 11, 0.1)',
+      border: 'rgba(245, 158, 11, 0.3)',
+      glow: 'var(--glow-amber)',
       badgeClass: 'badge-warning',
     },
     green: {
-      text: '#55C98A',
-      bg: 'rgba(85, 201, 138, 0.12)',
-      border: 'rgba(85, 201, 138, 0.35)',
+      text: 'var(--mint)',
+      bg: 'rgba(16, 185, 129, 0.1)',
+      border: 'var(--border-mint)',
+      glow: '0 0 16px rgba(16, 185, 129, 0.25)',
       badgeClass: 'badge-success',
     },
     mint: {
-      text: '#55C98A',
-      bg: 'rgba(85, 201, 138, 0.12)',
-      border: 'rgba(85, 201, 138, 0.35)',
+      text: 'var(--mint)',
+      bg: 'rgba(16, 185, 129, 0.1)',
+      border: 'var(--border-mint)',
+      glow: '0 0 16px rgba(16, 185, 129, 0.25)',
       badgeClass: 'badge-success',
     },
     indigo: {
-      text: '#818CF8',
-      bg: 'rgba(129, 140, 248, 0.12)',
-      border: 'rgba(129, 140, 248, 0.35)',
+      text: 'var(--violet)',
+      bg: 'rgba(129, 140, 248, 0.1)',
+      border: 'rgba(129, 140, 248, 0.3)',
+      glow: 'var(--glow-violet)',
       badgeClass: 'badge-blockchain',
     },
     cyan: {
-      text: '#38BDF8',
-      bg: 'rgba(56, 189, 248, 0.12)',
-      border: 'rgba(56, 189, 248, 0.35)',
+      text: 'var(--cyan)',
+      bg: 'rgba(0, 240, 255, 0.1)',
+      border: 'var(--border-highlight)',
+      glow: 'var(--glow-cyan)',
       badgeClass: 'badge-info',
     },
   };
@@ -54,46 +60,35 @@ const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
 
   return (
     <div
-      className="dc-stat-card"
+      className="spatial-panel spatial-panel-hoverable"
       style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '0.75rem',
         padding: '1.25rem 1.4rem',
-        background: '#1B272D',
-        border: '1px solid #2C393E',
+        background: 'rgba(11, 17, 30, 0.88)',
         borderLeft: `4px solid ${theme.text}`,
-        borderRadius: '12px',
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+        borderRadius: 'var(--radius-lg, 12px)',
         minHeight: '136px',
         boxSizing: 'border-box',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-        <span
-          style={{
-            fontSize: '0.74rem',
-            fontWeight: 700,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: '#AAB6B2',
-            lineHeight: 1.3,
-          }}
-        >
+        <span className="micro-label" style={{ color: 'var(--text-secondary)' }}>
           {title}
         </span>
         <div
           style={{
-            width: '36px',
-            height: '36px',
-            minWidth: '36px',
-            borderRadius: '8px',
+            width: '34px',
+            height: '34px',
+            minWidth: '34px',
+            borderRadius: 'var(--radius-xs, 6px)',
             background: theme.bg,
             border: `1px solid ${theme.border}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            boxShadow: theme.glow,
           }}
         >
           {renderIcon()}
@@ -101,15 +96,7 @@ const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.65rem', flexWrap: 'wrap' }}>
-        <span
-          style={{
-            fontSize: '1.9rem',
-            fontWeight: 800,
-            color: '#F5F7F5',
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
-          }}
-        >
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
           {value}
         </span>
         {badge && (
@@ -120,7 +107,7 @@ const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
       </div>
 
       {subtitle && (
-        <div style={{ fontSize: '0.78rem', color: '#7E8C87', lineHeight: 1.4, marginTop: 'auto' }}>
+        <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', lineHeight: 1.4, marginTop: 'auto' }}>
           {subtitle}
         </div>
       )}

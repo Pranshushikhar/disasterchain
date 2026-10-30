@@ -38,11 +38,11 @@ const PWAInstallPrompt = () => {
         width: 'calc(100% - 48px)',
         boxSizing: 'border-box',
         zIndex: 9990,
-        backgroundColor: 'var(--dc-elevated, #1B272D)',
-        border: '1px solid var(--border-subtle, #2C393E)',
+        backgroundColor: '#FFFDF8',
+        border: '1px solid #D8CDBA',
         borderRadius: '12px',
         padding: '12px 16px',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+        boxShadow: '0 10px 30px rgba(30, 39, 37, 0.1)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -59,7 +59,7 @@ const PWAInstallPrompt = () => {
             width: '36px',
             height: '36px',
             borderRadius: '8px',
-            border: '1px solid #2C393E',
+            border: '1px solid #D8CDBA',
             flexShrink: 0,
             objectFit: 'cover',
           }}
@@ -70,7 +70,7 @@ const PWAInstallPrompt = () => {
               fontSize: '0.8rem',
               fontWeight: '700',
               letterSpacing: '0.04em',
-              color: 'var(--text-primary, #F5F7F5)',
+              color: '#1E2725',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -81,7 +81,7 @@ const PWAInstallPrompt = () => {
           <div
             style={{
               fontSize: '0.74rem',
-              color: 'var(--text-secondary, #AAB6B2)',
+              color: '#65706B',
               lineHeight: 1.3,
               marginTop: '1px',
             }}
@@ -98,8 +98,8 @@ const PWAInstallPrompt = () => {
           onClick={dismissInstallPrompt}
           style={{
             background: 'transparent',
-            border: '1px solid #2C393E',
-            color: '#AAB6B2',
+            border: '1px solid #D8CDBA',
+            color: '#65706B',
             fontSize: '0.74rem',
             fontWeight: '600',
             padding: '6px 10px',
@@ -115,11 +115,11 @@ const PWAInstallPrompt = () => {
           type="button"
           onClick={handleInstallClick}
           style={{
-            background: 'var(--dc-earth-green, #55C98A)',
-            border: '1px solid var(--dc-earth-green, #55C98A)',
-            color: '#0E1418',
+            background: '#263F35',
+            border: 'none',
+            color: '#FFFDF8',
             fontSize: '0.75rem',
-            fontWeight: '700',
+            fontWeight: '600',
             padding: '6px 12px',
             borderRadius: '6px',
             cursor: 'pointer',

@@ -7,8 +7,8 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background-color: var(--dc-bg, #0E1418);
-  color: var(--dc-text, #F5F7F5);
+  background-color: var(--dc-bg, #F1EBDD);
+  color: var(--dc-text, #1E2725);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -49,7 +49,7 @@
   align-items: center;
   justify-content: space-between;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-subtle, #2C393E);
+  border-bottom: 1px solid var(--dc-border, #DCD3C3);
 }
 
 .dc-takeover-brand {

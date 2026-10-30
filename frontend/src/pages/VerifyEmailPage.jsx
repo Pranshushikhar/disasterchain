@@ -67,7 +67,7 @@ const VerifyEmailPage = () => {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '3rem 1.5rem',
-        backgroundColor: 'var(--dc-bg, #0E1418)',
+        backgroundColor: 'var(--dc-bg, #F1EBDD)',
       }}
     >
       <div
@@ -76,10 +76,10 @@ const VerifyEmailPage = () => {
           width: '100%',
           padding: '2.5rem 2.25rem',
           textAlign: 'center',
-          backgroundColor: 'var(--dc-elevated, #1B272D)',
-          border: '1px solid var(--border-medium, #2C393E)',
+          backgroundColor: 'var(--dc-elevated, #FFFDF8)',
+          border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
           borderRadius: 'var(--radius-lg, 16px)',
-          boxShadow: 'var(--shadow-md, 0 8px 32px rgba(0, 0, 0, 0.4))',
+          boxShadow: 'var(--shadow-md)',
         }}
       >
         {loading ? (
