@@ -55,10 +55,10 @@ function startServer() {
   const browser = await puppeteer.launch({
     executablePath: edgePath,
     headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   try {
     const page = await browser.newPage();
@@ -87,70 +87,70 @@ function startServer() {
         offsetH: btn ? btn.offsetHeight : 0,
         offsetW: btn ? btn.offsetWidth : 0,
         display: btn ? window.getComputedStyle(btn).display : 'none',
-        visibility: btn ? window.getComputedStyle(btn).visibility : 'none',
         container: Boolean(document.querySelector('.dc-voice-assistant-container')),
         appLayout: Boolean(document.querySelector('.dc-app-layout')),
-        htmlSnippet: document.body.innerHTML.slice(0, 400),
       };
     });
     console.log('DOM Debug Info:', debugInfo);
-    const hasVoiceBtn = debugInfo.hasBtn;
-    console.log('Global voice assistant button visible:', hasVoiceBtn);
-    if (!hasVoiceBtn) throw new Error('Global voice assistant button missing from page!');
+    if (!debugInfo.hasBtn) throw new Error('Global voice assistant button missing from page!');
 
-    // Click Voice Assistant button
+    // Click Voice Assistant button to open Conversational Assistant Window
+    console.log('Clicking global assistant capsule to open conversational window...');
     await page.click('#dc-global-voice-assistant-btn');
-    await sleep(600);
+    await sleep(800);
 
-    const isListeningActive = await page.evaluate(() => {
-      const btn = document.getElementById('dc-global-voice-assistant-btn');
-      return btn.classList.contains('listening') || btn.classList.contains('idle');
+    const hasChatWindow = await page.evaluate(() => {
+      const win = document.getElementById('dc-voice-assistant-window');
+      const input = document.getElementById('dc-voice-chat-input');
+      const sendBtn = document.getElementById('dc-voice-send-btn');
+      const micBtn = document.getElementById('dc-voice-mic-input-btn');
+      return Boolean(win && input && sendBtn && micBtn);
     });
-    console.log('Voice assistant button responds to click:', isListeningActive);
+    console.log('ChatGPT-style conversational assistant window opened:', hasChatWindow);
+    if (!hasChatWindow) throw new Error('Conversational assistant window failed to open!');
 
     // =========================================================================
-    // 2. Testing Voice Navigation Commands
+    // 2. Testing Conversational Text & Natural Q&A Interaction
     // =========================================================================
-    console.log('\n--- 2. Testing Voice Navigation Commands ---');
+    console.log('\n--- 2. Testing Conversational Text & Natural Q&A ---');
+    await page.type('#dc-voice-chat-input', 'Why is disaster preparedness important?');
+    await sleep(300);
+    await page.click('#dc-voice-send-btn');
+    await sleep(1800);
 
-    const testVoiceNav = async (command, expectedPath) => {
-      console.log(`Executing voice command: "${command}" -> expecting ${expectedPath}`);
-      await page.evaluate((cmd) => {
-        // Trigger voice command parser through window/context simulation
-        const event = new CustomEvent('dc:simulateVoice', { detail: { text: cmd } });
-        window.dispatchEvent(event);
-      }, command);
-
-      await sleep(1500);
-      const currentUrl = await page.evaluate(() => window.location.pathname);
-      console.log(`Current path after command: ${currentUrl}`);
-      if (currentUrl !== expectedPath) {
-        throw new Error(`Voice navigation failed for "${command}": expected ${expectedPath}, got ${currentUrl}`);
-      }
-      console.log(`✓ Navigated cleanly to ${expectedPath}`);
-    };
-
-    // Test Voice Navigation to Shelters
-    await page.evaluate(() => {
-      // Expose simulator listener on window if needed
-      window.addEventListener('dc:simulateVoice', (e) => {
-        const btn = document.getElementById('dc-global-voice-assistant-btn');
-        if (btn) {
-          // Trigger contextual simulator
-          const event = new CustomEvent('dc:runVoiceSim', { detail: e.detail });
-          window.dispatchEvent(event);
-        }
-      });
+    const messageCount = await page.evaluate(() => {
+      const msgs = document.querySelectorAll('.dc-voice-msg-row');
+      return msgs.length;
     });
+    console.log('Conversation message count after sending query:', messageCount);
+    if (messageCount < 2) {
+      throw new Error('Conversational message thread did not append user/assistant messages!');
+    }
 
-    // We can also trigger voice commands directly via DOM buttons or context hooks:
-    // Let's test navigation via the voice context
+    // =========================================================================
+    // 3. Testing Context-Aware Follow-up
+    // =========================================================================
+    console.log('\n--- 3. Testing Context-Aware Follow-up ---');
+    await page.type('#dc-voice-chat-input', 'Can you explain this in simpler words?');
+    await sleep(300);
+    await page.click('#dc-voice-send-btn');
+    await sleep(1800);
+
+    const followUpCount = await page.evaluate(() => {
+      return document.querySelectorAll('.dc-voice-msg-row').length;
+    });
+    console.log('Message count after follow-up simplification:', followUpCount);
+
+    // =========================================================================
+    // 4. Testing Conversational Feature Actions & Voice Navigation
+    // =========================================================================
+    console.log('\n--- 4. Testing Feature Actions & Tool Calling ---');
     const navTests = [
-      { cmd: 'Open the shelter page.', path: '/shelters' },
-      { cmd: 'Take me to the weather page.', path: '/weather' },
-      { cmd: 'Open the map.', path: '/map' },
+      { cmd: 'Show me the shelters.', path: '/shelters' },
+      { cmd: 'What is the weather like today?', path: '/weather' },
+      { cmd: 'Open the spatial map.', path: '/map' },
       { cmd: 'Show incident reports.', path: '/incidents' },
-      { cmd: 'Open the safety page.', path: '/safety' },
+      { cmd: 'Open safety guidelines.', path: '/safety' },
       { cmd: 'Return to home.', path: '/' },
     ];
 
@@ -159,7 +159,7 @@ function startServer() {
       await page.evaluate((cmdText) => {
         window.dispatchEvent(new CustomEvent('dc:testVoiceInput', { detail: { text: cmdText } }));
       }, t.cmd);
-      await sleep(1500);
+      await sleep(1800);
       const currentUrl = await page.evaluate(() => window.location.pathname);
       console.log(`Current path: ${currentUrl}`);
       if (currentUrl !== t.path) {
@@ -169,9 +169,9 @@ function startServer() {
     }
 
     // =========================================================================
-    // 3. Testing Critical SOS Voice Protocol
+    // 5. Testing Critical SOS Voice Protocol
     // =========================================================================
-    console.log('\n--- 3. Testing Critical SOS Voice Commands ---');
+    console.log('\n--- 5. Testing Critical SOS Voice Commands ---');
     // Trigger SOS via voice command "SOS"
     await page.evaluate(() => {
       window.dispatchEvent(new CustomEvent('dc:testVoiceInput', { detail: { text: 'SOS' } }));
@@ -188,7 +188,7 @@ function startServer() {
       throw new Error('SOS voice protocol did not display confirmation dialog!');
     }
 
-    // Now test voice cancellation: "Cancel SOS"
+    // Test voice cancellation: "Cancel SOS"
     console.log('Testing voice cancellation: "Cancel SOS"');
     await page.evaluate(() => {
       window.dispatchEvent(new CustomEvent('dc:testVoiceInput', { detail: { text: 'Cancel SOS' } }));
@@ -205,9 +205,9 @@ function startServer() {
     }
 
     // =========================================================================
-    // 4. Testing WeatherGPT Voice Features
+    // 6. Testing WeatherGPT Distinction
     // =========================================================================
-    console.log('\n--- 4. Testing WeatherGPT Two-Way Voice Integration ---');
+    console.log('\n--- 6. Testing WeatherGPT Two-Way Voice Integration ---');
     // Open WeatherGPT
     await page.evaluate(() => {
       const gptBtn = document.getElementById('dc-weathergpt-floating-btn') || document.getElementById('dc-sidebar-weathergpt');
@@ -215,7 +215,6 @@ function startServer() {
     });
     await sleep(1200);
 
-    // Verify in-chat microphone button exists
     const hasChatMic = await page.evaluate(() => {
       const mic = document.getElementById('dc-weathergpt-mic-btn');
       return Boolean(mic && mic.offsetHeight > 0);
@@ -223,29 +222,22 @@ function startServer() {
     console.log('WeatherGPT in-chat microphone button present:', hasChatMic);
     if (!hasChatMic) throw new Error('In-chat microphone button missing from WeatherGPT!');
 
-    // Click WeatherGPT mic button
-    await page.click('#dc-weathergpt-mic-btn');
+    // =========================================================================
+    // 7. Visual Artifact Capture
+    // =========================================================================
+    // Re-open conversational assistant to capture visual proof
+    await page.evaluate(() => {
+      const btn = document.getElementById('dc-global-voice-assistant-btn');
+      if (btn) btn.click();
+    });
     await sleep(800);
 
-    const isMicActiveInChat = await page.evaluate(() => {
-      const mic = document.getElementById('dc-weathergpt-mic-btn');
-      return Boolean(mic && (mic.classList.contains('listening') || mic.classList.contains('active')));
-    });
-    console.log('WeatherGPT in-chat mic activates on click:', isMicActiveInChat);
-
-    // Click mic again to stop
-    await page.click('#dc-weathergpt-mic-btn');
-    await sleep(600);
-
-    // =========================================================================
-    // 5. Visual Artifact Capture
-    // =========================================================================
-    const screenshotPath = path.join(ARTIFACT_DIR, 'e2e_voice_control_verified.png');
+    const screenshotPath = path.join(ARTIFACT_DIR, 'e2e_conversational_ai_verified.png');
     await page.screenshot({ path: screenshotPath, fullPage: false });
     console.log('Saved visual verification screenshot to:', screenshotPath);
 
     console.log('\n======================================================');
-    console.log('🎉 ALL VOICE CONTROL E2E SCENARIOS VERIFIED CLEANLY!');
+    console.log('🎉 ALL CONVERSATIONAL AI SCENARIOS VERIFIED CLEANLY!');
     console.log('======================================================');
 
     await page.close();

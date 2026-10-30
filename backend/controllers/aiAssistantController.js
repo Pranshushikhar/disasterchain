@@ -88,3 +88,103 @@ exports.handleAIChat = async (req, res) => {
     });
   }
 };
+
+const { processConversationalChat } = require('../services/conversationalAIService');
+const jwt = require('jsonwebtoken');
+
+/**
+ * @desc    Full Conversational AI Assistant (ChatGPT-like natural dialogue + DisasterChain actions)
+ * @route   POST /api/ai/conversational-chat
+ * @access  Public / Optional Auth
+ */
+exports.handleConversationalAIChat = async (req, res) => {
+  try {
+    const { message, conversation, latitude, longitude, language } = req.body;
+
+    // 1. Message Validation
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Message is required and cannot be empty.',
+      });
+    }
+
+    if (message.length > 1200) {
+      return res.status(400).json({
+        success: false,
+        message: 'Message exceeds maximum length of 1200 characters.',
+      });
+    }
+
+    // 2. Resolve User Role from optional token
+    let userRole = 'citizen';
+    if (req.headers && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+      const token = req.headers.authorization.split(' ')[1];
+      if (token) {
+        try {
+          const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET || 'disasterchain_secure_jwt_secret_2026'
+          );
+          userRole = decoded.role || 'citizen';
+        } catch (e) {
+          // Token invalid: safely proceed as public citizen
+        }
+      }
+    }
+
+    // 3. Coordinate validation
+    let validLat = null;
+    let validLon = null;
+    if (latitude != null && !isNaN(Number(latitude))) {
+      const lat = Number(latitude);
+      if (lat >= -90 && lat <= 90) validLat = lat;
+    }
+    if (longitude != null && !isNaN(Number(longitude))) {
+      const lon = Number(longitude);
+      if (lon >= -180 && lon <= 180) validLon = lon;
+    }
+
+    // 4. Sanitize conversation history (up to last 10 turns)
+    let cleanConversation = [];
+    if (Array.isArray(conversation)) {
+      cleanConversation = conversation
+        .filter((c) => c && typeof c === 'object' && c.role && c.content)
+        .slice(-10);
+    }
+
+    // 5. Language validation
+    const SUPPORTED_LANG_CODES = [
+      'en', 'hi', 'pa', 'bn', 'ta', 'te', 'mr', 'gu', 'kn', 'ml',
+      'or', 'as', 'ur', 'sa', 'ne', 'kok', 'ks', 'mai', 'sd', 'mni'
+    ];
+    let selectedLanguage = 'en';
+    if (language && typeof language === 'string') {
+      const code = language.trim().toLowerCase();
+      if (SUPPORTED_LANG_CODES.includes(code)) {
+        selectedLanguage = code;
+      }
+    }
+
+    // 6. Process through Conversational AI Engine
+    const result = await processConversationalChat({
+      message: message.trim(),
+      conversation: cleanConversation,
+      latitude: validLat,
+      longitude: validLon,
+      language: selectedLanguage,
+      userRole,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error('[ConversationalAI] Controller Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'The Conversational AI Assistant encountered an unexpected disruption. Please try again.',
+    });
+  }
+};

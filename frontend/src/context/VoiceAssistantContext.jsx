@@ -11,8 +11,7 @@ import { useTranslation } from '../i18n/i18n';
 import { useDCLocation } from './LocationContext';
 import { useWeatherGPT } from './WeatherGPTContext';
 import { useEnvironment } from './EnvironmentContext';
-import { createSosRequest, fetchShelters } from '../services/api';
-import { fetchCompleteWeather } from '../services/weatherApi';
+import { createSosRequest, sendConversationalChat } from '../services/api';
 
 const VoiceAssistantContext = createContext(null);
 
@@ -35,9 +34,25 @@ export const VoiceAssistantProvider = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { t, currentLanguage, setLanguage, languages } = useTranslation();
-  const { coords, locationName, city, requestGpsLocation } = useDCLocation();
+  const { coords, requestGpsLocation } = useDCLocation();
   const weatherGPT = useWeatherGPT();
   const { setEnvironment } = useEnvironment();
+
+  // Assistant Window & Input State
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [inputText, setInputText] = useState('');
+  const [isThinking, setIsThinking] = useState(false);
+
+  // Multi-Turn Conversational Memory
+  const [messages, setMessages] = useState(() => [
+    {
+      id: 'welcome_initial',
+      role: 'assistant',
+      content:
+        'Hello! I am your **DisasterChain AI Assistant**, powered by conversational earth intelligence. Ask me about flood or earthquake safety, 72-hour emergency kits, weather conditions, or finding safe shelters.',
+      timestamp: new Date().toISOString(),
+    },
+  ]);
 
   // Voice Engine State
   const [isListening, setIsListening] = useState(false);
@@ -51,9 +66,6 @@ export const VoiceAssistantProvider = ({
   const [permissionState, setPermissionState] = useState('unknown'); // 'granted' | 'denied' | 'prompt'
   const [isMuted, setIsMuted] = useState(false);
   const [speakingSpeed, setSpeakingSpeed] = useState(1.0);
-
-  // Two-way Conversational Mode (for hands-free WeatherGPT dialogues)
-  const [isVoiceConversationActive, setIsVoiceConversationActive] = useState(false);
 
   // Critical SOS Voice Confirmation State
   const [sosConfirmation, setSosConfirmation] = useState({
@@ -112,9 +124,32 @@ export const VoiceAssistantProvider = ({
     if (isListening) {
       stopListening();
     } else {
+      setIsChatOpen(true);
       startListening();
     }
   }, [isListening, startListening, stopListening]);
+
+  // Open / Close Assistant
+  const openAssistant = useCallback(() => {
+    setIsChatOpen(true);
+  }, []);
+
+  const closeAssistant = useCallback(() => {
+    setIsChatOpen(false);
+    stopListening();
+    cancelSpeech();
+  }, [cancelSpeech, stopListening]);
+
+  const toggleAssistant = useCallback(() => {
+    setIsChatOpen((prev) => {
+      if (prev) {
+        stopListening();
+        cancelSpeech();
+        return false;
+      }
+      return true;
+    });
+  }, [cancelSpeech, stopListening]);
 
   // =========================================================================
   // SOS VOICE CONFIRMATION SYSTEM (CRITICAL SAFETY PROTOCOL)
@@ -159,11 +194,11 @@ export const VoiceAssistantProvider = ({
 
     try {
       await createSosRequest({
-        emergencyType: 'Medical & Evacuation Assistance (Voice Triggered)',
+        emergencyType: 'Medical & Evacuation Assistance (Conversational Voice AI)',
         severity: 'critical',
         latitude: targetCoords.lat,
         longitude: targetCoords.lon,
-        description: `Hands-free verified voice SOS beacon dispatched at [${targetCoords.lat}, ${targetCoords.lon}].`,
+        description: `Verified SOS beacon dispatched via DisasterChain Conversational Assistant at [${targetCoords.lat}, ${targetCoords.lon}].`,
       });
       speakText(
         t(
@@ -190,427 +225,273 @@ export const VoiceAssistantProvider = ({
   }, [onCloseSos, speakText, t]);
 
   // =========================================================================
-  // VOICE COMMAND PROCESSOR & ACTION DISPATCHER
+  // TOOL ACTION EXECUTOR
   // =========================================================================
-  const handleProcessVoiceInput = useCallback(
-    async (spokenText) => {
-      if (!spokenText || !spokenText.trim()) return;
+  const executeToolAction = useCallback(
+    (action) => {
+      if (!action || !action.type) return;
 
-      setIsProcessing(true);
-      setStatusMessage(`Interpreting: "${spokenText}"`);
+      switch (action.type) {
+        case 'NAVIGATE': {
+          if (action.target) {
+            navigate(action.target);
+          }
+          break;
+        }
 
-      const parseContext = {
-        currentPath: location.pathname,
-        isSosOpen: sosConfirmation.active,
-        isSosConfirming: sosConfirmation.active,
-        isWeatherGPTOpen: Boolean(weatherGPT?.isOpen),
+        case 'OPEN_WEATHERGPT': {
+          if (weatherGPT?.openWeatherGPT) {
+            weatherGPT.openWeatherGPT();
+          } else {
+            navigate('/weather');
+          }
+          break;
+        }
+
+        case 'OPEN_CONTACTS': {
+          if (onOpenContacts) {
+            onOpenContacts();
+          } else {
+            navigate('/safety');
+          }
+          break;
+        }
+
+        case 'TRIGGER_SOS': {
+          initiateSosWorkflow();
+          break;
+        }
+
+        case 'CHANGE_LANGUAGE': {
+          if (action.target && languages.some((l) => l.code === action.target)) {
+            setLanguage(action.target);
+          }
+          break;
+        }
+
+        case 'TOGGLE_THEME': {
+          if (action.target) {
+            setEnvironment(action.target);
+          }
+          break;
+        }
+
+        default:
+          break;
+      }
+    },
+    [languages, navigate, onOpenContacts, setEnvironment, setLanguage, weatherGPT, initiateSosWorkflow]
+  );
+
+  // =========================================================================
+  // UNIFIED CONVERSATIONAL MESSAGE SENDER (VOICE & TEXT)
+  // =========================================================================
+  const sendMessage = useCallback(
+    async (rawText, fromVoice = false) => {
+      if (!rawText || !rawText.trim()) return;
+      const userText = rawText.trim();
+
+      // Immediate interrupt: stop any ongoing assistant speech
+      cancelSpeech();
+
+      // Critical SOS Voice Handling during active 15s confirmation window
+      if (sosConfirmation.active) {
+        if (/^(cancel|cancel sos|stop|abort|no)\b/i.test(userText)) {
+          cancelSosExecution();
+          return;
+        }
+        if (/^(confirm|confirm sos|send sos|yes|broadcast)\b/i.test(userText)) {
+          confirmSosExecution();
+          return;
+        }
+      }
+
+      const userMsgId = `usr_${Date.now()}`;
+      const newUserMsg = {
+        id: userMsgId,
+        role: 'user',
+        content: userText,
+        timestamp: new Date().toISOString(),
       };
 
-      const result = parseVoiceIntent(spokenText, parseContext);
+      setMessages((prev) => [...prev, newUserMsg]);
+      setInputText('');
+      setIsThinking(true);
+      setIsProcessing(true);
+      setStatusMessage('Interpreting...');
 
       try {
-        switch (result.intent) {
-          // --- SOS INTENTS ---
-          case INTENTS.SOS_TRIGGER: {
-            initiateSosWorkflow();
-            break;
-          }
+        // Collect conversation context (up to last 8 turns)
+        const history = messages
+          .filter((m) => m && m.role && m.content && m.id !== 'welcome_initial')
+          .slice(-8)
+          .map((m) => ({ role: m.role, content: m.content }));
 
-          case INTENTS.SOS_CONFIRM: {
-            if (sosConfirmation.active) {
-              await confirmSosExecution();
-            } else {
-              initiateSosWorkflow();
-            }
-            break;
-          }
+        const activeLat = coords?.lat ?? 30.7499;
+        const activeLon = coords?.lon ?? 76.6411;
 
-          case INTENTS.SOS_CANCEL: {
-            if (sosConfirmation.active) {
-              cancelSosExecution();
-            } else {
-              speakText('Standing by.');
-            }
-            break;
-          }
+        const response = await sendConversationalChat({
+          message: userText,
+          conversation: history,
+          latitude: activeLat,
+          longitude: activeLon,
+          language: currentLanguage,
+        });
 
-          // --- NAVIGATION INTENTS ---
-          case INTENTS.NAV_HOME: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navHome', 'Returning to Home Command Center.'));
-            navigate('/');
-            break;
-          }
+        const replyData = response?.data;
+        const replyText =
+          replyData?.reply ||
+          'I am here to assist you with disaster safety, emergency shelters, and live weather conditions.';
+        const toolAction = replyData?.action || null;
 
-          case INTENTS.NAV_WEATHER: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navWeather', 'Opening Weather Intelligence.'));
-            navigate('/weather');
-            break;
-          }
+        const assistantMsgId = `ast_${Date.now()}`;
+        const newAssistantMsg = {
+          id: assistantMsgId,
+          role: 'assistant',
+          content: replyText,
+          action: toolAction,
+          timestamp: new Date().toISOString(),
+          isEmergency: Boolean(replyData?.isEmergency),
+        };
 
-          case INTENTS.NAV_SHELTERS: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navShelters', 'Opening Emergency Shelters directory.'));
-            navigate('/shelters');
-            break;
-          }
+        setMessages((prev) => [...prev, newAssistantMsg]);
+        audioFeedback.playSuccessChime();
 
-          case INTENTS.NAV_MAP: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navMap', 'Opening Regional Spatial Map.'));
-            navigate('/map');
-            break;
-          }
-
-          case INTENTS.NAV_INCIDENTS: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navIncidents', 'Opening Incident Reports.'));
-            navigate('/incidents');
-            break;
-          }
-
-          case INTENTS.NAV_SAFETY: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navSafety', 'Opening Disaster Safety Guidelines.'));
-            navigate('/safety');
-            break;
-          }
-
-          case INTENTS.NAV_CONTACTS: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navContacts', 'Showing Emergency Helplines.'));
-            if (onOpenContacts) {
-              onOpenContacts();
-            } else {
-              navigate('/safety');
-            }
-            break;
-          }
-
-          case INTENTS.NAV_SETTINGS: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navSettings', 'Opening Platform Settings.'));
-            if (onOpenSettings) {
-              onOpenSettings();
-            }
-            break;
-          }
-
-          case INTENTS.NAV_BACK: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navBack', 'Navigating back.'));
-            navigate(-1);
-            break;
-          }
-
-          case INTENTS.NAV_WEATHERGPT: {
-            audioFeedback.playSuccessChime();
-            speakText(t('voice.navWeatherGpt', 'Opening WeatherGPT Copilot.'));
-            if (weatherGPT?.openWeatherGPT) {
-              weatherGPT.openWeatherGPT();
-            } else {
-              navigate('/weather');
-            }
-            break;
-          }
-
-          // --- SHELTER ACTIONS ---
-          case INTENTS.ACTION_SHELTER_NEARBY: {
-            audioFeedback.playSuccessChime();
-            navigate('/shelters');
-            try {
-              const sheltersList = await fetchShelters();
-              if (sheltersList && sheltersList.length > 0) {
-                const activeLat = coords?.lat ?? 30.7499;
-                const activeLon = coords?.lon ?? 76.6411;
-
-                // Sort by distance from coordinates
-                const sorted = [...sheltersList].sort((a, b) => {
-                  const distA = Math.hypot((a.latitude || 0) - activeLat, (a.longitude || 0) - activeLon);
-                  const distB = Math.hypot((b.latitude || 0) - activeLat, (b.longitude || 0) - activeLon);
-                  return distA - distB;
-                });
-                const nearest = sorted[0];
-                const availableSpots = (nearest.capacity || 200) - (nearest.occupancy || 0);
-                speakText(
-                  `The nearest active shelter is ${nearest.name}, located in ${nearest.city || city || 'your sector'}, with ${availableSpots} available places.`
-                );
-              } else {
-                speakText('Displaying verified emergency shelters in your regional perimeter.');
-              }
-            } catch (e) {
-              speakText('Displaying verified emergency relief hubs.');
-            }
-            break;
-          }
-
-          case INTENTS.ACTION_SHELTER_DIRECTIONS: {
-            audioFeedback.playSuccessChime();
-            const activeLat = coords?.lat ?? 30.7499;
-            const activeLon = coords?.lon ?? 76.6411;
-            speakText('Opening navigation directions to the nearest safe shelter.');
-            window.open(`https://www.google.com/maps/dir/?api=1&destination=${activeLat},${activeLon}`, '_blank');
-            break;
-          }
-
-          // --- WEATHER ACTIONS ---
-          case INTENTS.ACTION_WEATHER_TODAY: {
-            audioFeedback.playSuccessChime();
-            try {
-              const activeLat = coords?.lat ?? 30.7499;
-              const activeLon = coords?.lon ?? 76.6411;
-              const placeName = city || (locationName ? locationName.split(',')[0].trim() : 'your area');
-              const weather = await fetchCompleteWeather(activeLat, activeLon);
-              const temp = weather?.current?.temp != null ? Math.round(weather.current.temp) : 25;
-              const condition = weather?.current?.conditionText || 'Partly Cloudy';
-              speakText(`In ${placeName}, it is currently ${temp} degrees Celsius with ${condition}.`);
-            } catch (e) {
-              speakText(`Atmospheric conditions in your sector are calm with normal perimeter stability.`);
-            }
-            break;
-          }
-
-          case INTENTS.ACTION_WEATHER_FORECAST: {
-            audioFeedback.playSuccessChime();
-            navigate('/weather');
-            try {
-              const activeLat = coords?.lat ?? 30.7499;
-              const activeLon = coords?.lon ?? 76.6411;
-              const weather = await fetchCompleteWeather(activeLat, activeLon);
-              const tomorrow = weather?.daily?.[1];
-              if (tomorrow) {
-                const max = Math.round(tomorrow.tempMax ?? 28);
-                const min = Math.round(tomorrow.tempMin ?? 20);
-                const cond = tomorrow.conditionText || 'clear conditions';
-                speakText(`Tomorrow's forecast: High of ${max} degrees, low of ${min} degrees, with ${cond}.`);
-              } else {
-                speakText('Showing tomorrow atmospheric forecast on screen.');
-              }
-            } catch (e) {
-              speakText('Opening comprehensive multi-day forecast.');
-            }
-            break;
-          }
-
-          case INTENTS.ACTION_WEATHER_RAIN: {
-            audioFeedback.playSuccessChime();
-            try {
-              const activeLat = coords?.lat ?? 30.7499;
-              const activeLon = coords?.lon ?? 76.6411;
-              const weather = await fetchCompleteWeather(activeLat, activeLon);
-              const rainChance = weather?.daily?.[0]?.precipitationProbability ?? 15;
-              if (rainChance > 50) {
-                speakText(`Rain is expected today with approximately ${rainChance} percent probability. Carry appropriate waterproof gear.`);
-              } else {
-                speakText(`Low probability of rain today at approximately ${rainChance} percent. Atmospheric conditions remain stable.`);
-              }
-            } catch (e) {
-              speakText('Precipitation risk in your regional corridor is currently low.');
-            }
-            break;
-          }
-
-          // --- MAP ACTIONS ---
-          case INTENTS.ACTION_MAP_LOCATE: {
-            audioFeedback.playSuccessChime();
-            requestGpsLocation();
-            speakText('Acquiring high-precision GPS telemetry for your device.');
-            navigate('/map');
-            break;
-          }
-
-          case INTENTS.ACTION_MAP_ZOOM_IN: {
-            audioFeedback.playSuccessChime();
-            window.dispatchEvent(new CustomEvent('dc:mapZoom', { detail: { delta: 1 } }));
-            speakText('Zooming in.');
-            break;
-          }
-
-          case INTENTS.ACTION_MAP_ZOOM_OUT: {
-            audioFeedback.playSuccessChime();
-            window.dispatchEvent(new CustomEvent('dc:mapZoom', { detail: { delta: -1 } }));
-            speakText('Zooming out.');
-            break;
-          }
-
-          case INTENTS.ACTION_MAP_SHELTERS: {
-            audioFeedback.playSuccessChime();
-            navigate('/map');
-            speakText('Displaying emergency shelters on spatial map.');
-            break;
-          }
-
-          case INTENTS.ACTION_MAP_INCIDENTS: {
-            audioFeedback.playSuccessChime();
-            navigate('/map');
-            speakText('Highlighting verified incident markers on map.');
-            break;
-          }
-
-          // --- INCIDENT ACTIONS ---
-          case INTENTS.ACTION_INCIDENT_REPORT: {
-            audioFeedback.playSuccessChime();
-            speakText('Opening incident reporting form.');
-            if (onOpenIncident) onOpenIncident();
-            break;
-          }
-
-          case INTENTS.ACTION_INCIDENT_RECENT: {
-            audioFeedback.playSuccessChime();
-            speakText('Showing verified incident log.');
-            navigate('/incidents');
-            break;
-          }
-
-          case INTENTS.ACTION_ALERT_LATEST: {
-            audioFeedback.playSuccessChime();
-            speakText('Perimeter conditions are standard. No critical emergency alert is active in your sector.');
-            break;
-          }
-
-          // --- SAFETY GUIDELINES ---
-          case INTENTS.ACTION_SAFETY_FLOOD: {
-            audioFeedback.playSuccessChime();
-            navigate('/safety');
-            speakText(
-              'Flood safety rules: Move immediately to higher ground. Never walk or drive through moving water. Shut off electricity at the main breaker if water rises near electrical outlets.'
-            );
-            break;
-          }
-
-          case INTENTS.ACTION_SAFETY_EARTHQUAKE: {
-            audioFeedback.playSuccessChime();
-            navigate('/safety');
-            speakText(
-              'Earthquake safety: Drop to hands and knees. Take cover under sturdy furniture. Hold on until the shaking stops, and stay clear of windows.'
-            );
-            break;
-          }
-
-          case INTENTS.ACTION_SAFETY_CYCLONE: {
-            audioFeedback.playSuccessChime();
-            navigate('/safety');
-            speakText(
-              'Cyclone preparation: Secure loose outdoor objects, board windows, charge all communication devices, and keep an emergency go-bag ready.'
-            );
-            break;
-          }
-
-          // --- CONTACTS ACTIONS ---
-          case INTENTS.ACTION_CONTACT_CALL: {
-            audioFeedback.playSuccessChime();
-            speakText('Connecting to National Emergency Dispatch 112.');
-            window.location.href = 'tel:112';
-            break;
-          }
-
-          case INTENTS.ACTION_CONTACT_AMBULANCE: {
-            audioFeedback.playSuccessChime();
-            speakText('Ambulance emergency medical helpline is 108.');
-            if (onOpenContacts) onOpenContacts();
-            break;
-          }
-
-          case INTENTS.ACTION_CONTACT_NDRF: {
-            audioFeedback.playSuccessChime();
-            speakText('NDRF National Disaster Cell helpline is 1078.');
-            if (onOpenContacts) onOpenContacts();
-            break;
-          }
-
-          // --- SETTINGS ACTIONS ---
-          case INTENTS.ACTION_CHANGE_LANGUAGE: {
-            audioFeedback.playSuccessChime();
-            const targetLangCode = result.languageCode;
-            const langObj = languages.find((l) => l.code === targetLangCode);
-            if (targetLangCode && langObj) {
-              setLanguage(targetLangCode);
-              const langName = langObj.nativeName || langObj.name;
-              speakText(`Language changed to ${langName}.`, { lang: targetLangCode });
-            }
-            break;
-          }
-
-          case INTENTS.ACTION_DARK_MODE: {
-            audioFeedback.playSuccessChime();
-            setEnvironment('cyclonic');
-            speakText('Dark tactical mode activated.');
-            break;
-          }
-
-          case INTENTS.ACTION_LIGHT_MODE: {
-            audioFeedback.playSuccessChime();
-            setEnvironment('clear_sky');
-            speakText('Daylight atmospheric mode activated.');
-            break;
-          }
-
-          // --- CONVERSATIONAL WEATHERGPT ---
-          case INTENTS.WEATHERGPT_QUERY: {
-            audioFeedback.playSuccessChime();
-            const queryToSend = result.query || spokenText;
-            if (weatherGPT?.openWeatherGPT) {
-              weatherGPT.openWeatherGPT();
-              weatherGPT.sendMessage(queryToSend);
-            } else {
-              navigate('/weather');
-            }
-            break;
-          }
-
-          default: {
-            // General query routed to WeatherGPT
-            if (weatherGPT?.openWeatherGPT) {
-              weatherGPT.openWeatherGPT();
-              weatherGPT.sendMessage(spokenText);
-            } else {
-              speakText(
-                'I heard: ' +
-                  spokenText +
-                  '. You can say "Show shelters", "What is the weather today", or "SOS" for emergency assistance.'
-              );
-            }
-            break;
-          }
+        // Execute Tool Action if present
+        if (toolAction) {
+          executeToolAction(toolAction);
         }
+
+        // Voice output: Speak the answer aloud
+        speakText(replyText);
       } catch (err) {
-        console.error('[VoiceContext] Error executing intent:', err);
-        speakText('Command execution encountered a disruption. Please try again.');
+        console.warn('[VoiceAssistant] Conversational API network delay/offline, activating local client intelligence:', err.message);
+
+        // Fallback to local client-side conversational intelligence
+        const localIntent = parseVoiceIntent(userText, { currentPath: location.pathname });
+        let fallbackReply = 'I am here to assist with disaster safety and emergency coordination.';
+        let fallbackAction = null;
+
+        const lower = userText.toLowerCase();
+        const prevText = messages.slice(-4).map((m) => m.content || '').join(' ').toLowerCase();
+        const isRecentFlood = lower.includes('flood') || prevText.includes('flood');
+        const isRecentEarthquake = lower.includes('earthquake') || prevText.includes('earthquake');
+
+        if (localIntent.intent === INTENTS.NAV_SHELTERS || localIntent.intent === INTENTS.ACTION_SHELTER_NEARBY) {
+          fallbackReply = 'Opening the Emergency Shelters directory to view nearby safe havens and live capacities.';
+          fallbackAction = { type: 'NAVIGATE', target: '/shelters', label: 'Open Shelters' };
+        } else if (localIntent.intent === INTENTS.NAV_WEATHER || localIntent.intent === INTENTS.ACTION_WEATHER_TODAY || localIntent.intent === INTENTS.ACTION_WEATHER_FORECAST) {
+          fallbackReply = 'Opening the Weather Intelligence dashboard for localized atmospheric conditions and forecasts.';
+          fallbackAction = { type: 'NAVIGATE', target: '/weather', label: 'Open Weather' };
+        } else if (localIntent.intent === INTENTS.NAV_MAP || localIntent.intent === INTENTS.ACTION_MAP_LOCATE) {
+          fallbackReply = 'Opening the Regional Spatial Map for satellite reconnaissance and live risk perimeters.';
+          fallbackAction = { type: 'NAVIGATE', target: '/map', label: 'Open Map' };
+        } else if (localIntent.intent === INTENTS.NAV_INCIDENTS || localIntent.intent === INTENTS.ACTION_INCIDENT_RECENT) {
+          fallbackReply = 'Opening verified incident reports and hazard alerts.';
+          fallbackAction = { type: 'NAVIGATE', target: '/incidents', label: 'View Incidents' };
+        } else if (localIntent.intent === INTENTS.NAV_SAFETY || localIntent.intent === INTENTS.ACTION_SAFETY_FLOOD || localIntent.intent === INTENTS.ACTION_SAFETY_EARTHQUAKE) {
+          fallbackReply = 'Opening official disaster preparedness and survival guidelines.';
+          fallbackAction = { type: 'NAVIGATE', target: '/safety', label: 'Open Safety Guidelines' };
+        } else if (localIntent.intent === INTENTS.NAV_CONTACTS || localIntent.intent === INTENTS.ACTION_CONTACT_CALL) {
+          fallbackReply = 'Displaying emergency helplines and national response dispatch.';
+          fallbackAction = { type: 'OPEN_CONTACTS', label: 'Emergency Contacts' };
+        } else if (localIntent.intent === INTENTS.NAV_WEATHERGPT || localIntent.intent === INTENTS.WEATHERGPT_QUERY) {
+          fallbackReply = 'Opening WeatherGPT Copilot for in-depth weather discussions.';
+          fallbackAction = { type: 'OPEN_WEATHERGPT', label: 'Open WeatherGPT' };
+        } else if (localIntent.intent === INTENTS.NAV_HOME) {
+          fallbackReply = 'Returning to Home Command Center.';
+          fallbackAction = { type: 'NAVIGATE', target: '/', label: 'Go Home' };
+        } else if (localIntent.intent === INTENTS.SOS_TRIGGER) {
+          fallbackReply = 'Emergency assistance protocol initiated. Say "Confirm SOS" to transmit distress beacon.';
+          fallbackAction = { type: 'TRIGGER_SOS', label: 'Initiate SOS' };
+        } else if (/\b(inside\s+(my\s+)?(house|home|building|room))\b/i.test(lower)) {
+          if (isRecentFlood) {
+            fallbackReply = 'If trapped inside your house during a flood: shut off the main electrical breaker if safe, move family and emergency supplies to higher floors, and never enter a closed attic without an exit to the roof.';
+            fallbackAction = { type: 'NAVIGATE', target: '/safety', label: 'View Flood Safety' };
+          } else {
+            fallbackReply = 'If indoors during an earthquake: Drop, Cover, and Hold On under a sturdy desk or table. Stay away from windows and exterior walls, and do not try to run outside while shaking.';
+            fallbackAction = { type: 'NAVIGATE', target: '/safety', label: 'View Earthquake Safety' };
+          }
+        } else if (/\b(electricity|power|electrical|current|wire|breaker)\b/i.test(lower)) {
+          fallbackReply = '⚡ Electrical Safety: Never touch electrical switches, cords, or appliances while standing in water. Shut off the main breaker only if dry, and stay at least 35 feet away from downed power wires.';
+        } else if (/\b(preparedness important|why is disaster)\b/i.test(lower)) {
+          fallbackReply = 'Disaster preparedness saves lives, minimizes panic, and ensures access to water, food, and medication during the critical first 72 hours before first responders can reach you.';
+        } else if (/\b(emergency kit|go-?bag|supplies)\b/i.test(lower)) {
+          fallbackReply = 'An emergency 72-hour go-bag should include at least 3 liters of water per person per day, non-perishable food, a waterproof flashlight, a first aid kit, essential medications, and a power bank.';
+        } else if (/\b(children|elderly|pets|seniors)\b/i.test(lower)) {
+          fallbackReply = 'For children and elderly family members, store a 7-day supply of prescription medications, pack warm clothing, comfort items, spare glasses, mobility aids, and emergency ID cards.';
+        } else if (/\b(simpler?\s*(words?|terms?)?|simplify)\b/i.test(lower)) {
+          fallbackReply = 'Simply put: get to a safe place fast, keep drinking water and medicines ready, and call 112 or say "SOS" if you are trapped.';
+        } else if (/^(tell me more|more details?|elaborate)\b/i.test(lower)) {
+          fallbackReply = 'In addition: designate an out-of-area contact for SMS check-ins, keep physical cash, and know your neighborhood evacuation routes.';
+        } else if (/\b(worried|anxious|scared|fear)\b/i.test(lower)) {
+          fallbackReply = 'It is completely normal to feel worried during severe weather. Take a slow, calm breath. Having a plan and knowing your safe room or evacuation route will help keep you secure.';
+        } else if (/^(hi|hello|hey|namaste|greetings)\b/i.test(lower)) {
+          fallbackReply = 'Hello! I am your DisasterChain AI Assistant. How can I assist you with your disaster safety, weather updates, or emergency planning today?';
+        } else if (/\b(what can you (help|do)|who are you)\b/i.test(lower)) {
+          fallbackReply = 'I can help you navigate DisasterChain hands-free, provide flood and earthquake safety guides, help assemble emergency go-bags, find open shelters, and trigger emergency SOS assistance.';
+        }
+
+        const fallbackMsgId = `ast_local_${Date.now()}`;
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: fallbackMsgId,
+            role: 'assistant',
+            content: fallbackReply,
+            action: fallbackAction,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
+
+        if (fallbackAction) {
+          executeToolAction(fallbackAction);
+        }
+
+        speakText(fallbackReply);
       } finally {
+        setIsThinking(false);
         setIsProcessing(false);
       }
     },
     [
-      city,
-      coords,
-      initiateSosWorkflow,
-      confirmSosExecution,
+      cancelSpeech,
       cancelSosExecution,
-      languages,
+      confirmSosExecution,
+      coords,
+      currentLanguage,
+      executeToolAction,
       location.pathname,
-      locationName,
-      navigate,
-      onOpenContacts,
-      onOpenIncident,
-      onOpenSettings,
-      requestGpsLocation,
-      setEnvironment,
-      setLanguage,
+      messages,
       sosConfirmation.active,
       speakText,
-      t,
-      weatherGPT,
     ]
   );
 
-  // Programmatic voice simulator for testing and accessibility fallback
+  // Clear / Start New Conversation
+  const clearConversation = useCallback(() => {
+    cancelSpeech();
+    setMessages([
+      {
+        id: `welcome_${Date.now()}`,
+        role: 'assistant',
+        content: t(
+          'voice.welcomeMessage',
+          'New conversation started. Ask me about flood safety, 72-hour emergency kits, weather forecasts, or finding shelters.'
+        ),
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+  }, [cancelSpeech, t]);
+
+  // Programmatic voice simulator for testing
   const simulateVoiceInput = useCallback(
     (simulatedText) => {
       setTranscript(simulatedText);
-      handleProcessVoiceInput(simulatedText);
+      setIsChatOpen(true);
+      sendMessage(simulatedText, true);
     },
-    [handleProcessVoiceInput]
+    [sendMessage]
   );
 
   // Synchronize Speech Recognition callbacks
@@ -620,7 +501,7 @@ export const VoiceAssistantProvider = ({
     const unsubStart = speechRecognizer.on('start', () => {
       setIsListening(true);
       setVoiceError(null);
-      setStatusMessage(t('voice.listening', 'Listening for commands...'));
+      setStatusMessage(t('voice.listening', 'Listening for your voice...'));
     });
 
     const unsubEnd = speechRecognizer.on('end', () => {
@@ -635,7 +516,8 @@ export const VoiceAssistantProvider = ({
     const unsubFinal = speechRecognizer.on('final', (text) => {
       setTranscript(text);
       setInterimTranscript('');
-      handleProcessVoiceInput(text);
+      setIsChatOpen(true);
+      sendMessage(text, true);
     });
 
     const unsubError = speechRecognizer.on('error', (err) => {
@@ -665,7 +547,7 @@ export const VoiceAssistantProvider = ({
       unsubError();
       unsubState();
     };
-  }, [currentLanguage, handleProcessVoiceInput, t]);
+  }, [currentLanguage, sendMessage, t]);
 
   // Synchronize Speech Synthesis callbacks
   useEffect(() => {
@@ -677,14 +559,6 @@ export const VoiceAssistantProvider = ({
 
     const unsubEnd = speechSynthesizer.on('end', () => {
       setIsSpeaking(false);
-      // If voice conversation mode is enabled inside WeatherGPT, prompt next turn
-      if (isVoiceConversationActive && weatherGPT?.isOpen) {
-        setTimeout(() => {
-          if (!speechSynthesizer.isSpeaking()) {
-            startListening();
-          }
-        }, 600);
-      }
     });
 
     const unsubError = speechSynthesizer.on('error', () => {
@@ -696,7 +570,7 @@ export const VoiceAssistantProvider = ({
       unsubEnd();
       unsubError();
     };
-  }, [isVoiceConversationActive, startListening, weatherGPT?.isOpen]);
+  }, []);
 
   // Check initial microphone permission
   useEffect(() => {
@@ -710,12 +584,13 @@ export const VoiceAssistantProvider = ({
     const handleVoiceEvent = (e) => {
       if (e?.detail?.text) {
         setTranscript(e.detail.text);
-        handleProcessVoiceInput(e.detail.text);
+        setIsChatOpen(true);
+        sendMessage(e.detail.text, true);
       }
     };
     window.addEventListener('dc:testVoiceInput', handleVoiceEvent);
     return () => window.removeEventListener('dc:testVoiceInput', handleVoiceEvent);
-  }, [handleProcessVoiceInput]);
+  }, [sendMessage]);
 
   // Clean up timer on unmount
   useEffect(() => {
@@ -725,6 +600,20 @@ export const VoiceAssistantProvider = ({
   }, []);
 
   const value = {
+    // Conversational Chat Window State
+    isChatOpen,
+    setIsChatOpen,
+    openAssistant,
+    closeAssistant,
+    toggleAssistant,
+    messages,
+    inputText,
+    setInputText,
+    isThinking,
+    sendMessage,
+    clearConversation,
+
+    // Voice Engine State
     isListening,
     isSpeaking,
     isProcessing,
@@ -738,8 +627,6 @@ export const VoiceAssistantProvider = ({
     setIsMuted,
     speakingSpeed,
     setSpeakingSpeed,
-    isVoiceConversationActive,
-    setIsVoiceConversationActive,
     sosConfirmation,
     startListening,
     stopListening,
@@ -751,7 +638,6 @@ export const VoiceAssistantProvider = ({
     initiateSosWorkflow,
     confirmSosExecution,
     cancelSosExecution,
-    handleProcessVoiceInput,
     simulateVoiceInput,
   };
 

@@ -275,6 +275,24 @@ export const sendAIChatMessage = async ({ message, conversation, latitude, longi
   return res.data;
 };
 
+// ================= CONVERSATIONAL AI ASSISTANT API (CHATGPT-STYLE) =================
+export const sendConversationalChat = async ({
+  message,
+  conversation,
+  latitude,
+  longitude,
+  language,
+} = {}) => {
+  const res = await api.post('/ai/conversational-chat', {
+    message,
+    conversation,
+    latitude,
+    longitude,
+    language,
+  });
+  return res.data;
+};
+
 // ================= WEATHERGPT INTELLIGENCE API =================
 export const sendWeatherGPTChat = async ({
   message,

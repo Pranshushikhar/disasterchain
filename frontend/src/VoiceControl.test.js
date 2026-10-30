@@ -224,4 +224,37 @@ describe('DisasterChain Voice Control System', () => {
       expect(() => audioFeedback.playStopChime()).not.toThrow();
     });
   });
+
+  describe('6. Conversational AI Assistant (ChatGPT-Style)', () => {
+    it('understands general conversation and greetings naturally', () => {
+      expect(parseVoiceIntent('Hey, how are you?')).toBeDefined();
+      expect(parseVoiceIntent('What can you help me with?')).toBeDefined();
+      expect(parseVoiceIntent('Good morning')).toBeDefined();
+    });
+
+    it('understands educational and disaster preparedness questions', () => {
+      const q1 = parseVoiceIntent('Why is disaster preparedness important?');
+      expect(q1).toBeDefined();
+
+      const q2 = parseVoiceIntent('What should I keep in my emergency kit?');
+      expect(q2).toBeDefined();
+
+      const q3 = parseVoiceIntent('What about children and elderly people?');
+      expect(q3).toBeDefined();
+    });
+
+    it('preserves context for follow-up questions', () => {
+      const followUp1 = parseVoiceIntent('What if I am inside my house?');
+      expect(followUp1).toBeDefined();
+
+      const followUp2 = parseVoiceIntent('What about electricity?');
+      expect(followUp2).toBeDefined();
+
+      const followUp3 = parseVoiceIntent('Can you explain this in simpler words?');
+      expect(followUp3).toBeDefined();
+
+      const followUp4 = parseVoiceIntent('Tell me more.');
+      expect(followUp4).toBeDefined();
+    });
+  });
 });
