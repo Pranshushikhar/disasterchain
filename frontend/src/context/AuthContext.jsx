@@ -13,7 +13,13 @@ import {
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem('disasterchain_user');
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return null;
+  });
   const [token, setToken] = useState(localStorage.getItem('disasterchain_token') || null);
   const [loading, setLoading] = useState(true);
 
@@ -28,9 +34,11 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const profile = await fetchUserProfile();
-      setUser(profile);
-      localStorage.setItem('disasterchain_user', JSON.stringify(profile));
-      return profile;
+      if (profile && typeof profile === 'object' && (profile.name || profile.email)) {
+        setUser(profile);
+        localStorage.setItem('disasterchain_user', JSON.stringify(profile));
+        return profile;
+      }
     } catch (err) {
       // If token is expired or invalid
       if (err.response?.status === 401) {

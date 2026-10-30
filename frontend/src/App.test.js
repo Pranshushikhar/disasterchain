@@ -191,26 +191,58 @@ describe('DisasterChain Core Smoke Tests', () => {
       expect(extractCityName('Kharar, Punjab, India', 'Kharar')).toBe('Kharar');
     });
 
-    it('ensures dynamic greeting strictly matches the selected location', () => {
-      const getGreeting = (city, hour = 14) => {
-        const salutation = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-        return `${salutation}, ${city}.`;
+    it('ensures dynamic greeting uses username when logged in, and falls back to clean greeting without location when unauthenticated', () => {
+      const getGreeting = (user, hour = 14, t = (k, def) => def) => {
+        const salutation =
+          hour < 12
+            ? t('common.goodMorning', 'Good morning')
+            : hour < 17
+            ? t('common.goodAfternoon', 'Good afternoon')
+            : t('common.goodEvening', 'Good evening');
+
+        const rawName = user?.name || user?.username || '';
+        const cleanName = typeof rawName === 'string' ? rawName.trim().split(' ')[0] : '';
+
+        if (cleanName) {
+          return `${salutation}, ${cleanName}.`;
+        }
+
+        return `${salutation}.`;
       };
 
-      // Kharar selected
-      expect(getGreeting('Kharar', 14)).toBe('Good afternoon, Kharar.');
-      expect(getGreeting('Kharar', 9)).toBe('Good morning, Kharar.');
-      expect(getGreeting('Kharar', 19)).toBe('Good evening, Kharar.');
+      // 1. Authenticated user "Rahul"
+      const userRahul = { name: 'Rahul' };
+      expect(getGreeting(userRahul, 9)).toBe('Good morning, Rahul.');
+      expect(getGreeting(userRahul, 14)).toBe('Good afternoon, Rahul.');
+      expect(getGreeting(userRahul, 19)).toBe('Good evening, Rahul.');
 
-      // Mumbai selected
-      expect(getGreeting('Mumbai', 14)).toBe('Good afternoon, Mumbai.');
-      expect(getGreeting('Mumbai', 9)).toBe('Good morning, Mumbai.');
+      // 2. Authenticated user with full name "Rahul Sharma"
+      const userFullName = { name: 'Rahul Sharma' };
+      expect(getGreeting(userFullName, 14)).toBe('Good afternoon, Rahul.');
 
-      // Never allows "Good afternoon, Mumbai" when Kharar is active
-      const activeLocation = { city: 'Kharar', displayName: 'Kharar, Punjab, India' };
-      const homeGreeting = getGreeting(activeLocation.city, 14);
-      expect(homeGreeting).toContain('Kharar');
-      expect(homeGreeting).not.toContain('Mumbai');
+      // 3. Unauthenticated / Logged-out user (no location, no placeholder)
+      expect(getGreeting(null, 9)).toBe('Good morning.');
+      expect(getGreeting(null, 14)).toBe('Good afternoon.');
+      expect(getGreeting(null, 19)).toBe('Good evening.');
+      expect(getGreeting({}, 14)).toBe('Good afternoon.');
+
+      // 4. Never uses city/location in the greeting
+      const unauthGreeting = getGreeting(null, 14);
+      expect(unauthGreeting).not.toContain('Mumbai');
+      expect(unauthGreeting).not.toContain('Kharar');
+      expect(unauthGreeting).not.toContain('Delhi');
+      expect(unauthGreeting).not.toContain('Sector');
+      expect(unauthGreeting).toBe('Good afternoon.');
+
+      // 5. In other languages (e.g. Hindi)
+      const mockTHindi = (key) => {
+        if (key === 'common.goodMorning') return 'शुभ प्रभात';
+        if (key === 'common.goodAfternoon') return 'शुभ दोपहर';
+        if (key === 'common.goodEvening') return 'शुभ संध्या';
+        return '';
+      };
+      expect(getGreeting(userRahul, 14, mockTHindi)).toBe('शुभ दोपहर, Rahul.');
+      expect(getGreeting(null, 14, mockTHindi)).toBe('शुभ दोपहर.');
     });
 
     it('ensures official advisories are strictly verified against active location', () => {

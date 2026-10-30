@@ -13,6 +13,7 @@ import {
 import { fetchShelters, fetchAlerts } from '../services/api';
 import { fetchCompleteWeather } from '../services/weatherApi';
 import { useDCLocation } from '../context/LocationContext';
+import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/i18n';
 import { translateWeatherConditionText } from '../utils/weatherUtils';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -54,6 +55,7 @@ const createShelterPinIcon = () =>
 export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   // Centralized unified location state & controls
   const {
@@ -75,18 +77,36 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
   const [shelters, setShelters] = useState([]);
   const weatherReqIdRef = useRef(0);
 
-  // Time-of-day greeting authoritatively bound to active location
+  // Clock state to automatically update greeting when the time period transitions
+  const [currentHour, setCurrentHour] = useState(() => new Date().getHours());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentHour(new Date().getHours());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Time-based greeting using authenticated user's name (e.g. "Good morning, Rahul." or "Good afternoon.")
+  // Never uses location or city in greeting; location remains separate in the location pill
   const greetingText = useMemo(() => {
-    const hour = new Date().getHours();
     const salutation =
-      hour < 12
+      currentHour < 12
         ? t('common.goodMorning', 'Good morning')
-        : hour < 17
+        : currentHour < 17
         ? t('common.goodAfternoon', 'Good afternoon')
         : t('common.goodEvening', 'Good evening');
-    const targetCity = city || (locationName ? locationName.split(',')[0].trim() : '') || 'Sector';
-    return `${salutation}, ${targetCity}.`;
-  }, [city, locationName, t]);
+
+    const rawName = user?.name || user?.username || '';
+    const cleanName = typeof rawName === 'string' ? rawName.trim().split(' ')[0] : '';
+
+    if (cleanName) {
+      return `${salutation}, ${cleanName}.`;
+    }
+
+    // Unauthenticated or name unavailable: display salutation alone without location or placeholder
+    return `${salutation}.`;
+  }, [currentHour, user, t]);
 
   // Fetch real atmospheric telemetry from Open-Meteo for active coordinates
   useEffect(() => {
