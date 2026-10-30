@@ -8,13 +8,15 @@
  * 4. Cache application shell & static bundles for offline interface resilience.
  */
 
-const SHELL_CACHE_VERSION = 'disasterchain-shell-v3.0.0-earth-intel';
-const API_CACHE_VERSION = 'disasterchain-api-v3.0.0-earth-intel';
+const SHELL_CACHE_VERSION = 'disasterchain-shell-v3.1.0-academy-offline';
+const API_CACHE_VERSION = 'disasterchain-api-v3.1.0-academy-offline';
 
 // Core Application Shell assets to precache
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
+  '/offline',
+  '/academy',
   '/manifest.webmanifest',
   '/manifest.json',
   '/icon-192.png',
@@ -38,7 +40,8 @@ const OPERATIONAL_API_ROUTES = [
   '/api/weather',
   '/api/preparedness',
   '/api/blockchain',
-  '/api/affected-areas'
+  '/api/affected-areas',
+  '/api/academy'
 ];
 
 self.addEventListener('install', (event) => {

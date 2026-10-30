@@ -394,7 +394,37 @@ export const VoiceAssistantProvider = ({
         const isRecentFlood = lower.includes('flood') || prevText.includes('flood');
         const isRecentEarthquake = lower.includes('earthquake') || prevText.includes('earthquake');
 
-        if (localIntent.intent === INTENTS.NAV_SHELTERS || localIntent.intent === INTENTS.ACTION_SHELTER_NEARBY) {
+        const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
+        if (isOffline) {
+          fallbackReply = '⚠️ **Offline Emergency Mode:** You are currently disconnected from the internet. Cloud AI reasoning is offline, but pre-cached emergency guidance is fully active.\n\n• 🚨 Direct Emergency Dispatch: Call 112\n• 🚑 Ambulance: Call 108\n• 🚒 Fire: Call 101\n• 🛡️ NDRF Disaster Cell: Call 1078\n\nAll 10 pre-cached survival guides and personal contacts remain accessible in Offline Mode.';
+          fallbackAction = { type: 'NAVIGATE', target: '/offline', label: 'Open Offline Mode' };
+        } else if (/\b(disaster\s+)?academy\b/i.test(lower)) {
+          fallbackReply = 'Opening **Disaster Academy**! Explore 15 interactive safety courses, practical illustrated diagrams, scenario simulations, and earn certified credentials.';
+          fallbackAction = { type: 'NAVIGATE', target: '/academy', label: 'Open Disaster Academy' };
+        } else if (/\b(offline\s+(emergency\s+)?mode|turn\s+on\s+offline)\b/i.test(lower)) {
+          fallbackReply = 'Entering **Offline Emergency Mode**. Fast-loading emergency guides, verified toll-free contacts, and personal survival checklists remain accessible without connectivity.';
+          fallbackAction = { type: 'NAVIGATE', target: '/offline', label: 'Open Offline Mode' };
+        } else if (/\bteach\s+me\s+earthquake\b/i.test(lower)) {
+          fallbackReply = '🏛️ **Earthquake Safety:** Drop, Cover, and Hold On beneath a sturdy table. Stay away from exterior windows, put on shoes after tremors, and check for gas leaks.';
+          fallbackAction = { type: 'NAVIGATE', target: '/academy/course/earthquake-safety', label: 'Earthquake Course' };
+        } else if (/\bteach\s+me\s+flood\b/i.test(lower)) {
+          fallbackReply = '🌊 **Flood Safety:** Just 6 inches of moving water knocks an adult down, and 12 inches floats cars. Move to high ground, shut off electrical breakers if dry, and boil water.';
+          fallbackAction = { type: 'NAVIGATE', target: '/academy/course/flood-safety', label: 'Flood Course' };
+        } else if (/\b(quiz|exam)\b/i.test(lower) && /\b(earthquake|flood|fire|cyclone)\b/i.test(lower)) {
+          const isEq = lower.includes('earthquake');
+          fallbackReply = `Starting the ${isEq ? 'Earthquake' : 'Flood'} Safety knowledge assessment to test your emergency survival readiness.`;
+          fallbackAction = { type: 'NAVIGATE', target: `/academy/course/${isEq ? 'earthquake-safety' : 'flood-safety'}`, label: 'Start Quiz' };
+        } else if (/\b(learning\s+progress|my\s+progress|streak|xp)\b/i.test(lower)) {
+          fallbackReply = 'Opening your **Academy Learning Progress** to inspect courses completed, daily learning streak, and earned badges.';
+          fallbackAction = { type: 'NAVIGATE', target: '/academy', label: 'Academy Dashboard' };
+        } else if (/\b(saved\s+emergency\s+contacts?|my\s+contacts?)\b/i.test(lower)) {
+          fallbackReply = 'Opening your **Saved Emergency Contacts** in Offline Mode with one-tap telephone dialer links.';
+          fallbackAction = { type: 'NAVIGATE', target: '/offline', label: 'View Contacts' };
+        } else if (/\b(checklist|emergency\s+kit\s+checklist|evacuation\s+checklist)\b/i.test(lower)) {
+          fallbackReply = 'Opening your **Survival Checklists** in Offline Mode. Track your 72-Hour Go-Bag and 15-Minute Evacuation readiness.';
+          fallbackAction = { type: 'NAVIGATE', target: '/offline', label: 'Open Checklists' };
+        } else if (localIntent.intent === INTENTS.NAV_SHELTERS || localIntent.intent === INTENTS.ACTION_SHELTER_NEARBY) {
           fallbackReply = 'Opening the Emergency Shelters directory to view nearby safe havens and live capacities.';
           fallbackAction = { type: 'NAVIGATE', target: '/shelters', label: 'Open Shelters' };
         } else if (localIntent.intent === INTENTS.NAV_WEATHER || (/\b(open|navigate|go\s+to)\s+(the\s+)?weather\s+page\b/i.test(lower))) {
@@ -525,6 +555,21 @@ export const VoiceAssistantProvider = ({
     },
     [sendMessage]
   );
+
+  // Listen for programmatic prompt dispatch from Academy or UI triggers
+  useEffect(() => {
+    const handleAskPrompt = (e) => {
+      const detail = e.detail;
+      if (detail && detail.prompt) {
+        setIsChatOpen(true);
+        setTimeout(() => {
+          sendMessage(detail.prompt, false);
+        }, 150);
+      }
+    };
+    window.addEventListener('dc:aiAskPrompt', handleAskPrompt);
+    return () => window.removeEventListener('dc:aiAskPrompt', handleAskPrompt);
+  }, [sendMessage]);
 
   // Synchronize Speech Recognition callbacks
   useEffect(() => {

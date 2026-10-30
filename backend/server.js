@@ -80,6 +80,7 @@ app.use('/api/preparedness', require('./routes/preparednessRoutes'));
 app.use('/api/blockchain', require('./routes/blockchainRoutes'));
 app.use('/api/intelligence', require('./routes/crisisIntelligenceRoutes'));
 app.use('/api/ai', require('./routes/aiAssistantRoutes'));
+app.use('/api/academy', require('./routes/academyRoutes'));
 app.use('/api/weather', require('./routes/weatherRoutes'));
 app.use('/api/weather-gpt', require('./routes/weatherGPTRoutes'));
 app.use('/api/seed', require('./routes/seedRoutes'));

@@ -27,6 +27,8 @@ import {
   Globe,
   Search,
   Mic,
+  GraduationCap,
+  WifiOff,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeatherGPT } from '../context/WeatherGPTContext';
@@ -200,6 +202,32 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                   <span className="dc-sidebar-label">{t('nav.shelters', 'Shelters')}</span>
                 )}
                 {isCurrentActive('/shelters') && <span className="dc-sidebar-active-indicator" />}
+              </NavLink>
+
+              <NavLink
+                to="/academy"
+                id="dc-sidebar-academy"
+                className={`dc-sidebar-link ${isCurrentActive('/academy') ? 'active' : ''}`}
+                title={isCollapsed ? t('nav.academy', 'Disaster Academy') : undefined}
+              >
+                <GraduationCap size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && (
+                  <span className="dc-sidebar-label">{t('nav.academy', 'Disaster Academy')}</span>
+                )}
+                {isCurrentActive('/academy') && <span className="dc-sidebar-active-indicator" />}
+              </NavLink>
+
+              <NavLink
+                to="/offline"
+                id="dc-sidebar-offline"
+                className={`dc-sidebar-link ${isCurrentActive('/offline') ? 'active' : ''}`}
+                title={isCollapsed ? t('nav.offlineMode', 'Offline Mode') : undefined}
+              >
+                <WifiOff size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && (
+                  <span className="dc-sidebar-label">{t('nav.offlineMode', 'Offline Mode')}</span>
+                )}
+                {isCurrentActive('/offline') && <span className="dc-sidebar-active-indicator" />}
               </NavLink>
 
               <button
@@ -474,6 +502,24 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                   >
                     <Home size={18} />
                     <span>Shelters Directory</span>
+                  </NavLink>
+
+                  <NavLink
+                    to="/academy"
+                    onClick={() => setIsMobileDrawerOpen(false)}
+                    className="dc-drawer-link"
+                  >
+                    <GraduationCap size={18} />
+                    <span>Disaster Academy</span>
+                  </NavLink>
+
+                  <NavLink
+                    to="/offline"
+                    onClick={() => setIsMobileDrawerOpen(false)}
+                    className="dc-drawer-link"
+                  >
+                    <WifiOff size={18} />
+                    <span>Offline Emergency Mode</span>
                   </NavLink>
 
                   <button

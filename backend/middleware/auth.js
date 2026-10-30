@@ -93,6 +93,28 @@ const authorize = (...roles) => {
   };
 };
 
+// Optional authentication - populates req.user if token is present, continues as guest if not
+const optionalAuth = async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'disasterchain_secure_jwt_secret_2026'
+      );
+      if (decoded && decoded.id) {
+        req.user = { id: decoded.id, role: decoded.role, email: decoded.email, name: decoded.name };
+      }
+    } catch (e) {
+      // Token invalid or expired - proceed as guest
+    }
+  }
+  next();
+};
+
 const authorizeAdmin = authorize('admin');
 
-module.exports = { protect, authorize, authorizeAdmin };
+module.exports = { protect, authorize, authorizeAdmin, optionalAuth };

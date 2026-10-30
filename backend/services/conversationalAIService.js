@@ -940,10 +940,10 @@ async function generateConversationalFallback(message, conversation = [], langua
     };
   }
 
-  // Emergency SOS Distress Trigger
+  // Emergency SOS Distress Trigger (Exclude offline emergency mode, guides, kits, plans, contacts)
   const isEmergencyDistress =
     /\b(sos|i need help|i am in danger|save me|trapped|in immediate danger)\b/i.test(text) ||
-    (/\bemergency\b/i.test(text) && !/\b(kit|plan|guide|contacts?|helpline|preparedness)\b/i.test(text));
+    (/\bemergency\b/i.test(text) && !/\b(kit|plan|guide|contacts?|helpline|preparedness|offline|mode)\b/i.test(text));
 
   if (isEmergencyDistress) {
     return {
@@ -995,6 +995,146 @@ async function generateConversationalFallback(message, conversation = [], langua
       reply: `Opening the official **Disaster Safety Guidelines** center. You can review structured action checklists for floods, earthquakes, cyclones, fires, and tsunamis.`,
       action: { type: 'NAVIGATE', target: '/safety', label: 'Open Safety Guidelines' },
       source: 'DisasterChain Disaster Guidelines',
+    };
+  }
+
+  // =========================================================================
+  // 5A. DISASTER ACADEMY & ACADEMY TUTOR
+  // =========================================================================
+
+  // "Open Disaster Academy" / "Go to academy"
+  if (
+    (/\b(open|go\s*to|launch|show|view)?\s*(disaster\s*)?academy\b/i.test(text) || /academy/i.test(text)) &&
+    !/\b(quiz|lesson|course)\b/i.test(text)
+  ) {
+    return {
+      reply: `Welcome to **DisasterChain Academy**! 🎓\n\n` +
+        `Here you can build practical life-saving skills across 15 interactive courses—including Earthquake Survival, Flood Safety, Fire Response, First Aid & CPR, and Emergency Evacuation.\n\n` +
+        `You can also test your instincts in scenario-based disaster simulations and earn non-accredited completion credentials. What would you like to learn today?`,
+      action: { type: 'NAVIGATE', target: '/academy', label: 'Open Disaster Academy' },
+      source: 'DisasterChain Academy Curriculum',
+    };
+  }
+
+  // "Teach me earthquake safety"
+  if (/\bteach\s+me\s+earthquake(\s+safety)?\b/i.test(text) || /\bhow\s+to\s+survive\s+an?\s+earthquake\b/i.test(text)) {
+    return {
+      reply: `🏛️ **Earthquake Safety Fundamentals:**\n\n` +
+        `1. 🛑 **DROP, COVER, HOLD ON:** Drop onto your hands and knees immediately. Cover your head and neck beneath a sturdy desk or interior wall. Hold on until all shaking stops.\n` +
+        `2. 🚫 **Stay Indoors:** Never run outside while shaking is active; falling glass, masonry, and facades are the primary cause of injury.\n` +
+        `3. 👞 **Sturdy Footwear:** Immediately put on shoes after tremors to protect against shattered glass.\n` +
+        `4. ⚡ **Check for Gas Leaks:** If smelling sulfur or hearing hissing, shut the main valve and evacuate via the stairs (never use elevators).\n\n` +
+        `I am opening the full interactive **Earthquake Safety Course** in Disaster Academy for step-by-step lessons and diagrams.`,
+      action: { type: 'NAVIGATE', target: '/academy/course/earthquake-safety', label: 'Start Earthquake Course' },
+      source: 'DisasterChain Academy - Earthquake Module',
+    };
+  }
+
+  // "Teach me flood safety"
+  if (/\bteach\s+me\s+flood(\s+safety)?\b/i.test(text) || /\bhow\s+to\s+survive\s+a?\s+flood\b/i.test(text)) {
+    return {
+      reply: `🌊 **Flood Safety & Swiftwater Rules:**\n\n` +
+        `1. 🛑 **Turn Around, Don't Drown:** Just **6 inches (15 cm)** of moving water sweeps an adult off their feet; **12 inches (30 cm)** floats most passenger cars.\n` +
+        `2. ⚡ **Electrical Safety:** De-energize main electrical breakers only if the floor and panel are completely dry.\n` +
+        `3. 🏠 **Vertical Retreat:** Move to upper floors if trapped, but never enter a closed attic without an exterior roof exit hatch.\n` +
+        `4. 🚰 **Sanitation:** Boil municipal tap water vigorously for 1 full minute before drinking.\n\n` +
+        `Opening the complete **Flood Safety & Swiftwater Course** in Disaster Academy for you now.`,
+      action: { type: 'NAVIGATE', target: '/academy/course/flood-safety', label: 'Start Flood Course' },
+      source: 'DisasterChain Academy - Flood Module',
+    };
+  }
+
+  // "Start a flood safety quiz" / "Quiz me on earthquakes"
+  if (/\b(start|take|quiz\s+me|test\s+me)\b/i.test(text) && /\b(quiz|exam|test|earthquake|flood|fire|cyclone|first\s*aid)\b/i.test(text)) {
+    const isEq = /\bearthquake\b/i.test(text);
+    const targetCourse = isEq ? 'earthquake-safety' : 'flood-safety';
+    const courseTitle = isEq ? 'Earthquake Safety' : 'Flood Safety';
+
+    return {
+      reply: `📝 **Knowledge Check: ${courseTitle}**\n\n` +
+        `Here is a quick evaluation question:\n` +
+        (isEq
+          ? `*When earthquake tremors begin while you are indoors, what is the globally recommended response?*\n` +
+            `A) Sprint for the building elevator\n` +
+            `B) Drop to hands and knees, cover head/neck under a sturdy table, and hold on\n` +
+            `C) Stand in an open doorway or run to the window\n\n` +
+            `*(The correct response is B! Elevators and windows are high-risk hazard zones).*`
+          : `*How deep does rapidly moving floodwater need to be to sweep an adult off their feet?*\n` +
+            `A) At least 3 feet\n` +
+            `B) 6 inches (15 cm)\n` +
+            `C) Water depth does not matter\n\n` +
+            `*(The correct response is B! Just 6 inches of current exerts massive hydraulic force).*`) +
+        `\n\nWould you like to take the official end-of-course exam and earn your credential?`,
+      action: { type: 'NAVIGATE', target: `/academy/course/${targetCourse}`, label: `Take ${courseTitle} Exam` },
+      source: 'DisasterChain Academy Quiz Engine',
+    };
+  }
+
+  // "Show my learning progress"
+  if (/\b(show|view|check)?\s*(my\s+)?learning\s+progress\b/i.test(text) || /\b(my\s+)?(academy\s+)?(streak|xp|badges?|certificates?)\b/i.test(text)) {
+    return {
+      reply: `📊 **Your DisasterChain Academy Progress:**\n\n` +
+        `• 🏆 **Curriculum Courses:** 15 comprehensive disaster preparedness modules.\n` +
+        `• 🔥 **Learning Streak:** Maintained daily with every completed lesson.\n` +
+        `• 🎖️ **Achievements:** Unlocked for master evaluations, CPR proficiency, and multi-course completion.\n` +
+        `• 📜 **Completion Credentials:** Conferred upon achieving 80%+ on any final course exam.\n\n` +
+        `Navigating to your **Academy Dashboard** to inspect all active stats.`,
+      action: { type: 'NAVIGATE', target: '/academy', label: 'View Academy Dashboard' },
+      source: 'DisasterChain Academy Tracking System',
+    };
+  }
+
+  // "Explain this lesson in simpler words" / "Give me another example" / "What did I get wrong?" / "Explain why this answer is unsafe"
+  if (
+    /\b(explain\s+this\s+lesson|simpler\s+words?|simple\s+terms?|another\s+example|what\s+did\s+i\s+get\s+wrong|why\s+(is\s+)?this\s+answer\s+unsafe|explain\s+why\s+unsafe)\b/i.test(text)
+  ) {
+    return {
+      reply: `💡 **Academy Tutor Explanation:**\n\n` +
+        `In emergency response, human intuition often misjudges danger because fear causes people to run. Here is the core principle in simpler terms:\n\n` +
+        `• **Why running is hazardous:** When an earthquake or fire strikes, the exterior perimeter of buildings collapses first—glass sheets drop vertically, falling bricks crush sidewalks, and airflow fans flames.\n` +
+        `• **Practical analogy:** Think of dropping and covering like a turtle pulling into its shell. You create a rigid shield between falling debris and your vital brain/spine organs.\n` +
+        `• **Why the wrong choice was unsafe:** Actions like using elevators or driving into water fail because mechanical and hydraulic limits are reached instantly without human warning.\n\n` +
+        `Does this clarify the lesson concept, or would you like to review another practical scenario?`,
+      action: null,
+      source: 'DisasterChain Academy AI Tutor',
+    };
+  }
+
+  // =========================================================================
+  // 5B. OFFLINE EMERGENCY MODE
+  // =========================================================================
+
+  // "Turn on Offline Emergency Mode" / "Open offline mode"
+  if (
+    /\b((turn\s*on|open|enable|switch\s*to|start)\s*)?offline(\s*emergency)?\s*mode\b/i.test(text) ||
+    (/offline/i.test(text) && !/\b(contacts?|checklists?|plan|guides?)\b/i.test(text))
+  ) {
+    return {
+      reply: `Switching to **Offline Emergency Mode**.\n\n` +
+        `This minimal, high-contrast interface loads instantly and functions 100% without internet or cellular connectivity.\n\n` +
+        `You have direct access to 10 verified disaster safety guides, verified toll-free hotlines, your local emergency plan, and 72-hour survival checklists.`,
+      action: { type: 'NAVIGATE', target: '/offline', label: 'Enter Offline Emergency Mode' },
+      source: 'DisasterChain Offline Engine',
+    };
+  }
+
+  // "Show my saved emergency contacts"
+  if (/\b(saved\s+emergency\s+contacts?|show\s+my\s+contacts?|my\s+emergency\s+numbers?)\b/i.test(text)) {
+    return {
+      reply: `Opening your **Saved Emergency Contacts** in Offline Mode.\n\n` +
+        `Here you can view national priority dispatchers (112, 1078, 108, 101, 100) and your private family contacts with one-tap cellular dialer links.`,
+      action: { type: 'NAVIGATE', target: '/offline', label: 'Open Emergency Contacts' },
+      source: 'DisasterChain Emergency Registry',
+    };
+  }
+
+  // "Open my emergency checklist"
+  if (/\b(emergency\s+checklist|open\s+(my\s+)?checklist|evacuation\s+checklist|kit\s+checklist)\b/i.test(text)) {
+    return {
+      reply: `Opening your **Emergency Survival Checklists**.\n\n` +
+        `You can review and check off items for your 72-Hour Go-Bag (water rations, crank radio, waterproof docs) and 15-Minute Rapid Evacuation sequence. All checkmarks are saved safely on your local device.`,
+      action: { type: 'NAVIGATE', target: '/offline', label: 'Open Emergency Checklists' },
+      source: 'DisasterChain Preparedness Engine',
     };
   }
 

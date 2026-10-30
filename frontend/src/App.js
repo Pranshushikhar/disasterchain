@@ -19,6 +19,11 @@ import ModernWeatherPage from './pages/ModernWeatherPage';
 import ModernMapPage from './pages/ModernMapPage';
 import ModernIncidentsPage from './pages/ModernIncidentsPage';
 import ModernSafetyPage from './pages/ModernSafetyPage';
+import ModernAcademyPage from './pages/ModernAcademyPage';
+import AcademyCoursePage from './pages/AcademyCoursePage';
+import AcademySimulationsPage from './pages/AcademySimulationsPage';
+import ModernOfflineEmergencyPage from './pages/ModernOfflineEmergencyPage';
+import OfflineDetectionBanner from './components/OfflineDetectionBanner';
 import ModernWeatherGPT from './components/ModernWeatherGPT';
 import ModernSosModal from './components/ModernSosModal';
 import GlobalVoiceAssistant from './components/GlobalVoiceAssistant';
@@ -168,6 +173,9 @@ const AppLayout = () => {
       onOpenSettings={() => window.dispatchEvent(new CustomEvent('dc:openSettings'))}
     >
       <div className="dc-app-layout">
+      {/* Offline Detection & Transition Banner */}
+      <OfflineDetectionBanner />
+
       {/* 0. LIVING ENVIRONMENT ATMOSPHERIC CANVAS */}
       <LivingEnvironment />
 
@@ -243,6 +251,15 @@ const AppLayout = () => {
               path="/sos"
               element={<ModernSafetyPage onOpenSos={() => setIsSosOpen(true)} />}
             />
+
+            {/* Disaster Academy & Interactive Simulations */}
+            <Route path="/academy" element={<ModernAcademyPage />} />
+            <Route path="/academy/course/:courseId" element={<AcademyCoursePage />} />
+            <Route path="/academy/simulations" element={<AcademySimulationsPage />} />
+
+            {/* Offline Emergency Mode */}
+            <Route path="/offline" element={<ModernOfflineEmergencyPage />} />
+            <Route path="/offline-mode" element={<ModernOfflineEmergencyPage />} />
 
             {/* Secondary Operations & Resources */}
             <Route path="/shelters" element={<SheltersPage />} />

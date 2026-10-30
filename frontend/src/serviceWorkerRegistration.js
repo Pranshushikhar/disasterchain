@@ -11,7 +11,12 @@ export function register(config) {
     window.addEventListener('load', () => {
       const swUrl = `${process.env.PUBLIC_URL || ''}/sw.js`;
 
-      if (isLocalhost) {
+      const forceSwTest =
+        typeof window !== 'undefined' &&
+        (window.location.search.includes('enable_sw=1') ||
+          window.location.search.includes('pwa_test=1'));
+
+      if (isLocalhost && !forceSwTest) {
         // Localhost development: Unregister service worker and purge local caches
         // so that active code changes & testing are never intercepted by stale cache bundles
         unregister();
@@ -25,7 +30,7 @@ export function register(config) {
           });
         }
       } else {
-        // Production registration
+        // Production registration or automated offline test
         registerValidSW(swUrl, config);
       }
     });

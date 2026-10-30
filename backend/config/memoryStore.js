@@ -579,6 +579,7 @@ const memoryStore = {
     },
   ],
   passwordRecoveryRequests: [],
+  academyProgress: [],
 };
 
 module.exports = memoryStore;
