@@ -61,8 +61,9 @@ exports.createIncident = async (req, res) => {
     }
 
     const incidentId = `INC-${Math.floor(1000 + Math.random() * 9000)}`;
-    const effectiveLat = Number(latitude) || 28.6139;
-    const effectiveLon = Number(longitude) || 77.2090;
+    const hasValidCoords = latitude !== undefined && longitude !== undefined && latitude !== null && longitude !== null && latitude !== '' && longitude !== '' && !isNaN(Number(latitude)) && !isNaN(Number(longitude));
+    const effectiveLat = hasValidCoords ? Number(latitude) : null;
+    const effectiveLon = hasValidCoords ? Number(longitude) : null;
 
     const { analyzeIncidentMedia, computePerceptualHash } = require('../services/aiMediaAnalysisService');
     const { findDuplicateIncidents } = require('../services/duplicateDetectionService');

@@ -52,9 +52,9 @@ exports.createResource = async (req, res) => {
 // @desc    Update resource
 exports.updateResource = async (req, res) => {
   try {
-    if (isDbConnected()) {
+    if (isDbConnected() && mongoose.isValidObjectId(req.params.id)) {
       const resource = await Resource.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      return res.json({ success: true, data: resource });
+      if (resource) return res.json({ success: true, data: resource });
     }
     const idx = memoryStore.resources.findIndex((r) => r._id === req.params.id);
     if (idx !== -1) {
@@ -70,12 +70,16 @@ exports.updateResource = async (req, res) => {
 // @desc    Delete resource
 exports.deleteResource = async (req, res) => {
   try {
-    if (isDbConnected()) {
-      await Resource.findByIdAndDelete(req.params.id);
+    if (isDbConnected() && mongoose.isValidObjectId(req.params.id)) {
+      const resource = await Resource.findByIdAndDelete(req.params.id);
+      if (resource) return res.json({ success: true, message: 'Deleted' });
+    }
+    const idx = memoryStore.resources.findIndex((r) => r._id === req.params.id);
+    if (idx !== -1) {
+      memoryStore.resources.splice(idx, 1);
       return res.json({ success: true, message: 'Deleted' });
     }
-    memoryStore.resources = memoryStore.resources.filter((r) => r._id !== req.params.id);
-    res.json({ success: true, message: 'Deleted' });
+    res.status(404).json({ success: false, message: 'Not found' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error' });
   }

@@ -17,7 +17,7 @@ const { computePerceptualHash, comparePerceptualHashes } = require('./aiMediaAna
  * Calculate Haversine distance in kilometers between two GPS coordinates
  */
 function calculateDistanceKm(lat1, lon1, lat2, lon2) {
-  if (lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined) return 9999;
+  if (lat1 == null || lon1 == null || lat2 == null || lon2 == null || isNaN(Number(lat1)) || isNaN(Number(lon1)) || isNaN(Number(lat2)) || isNaN(Number(lon2))) return 9999;
   const R = 6371; // Earth radius in km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -72,10 +72,10 @@ function evaluateDuplicateCandidate(candidate, existing) {
   let score = 0;
 
   // 1. Geographic Proximity (Max 40 points)
-  const cLat = Number(candidate.latitude);
-  const cLon = Number(candidate.longitude);
-  const eLat = Number(existing.latitude);
-  const eLon = Number(existing.longitude);
+  const cLat = candidate.latitude != null && candidate.latitude !== '' && !isNaN(Number(candidate.latitude)) ? Number(candidate.latitude) : null;
+  const cLon = candidate.longitude != null && candidate.longitude !== '' && !isNaN(Number(candidate.longitude)) ? Number(candidate.longitude) : null;
+  const eLat = existing.latitude != null && existing.latitude !== '' && !isNaN(Number(existing.latitude)) ? Number(existing.latitude) : null;
+  const eLon = existing.longitude != null && existing.longitude !== '' && !isNaN(Number(existing.longitude)) ? Number(existing.longitude) : null;
 
   const distanceKm = calculateDistanceKm(cLat, cLon, eLat, eLon);
 

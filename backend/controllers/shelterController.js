@@ -108,7 +108,7 @@ exports.createShelter = async (req, res) => {
 // @access  Private / Admin
 exports.updateShelter = async (req, res) => {
   try {
-    if (isDbConnected()) {
+    if (isDbConnected() && mongoose.isValidObjectId(req.params.id)) {
       const shelter = await Shelter.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
@@ -146,7 +146,7 @@ exports.updateShelter = async (req, res) => {
 // @access  Private / Admin
 exports.deleteShelter = async (req, res) => {
   try {
-    if (isDbConnected()) {
+    if (isDbConnected() && mongoose.isValidObjectId(req.params.id)) {
       const shelter = await Shelter.findByIdAndDelete(req.params.id);
       if (!shelter) {
         return res.status(404).json({ success: false, message: 'Shelter not found' });
@@ -154,8 +154,13 @@ exports.deleteShelter = async (req, res) => {
       return res.json({ success: true, message: 'Shelter removed successfully' });
     }
 
-    memoryStore.shelters = memoryStore.shelters.filter((s) => s._id !== req.params.id);
-    res.json({ success: true, message: 'Shelter removed successfully (In-Memory)' });
+    const idx = memoryStore.shelters.findIndex((s) => s._id === req.params.id);
+    if (idx !== -1) {
+      memoryStore.shelters.splice(idx, 1);
+      return res.json({ success: true, message: 'Shelter removed successfully (In-Memory)' });
+    }
+
+    res.status(404).json({ success: false, message: 'Shelter not found' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error deleting shelter' });
   }

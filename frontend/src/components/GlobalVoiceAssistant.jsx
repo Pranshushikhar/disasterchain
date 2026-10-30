@@ -45,6 +45,7 @@ export default function GlobalVoiceAssistant() {
     lastSpokenText,
     statusMessage,
     voiceError,
+    setVoiceError,
     permissionState,
     isMuted,
     setIsMuted,
@@ -266,6 +267,47 @@ export default function GlobalVoiceAssistant() {
                   </button>
                 </div>
               </div>
+
+              {/* Microphone / Speech Recognition Warning Banner */}
+              {voiceError && (
+                <div
+                  style={{
+                    margin: '8px 12px 0 12px',
+                    padding: '8px 12px',
+                    backgroundColor: '#FEF3C7',
+                    border: '1px solid #F59E0B',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.8rem',
+                    color: '#92400E',
+                    lineHeight: 1.35,
+                  }}
+                  role="alert"
+                >
+                  <AlertTriangle size={16} style={{ flexShrink: 0, color: '#D97706' }} />
+                  <span style={{ flex: 1 }}>{voiceError}</span>
+                  {setVoiceError && (
+                    <button
+                      type="button"
+                      onClick={() => setVoiceError(null)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '2px',
+                        color: '#92400E',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                      aria-label="Dismiss error"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Chat Thread Messages */}
               <div className="dc-voice-chat-messages">

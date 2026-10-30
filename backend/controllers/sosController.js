@@ -110,13 +110,26 @@ exports.createSosRequest = async (req, res) => {
         }
       }
 
+      const validLat =
+        typeof latitude === 'number' && !isNaN(latitude)
+          ? latitude
+          : latitude !== undefined && latitude !== null && latitude !== '' && !isNaN(Number(latitude))
+          ? Number(latitude)
+          : null;
+      const validLon =
+        typeof longitude === 'number' && !isNaN(longitude)
+          ? longitude
+          : longitude !== undefined && longitude !== null && longitude !== '' && !isNaN(Number(longitude))
+          ? Number(longitude)
+          : null;
+
       const sosData = {
         name,
         emergencyType,
         description,
         location,
-        latitude: latitude || 28.6139,
-        longitude: longitude || 77.2090,
+        latitude: validLat,
+        longitude: validLon,
         peopleAffected: Number(peopleAffected) || 1,
         severity: severity || 'High',
         contact,
@@ -159,6 +172,19 @@ exports.createSosRequest = async (req, res) => {
         });
       }
     }
+    const memLat =
+      typeof latitude === 'number' && !isNaN(latitude)
+        ? latitude
+        : latitude !== undefined && latitude !== null && latitude !== '' && !isNaN(Number(latitude))
+        ? Number(latitude)
+        : null;
+    const memLon =
+      typeof longitude === 'number' && !isNaN(longitude)
+        ? longitude
+        : longitude !== undefined && longitude !== null && longitude !== '' && !isNaN(Number(longitude))
+        ? Number(longitude)
+        : null;
+
     const sosData = {
       _id: `sos-${Date.now()}`,
       requestId: memoryRequestId,
@@ -166,8 +192,8 @@ exports.createSosRequest = async (req, res) => {
       emergencyType,
       description,
       location,
-      latitude: latitude || 28.6139,
-      longitude: longitude || 77.2090,
+      latitude: memLat,
+      longitude: memLon,
       peopleAffected: Number(peopleAffected) || 1,
       severity: severity || 'High',
       contact,

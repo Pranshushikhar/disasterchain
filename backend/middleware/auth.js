@@ -29,9 +29,10 @@ const protect = async (req, res, next) => {
         } catch (e) {}
 
         if (!user) {
-          if (decoded.id && (String(decoded.id).startsWith('demo-') || String(decoded.id).startsWith('507f'))) {
+          if (process.env.NODE_ENV !== 'production' && decoded.id && String(decoded.id).startsWith('demo-')) {
             user = {
               _id: decoded.id,
+              id: decoded.id,
               role: decoded.role || 'citizen',
               name: decoded.name || 'Demo User',
               email: decoded.email || 'operator@disasterchain.org',
@@ -106,7 +107,13 @@ const optionalAuth = async (req, res, next) => {
         process.env.JWT_SECRET || 'disasterchain_secure_jwt_secret_2026'
       );
       if (decoded && decoded.id) {
-        req.user = { id: decoded.id, role: decoded.role, email: decoded.email, name: decoded.name };
+        req.user = {
+          _id: decoded.id,
+          id: decoded.id,
+          role: decoded.role,
+          email: decoded.email,
+          name: decoded.name,
+        };
       }
     } catch (e) {
       // Token invalid or expired - proceed as guest

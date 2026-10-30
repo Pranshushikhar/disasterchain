@@ -256,19 +256,25 @@ exports.getAllPreparedness = async (req, res) => {
 // @access  Public
 exports.getPreparednessByType = async (req, res) => {
   try {
+    const rawType = String(req.params.type || '').trim();
+    if (!rawType) {
+      return res.status(400).json({ success: false, message: 'Disaster type is required' });
+    }
+    const escapedType = rawType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     if (isDbConnected()) {
       const guide = await Preparedness.findOne({
-        disasterType: { $regex: new RegExp(`^${req.params.type}$`, 'i') },
+        disasterType: { $regex: new RegExp(`^${escapedType}$`, 'i') },
       });
       if (guide) return res.json({ success: true, data: guide });
     }
 
     const guide = defaultPreparedness.find(
-      (g) => g.disasterType.toLowerCase() === req.params.type.toLowerCase()
+      (g) => g.disasterType.toLowerCase() === rawType.toLowerCase()
     );
 
     if (!guide) {
-      return res.status(404).json({ success: false, message: `Guide for '${req.params.type}' not found` });
+      return res.status(404).json({ success: false, message: `Guide for '${rawType}' not found` });
     }
 
     return res.json({ success: true, data: guide });

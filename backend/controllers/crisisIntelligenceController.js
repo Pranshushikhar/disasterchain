@@ -35,6 +35,7 @@ exports.getActiveCrisisIntelligence = async (req, res) => {
     let activeIncidents = [];
     let shelters = [];
     let resources = [];
+    let affectedAreas = [];
     let alerts = [];
 
     if (isDbConnected()) {

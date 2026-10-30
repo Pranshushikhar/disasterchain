@@ -15,7 +15,7 @@ function extractCoords(query) {
 async function getCurrentWeather(req, res) {
   try {
     const { lat, lon } = extractCoords(req.query);
-    if (!lat || !lon) {
+    if (lat === undefined || lon === undefined || lat === null || lon === null || lat === '' || lon === '') {
       return res.status(400).json({
         success: false,
         message: 'Query parameters "lat" (or "latitude") and "lon" (or "longitude") are required.',
@@ -42,7 +42,7 @@ async function getCurrentWeather(req, res) {
 async function getForecast(req, res) {
   try {
     const { lat, lon } = extractCoords(req.query);
-    if (!lat || !lon) {
+    if (lat === undefined || lon === undefined || lat === null || lon === null || lat === '' || lon === '') {
       return res.status(400).json({
         success: false,
         message: 'Query parameters "lat" (or "latitude") and "lon" (or "longitude") are required.',
@@ -69,7 +69,7 @@ async function getForecast(req, res) {
 async function getAirQuality(req, res) {
   try {
     const { lat, lon } = extractCoords(req.query);
-    if (!lat || !lon) {
+    if (lat === undefined || lon === undefined || lat === null || lon === null || lat === '' || lon === '') {
       return res.status(400).json({
         success: false,
         message: 'Query parameters "lat" (or "latitude") and "lon" (or "longitude") are required.',
@@ -97,7 +97,7 @@ async function getAirQuality(req, res) {
 async function getCompleteWeather(req, res) {
   try {
     const { lat, lon } = extractCoords(req.query);
-    if (!lat || !lon) {
+    if (lat === undefined || lon === undefined || lat === null || lon === null || lat === '' || lon === '') {
       return res.status(400).json({
         success: false,
         message: 'Query parameters "lat" (or "latitude") and "lon" (or "longitude") are required.',

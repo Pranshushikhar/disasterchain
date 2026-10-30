@@ -88,7 +88,7 @@ exports.createAlert = async (req, res) => {
 // @access  Private / Admin
 exports.updateAlert = async (req, res) => {
   try {
-    if (isDbConnected()) {
+    if (isDbConnected() && mongoose.isValidObjectId(req.params.id)) {
       const alert = await Alert.findByIdAndUpdate(req.params.id, req.body, { new: true });
       if (!alert) return res.status(404).json({ success: false, message: 'Alert not found' });
       return res.json({ success: true, message: 'Updated', data: alert });
@@ -109,13 +109,17 @@ exports.updateAlert = async (req, res) => {
 // @access  Private / Admin
 exports.deleteAlert = async (req, res) => {
   try {
-    if (isDbConnected()) {
+    if (isDbConnected() && mongoose.isValidObjectId(req.params.id)) {
       const alert = await Alert.findByIdAndDelete(req.params.id);
       if (!alert) return res.status(404).json({ success: false, message: 'Not found' });
       return res.json({ success: true, message: 'Deleted' });
     }
-    memoryStore.alerts = memoryStore.alerts.filter((a) => a._id !== req.params.id);
-    res.json({ success: true, message: 'Deleted (In-Memory)' });
+    const idx = memoryStore.alerts.findIndex((a) => a._id === req.params.id);
+    if (idx !== -1) {
+      memoryStore.alerts.splice(idx, 1);
+      return res.json({ success: true, message: 'Deleted (In-Memory)' });
+    }
+    res.status(404).json({ success: false, message: 'Not found' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error' });
   }

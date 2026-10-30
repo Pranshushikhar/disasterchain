@@ -39,10 +39,13 @@ async function itAsync(desc, fn) {
   }
 }
 
+let testPort = 5192;
+let testServer = null;
+
 // HTTP request helper
 function requestGet(path) {
   return new Promise((resolve, reject) => {
-    http.get(`http://localhost:5000${path}`, (res) => {
+    http.get(`http://127.0.0.1:${testPort}${path}`, (res) => {
       let body = '';
       res.on('data', (c) => (body += c));
       res.on('end', () => {
@@ -57,6 +60,14 @@ function requestGet(path) {
 }
 
 async function runWeatherTestSuite() {
+  const express = require('express');
+  const weatherRoutes = require('./routes/weatherRoutes');
+  const app = express();
+  app.use(express.json());
+  app.use('/api/weather', weatherRoutes);
+  testServer = http.createServer(app);
+  await new Promise((resolve) => testServer.listen(testPort, resolve));
+
   console.log('================================================================');
   console.log('🌤️ DISASTERCHAIN WEATHER & ATMOSPHERIC INTELLIGENCE TEST SUITE');
   console.log('================================================================\n');
@@ -363,6 +374,10 @@ async function runWeatherTestSuite() {
   console.log(`📊 WEATHER INTELLIGENCE TEST SUMMARY: ${passedTests} / ${totalTests} TESTS PASSED (100%)`);
   console.log('🎉 ALL WEATHER & ATMOSPHERIC DISASTER INTELLIGENCE CHECKS PASSED!');
   console.log('================================================================\n');
+
+  if (testServer) {
+    await new Promise((res) => testServer.close(res));
+  }
 }
 
 runWeatherTestSuite().catch((err) => {

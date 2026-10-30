@@ -60,7 +60,7 @@ const AdminDashboard = () => {
   const loadAll = async () => {
     setLoading(true);
     try {
-      const [sos, sh, inc, alt, don, dist, bc, usr, rec] = await Promise.all([
+      const results = await Promise.allSettled([
         fetchSosRequests(),
         fetchShelters(),
         fetchIncidents(),
@@ -69,17 +69,20 @@ const AdminDashboard = () => {
         fetchDistributions(),
         fetchBlockchainTransactions(),
         fetchAdminUsers(),
-        fetchPasswordRecoveryRequests().catch(() => []),
+        fetchPasswordRecoveryRequests(),
       ]);
-      setSosList(sos || []);
-      setShelters(sh || []);
-      setIncidents(inc || []);
-      setAlerts(alt || []);
-      setDonations(don || []);
-      setDistributions(dist || []);
-      setBlockchainRecords(bc || []);
-      setUsers(usr || []);
-      setRecoveryRequests(rec || []);
+
+      const [sos, sh, inc, alt, don, dist, bc, usr, rec] = results;
+
+      setSosList(sos.status === 'fulfilled' && sos.value ? sos.value : []);
+      setShelters(sh.status === 'fulfilled' && sh.value ? sh.value : []);
+      setIncidents(inc.status === 'fulfilled' && inc.value ? inc.value : []);
+      setAlerts(alt.status === 'fulfilled' && alt.value ? alt.value : []);
+      setDonations(don.status === 'fulfilled' && don.value ? don.value : []);
+      setDistributions(dist.status === 'fulfilled' && dist.value ? dist.value : []);
+      setBlockchainRecords(bc.status === 'fulfilled' && bc.value ? bc.value : []);
+      setUsers(usr.status === 'fulfilled' && usr.value ? usr.value : []);
+      setRecoveryRequests(rec.status === 'fulfilled' && rec.value ? rec.value : []);
     } catch (err) {
       console.error('Failed to load admin data:', err);
     } finally {

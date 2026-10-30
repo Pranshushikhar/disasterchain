@@ -43,11 +43,11 @@ const incidentSchema = new mongoose.Schema({
   },
   latitude: {
     type: Number,
-    default: 28.6139,
+    default: null,
   },
   longitude: {
     type: Number,
-    default: 77.2090,
+    default: null,
   },
   imageUrl: {
     type: String,

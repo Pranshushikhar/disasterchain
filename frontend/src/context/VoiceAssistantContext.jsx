@@ -711,6 +711,7 @@ export const VoiceAssistantProvider = ({
     lastSpokenText,
     statusMessage,
     voiceError,
+    setVoiceError,
     permissionState,
     isMuted,
     setIsMuted,
