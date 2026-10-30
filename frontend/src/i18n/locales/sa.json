@@ -742,7 +742,8 @@
     "assigned": "सौंपा गया",
     "inProgress": "प्रगति पर है",
     "rejected": "अस्वीकृत",
-    "action": "कार्रवाई"
+    "action": "कार्रवाई",
+    "incidentVerification": "घटना प्रमाणीकरणम्"
   },
   "weather": {
     "liveData": "लाइव डेटा",

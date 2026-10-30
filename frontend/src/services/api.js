@@ -319,4 +319,71 @@ export const sendWeatherGPTChat = async ({
   return res.data;
 };
 
+// ================= INCIDENT TRUST & VERIFICATION API =================
+
+export const checkIncidentDuplicates = async (draftIncident) => {
+  const res = await api.post('/incidents/check-duplicates', draftIncident);
+  return res.data;
+};
+
+export const analyzeIncidentMedia = async (mediaPayload) => {
+  const res = await api.post('/incidents/analyze-media', mediaPayload);
+  return res.data;
+};
+
+export const submitWitnessVerification = async (incidentId, witnessData) => {
+  const res = await api.post(`/incidents/${incidentId}/witness`, witnessData);
+  return res.data;
+};
+
+export const fetchIncidentWitnesses = async (incidentId) => {
+  const res = await api.get(`/incidents/${incidentId}/witnesses`);
+  return res.data;
+};
+
+export const fetchIncidentTrustScore = async (incidentId) => {
+  const res = await api.get(`/incidents/${incidentId}/trust-score`);
+  return res.data;
+};
+
+export const adminVerifyIncident = async (incidentId, reason) => {
+  const res = await api.post(`/incidents/${incidentId}/admin/verify`, { reason });
+  return res.data;
+};
+
+export const adminDisputeIncident = async (incidentId, reason) => {
+  const res = await api.post(`/incidents/${incidentId}/admin/dispute`, { reason });
+  return res.data;
+};
+
+export const adminRejectIncident = async (incidentId, reason) => {
+  const res = await api.post(`/incidents/${incidentId}/admin/reject`, { reason });
+  return res.data;
+};
+
+export const adminRequestEvidence = async (incidentId, note) => {
+  const res = await api.post(`/incidents/${incidentId}/admin/request-evidence`, { note });
+  return res.data;
+};
+
+export const adminMergeDuplicates = async (incidentId, duplicateIncidentId, reason) => {
+  const res = await api.post(`/incidents/${incidentId}/admin/merge`, { duplicateIncidentId, reason });
+  return res.data;
+};
+
+export const adminEscalateIncident = async (incidentId, notes) => {
+  const res = await api.post(`/incidents/${incidentId}/admin/escalate`, { notes });
+  return res.data;
+};
+
+export const adminReopenIncident = async (incidentId, reason) => {
+  const res = await api.post(`/incidents/${incidentId}/admin/reopen`, { reason });
+  return res.data;
+};
+
+export const fetchAdminVerificationStats = async () => {
+  const res = await api.get('/incidents/admin/verification-stats');
+  return res.data;
+};
+
 export default api;

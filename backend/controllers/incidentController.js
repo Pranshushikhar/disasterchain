@@ -53,36 +53,128 @@ exports.getIncidentById = async (req, res) => {
 // @access  Public
 exports.createIncident = async (req, res) => {
   try {
-    const { title, type, description, location, latitude, longitude, severity } = req.body;
+    const { title, type, category, description, location, latitude, longitude, severity, imageUrl, exif } = req.body;
 
-    if (!title || !type || !description || !location) {
+    const resolvedType = type || category;
+    if (!title || !resolvedType || !description || !location) {
       return res.status(400).json({ success: false, message: 'Please provide title, hazard type, description, and location' });
     }
 
     const incidentId = `INC-${Math.floor(1000 + Math.random() * 9000)}`;
+    const effectiveLat = Number(latitude) || 28.6139;
+    const effectiveLon = Number(longitude) || 77.2090;
 
-    const incidentData = {
-      incidentId,
-      title,
-      type,
-      description,
-      location,
-      latitude: Number(latitude) || 28.6139,
-      longitude: Number(longitude) || 77.2090,
-      severity: severity || 'Medium',
-      reporterName: (req.user && req.user.name) ? req.user.name : (req.body.reporterName || 'Anonymous Student'),
-      status: 'Pending',
-      createdAt: new Date(),
-    };
+    const { analyzeIncidentMedia, computePerceptualHash } = require('../services/aiMediaAnalysisService');
+    const { findDuplicateIncidents } = require('../services/duplicateDetectionService');
+    const { calculateTrustScore } = require('../services/incidentTrustService');
 
+    // 1. Check for duplicate incident candidates in database or memoryStore
+    let existingIncidents = [];
     if (isDbConnected()) {
-      const incident = await Incident.create(incidentData);
-      return res.status(201).json({ success: true, message: 'Hazard incident reported', data: incident });
+      existingIncidents = await Incident.find({}).sort({ createdAt: -1 }).limit(100);
+    } else {
+      existingIncidents = memoryStore.incidents;
     }
 
-    const memoryIncident = { _id: `inc-${Date.now()}`, ...incidentData };
+    const duplicateCheck = findDuplicateIncidents(
+      { title, type: resolvedType, description, latitude: effectiveLat, longitude: effectiveLon, imageUrl },
+      existingIncidents
+    );
+
+    const isDuplicate = duplicateCheck.hasDuplicates && duplicateCheck.topMatchScore >= 60;
+    const duplicateInfo = {
+      isDuplicate,
+      mergedIntoIncidentId: null,
+      mergedIncidents: [],
+      duplicateMatchScore: duplicateCheck.topMatchScore || 0,
+      matchReasons: duplicateCheck.candidates?.[0]?.reasons || [],
+    };
+
+    // 2. Perform AI Media Analysis if image is attached
+    const mediaAnalysisList = [];
+    if (imageUrl && imageUrl.trim().length > 0) {
+      const existingHashes = existingIncidents
+        .filter((i) => i.imageUrl)
+        .map((i) => ({ incidentId: i.incidentId, hash: computePerceptualHash(i.imageUrl) }));
+
+      const analysis = await analyzeIncidentMedia({
+        url: imageUrl,
+        category: resolvedType,
+        description,
+        latitude: effectiveLat,
+        longitude: effectiveLon,
+        existingMediaHashes: existingHashes,
+        exif,
+      });
+      mediaAnalysisList.push(analysis);
+    }
+
+    const reporterName = (req.user && req.user.name) ? req.user.name : (req.body.reporterName || 'Anonymous Student');
+    const reportedBy = req.user ? (req.user.id || req.user._id) : null;
+
+    const incidentDraft = {
+      incidentId,
+      title,
+      type: resolvedType,
+      description,
+      location,
+      latitude: effectiveLat,
+      longitude: effectiveLon,
+      severity: severity || 'Medium',
+      imageUrl: imageUrl || '',
+      reportedBy,
+      reporterName,
+      status: 'Received',
+      verificationStatus: 'Received',
+      duplicateInfo,
+      mediaAnalysis: mediaAnalysisList,
+      witnessStats: { confirmedCount: 0, disputedCount: 0, lastConfirmedAt: null },
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // 3. Compute initial trust score
+    const initialTrust = calculateTrustScore({
+      incident: incidentDraft,
+      witnesses: [],
+      officialAlerts: memoryStore.alerts || [],
+      duplicateCandidates: duplicateCheck.candidates || [],
+    });
+
+    incidentDraft.trustScore = initialTrust.trustScore;
+    incidentDraft.trustLevel = initialTrust.trustLevel;
+    incidentDraft.trustScoreBreakdown = initialTrust.trustScoreBreakdown;
+    incidentDraft.aiEvidenceSummary = initialTrust.aiEvidenceSummary;
+    incidentDraft.officialAlertMatch = initialTrust.officialAlertMatch;
+    incidentDraft.auditLog = [
+      {
+        adminId: reportedBy ? String(reportedBy) : 'system',
+        adminName: reporterName,
+        action: 'REPORT_CREATED',
+        reason: 'Initial citizen incident report created and submitted to verification pipeline.',
+        timestamp: new Date(),
+        metadata: { duplicateCheckScore: duplicateCheck.topMatchScore },
+      },
+    ];
+
+    if (isDbConnected()) {
+      const incident = await Incident.create(incidentDraft);
+      return res.status(201).json({
+        success: true,
+        message: 'Hazard incident reported successfully',
+        data: incident,
+        duplicateWarning: duplicateCheck.hasDuplicates ? duplicateCheck.candidates[0] : null,
+      });
+    }
+
+    const memoryIncident = { _id: `inc-${Date.now()}`, ...incidentDraft };
     memoryStore.incidents.unshift(memoryIncident);
-    return res.status(201).json({ success: true, message: 'Hazard incident reported (In-Memory)', data: memoryIncident });
+    return res.status(201).json({
+      success: true,
+      message: 'Hazard incident reported (In-Memory)',
+      data: memoryIncident,
+      duplicateWarning: duplicateCheck.hasDuplicates ? duplicateCheck.candidates[0] : null,
+    });
   } catch (error) {
     console.error('Create incident error:', error);
     res.status(500).json({ success: false, message: error.message || 'Server error reporting incident' });

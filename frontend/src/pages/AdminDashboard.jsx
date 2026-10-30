@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '../components/StatCard';
 import BlockchainReceiptModal from '../components/BlockchainReceiptModal';
+import AdminIncidentVerificationDashboard from '../components/AdminIncidentVerificationDashboard';
 import Icon from '../components/Icons';
 import { useTranslation } from '../i18n/i18n';
 import {
@@ -296,6 +297,7 @@ const AdminDashboard = () => {
       >
         {[
           { id: 'overview', label: t('admin.systemHealth', 'System Analytics'), icon: 'activity' },
+          { id: 'verification', label: t('admin.incidentVerification', 'Incident Verification'), icon: 'shield' },
           { id: 'sos', label: `${t('nav.emergencySos', 'Manage SOS')} (${sosList.length})`, icon: 'sos' },
           { id: 'incidents', label: `${t('nav.incidentReports', 'Review Hazards')} (${incidents.length})`, icon: 'warning' },
           { id: 'shelters', label: `${t('nav.shelters', 'Shelters')} (${shelters.length})`, icon: 'home' },
@@ -328,6 +330,19 @@ const AdminDashboard = () => {
       {activeTab === 'overview' && (
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
+            <div
+              onClick={() => setActiveTab('verification')}
+              style={{ cursor: 'pointer' }}
+              title="Click to open AI Incident Verification Command Center"
+            >
+              <StatCard
+                title={t('admin.incidentVerification', 'Incident Verification')}
+                value={incidents.filter((i) => i.verificationStatus === 'Under Verification' || i.verificationStatus === 'Received' || i.status === 'Pending').length}
+                subtitle="AI Forensics & Trust Scoring →"
+                icon="shield"
+                color="indigo"
+              />
+            </div>
             <StatCard
               title={t('emergency.activeCrisis', 'Total SOS Distress')}
               value={sosList.length}
@@ -444,6 +459,11 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* 1.5. INCIDENT VERIFICATION DASHBOARD */}
+      {activeTab === 'verification' && (
+        <AdminIncidentVerificationDashboard onIncidentUpdated={loadAll} />
       )}
 
       {/* 2. SOS MANAGEMENT */}

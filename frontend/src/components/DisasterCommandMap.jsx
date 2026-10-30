@@ -825,6 +825,24 @@ const DisasterCommandMapContent = ({
           safeIncidents.map((inc, idx) => {
             if (inc.latitude == null || inc.longitude == null) return null;
             const key = inc._id || inc.id || `inc-${idx}`;
+            const vStatus = inc.verificationStatus || (inc.status === 'Resolved' ? 'Officially Verified' : 'Received');
+            const vColor =
+              vStatus === 'Officially Verified'
+                ? '#166534'
+                : vStatus === 'Community Corroborated'
+                ? '#6b21a8'
+                : vStatus === 'Disputed'
+                ? '#9a3412'
+                : '#1e40af';
+            const vBg =
+              vStatus === 'Officially Verified'
+                ? '#dcfce7'
+                : vStatus === 'Community Corroborated'
+                ? '#f3e8ff'
+                : vStatus === 'Disputed'
+                ? '#ffedd5'
+                : '#dbeafe';
+
             return (
               <Marker
                 key={key}
@@ -835,13 +853,35 @@ const DisasterCommandMapContent = ({
                 }}
               >
                 <Popup className="tactical-popup">
-                  <div style={{ color: '#120B08', padding: '4px' }}>
-                    <div style={{ fontWeight: 800, color: '#D97706' }}>
+                  <div style={{ color: '#120B08', padding: '4px', maxWidth: '240px' }}>
+                    <div style={{ fontWeight: 800, color: '#D97706', marginBottom: '3px' }}>
                       ⚠️ {inc.title || inc.type || 'Incident Report'}
                     </div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 600 }}>
-                      Severity: {inc.severity || 'Medium'} | Status: {inc.status || 'Active'}
+                    <div style={{ fontSize: '0.74rem', fontWeight: 600, display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
+                      <span>{inc.severity || 'Medium'} Severity</span>
+                      <span
+                        style={{
+                          padding: '1px 6px',
+                          borderRadius: '4px',
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          backgroundColor: vBg,
+                          color: vColor,
+                        }}
+                      >
+                        {vStatus}
+                      </span>
                     </div>
+                    {inc.trustScore !== undefined && (
+                      <div style={{ fontSize: '0.72rem', color: '#334155', fontWeight: 600, marginBottom: '2px' }}>
+                        AI Trust Rating: {inc.trustScore}/100 ({inc.trustLevel || 'Evaluated'})
+                      </div>
+                    )}
+                    {inc.witnessStats?.confirmedCount > 0 && (
+                      <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 600 }}>
+                        ✓ {inc.witnessStats.confirmedCount} Witness Confirmation{inc.witnessStats.confirmedCount > 1 ? 's' : ''}
+                      </div>
+                    )}
                   </div>
                 </Popup>
               </Marker>

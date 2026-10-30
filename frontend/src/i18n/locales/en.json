@@ -742,7 +742,8 @@
     "assigned": "Assigned",
     "inProgress": "In Progress",
     "rejected": "Rejected",
-    "action": "Action"
+    "action": "Action",
+    "incidentVerification": "Incident Verification"
   },
   "weather": {
     "liveData": "LIVE DATA",
