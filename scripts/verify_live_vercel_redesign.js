@@ -21,6 +21,12 @@ const LIVE_URL = 'https://disasterchain.vercel.app';
       localStorage.setItem('dc_cinematic_intro_seen', 'true');
     });
 
+    console.log('Capturing Live Vercel Home Page...');
+    await page.goto(`${LIVE_URL}/?skip_intro=1`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await new Promise((r) => setTimeout(r, 2000));
+    await page.screenshot({ path: path.join(ARTIFACT_DIR, 'live_vercel_home_restored.png') });
+    console.log('Saved live_vercel_home_restored.png');
+
     console.log('Capturing Live Academy Course page...');
     await page.goto(`${LIVE_URL}/academy/course/earthquake-safety?skip_intro=1`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await new Promise((r) => setTimeout(r, 2000));
@@ -29,19 +35,19 @@ const LIVE_URL = 'https://disasterchain.vercel.app';
       if (box) box.scrollIntoView({ behavior: 'instant', block: 'center' });
     });
     await new Promise((r) => setTimeout(r, 800));
-    await page.screenshot({ path: path.join(ARTIFACT_DIR, 'live_vercel_academy_lesson.png') });
-    console.log('Saved live_vercel_academy_lesson.png');
+    await page.screenshot({ path: path.join(ARTIFACT_DIR, 'live_vercel_academy_lesson_restored.png') });
+    console.log('Saved live_vercel_academy_lesson_restored.png');
 
-    console.log('Navigating to Live Academy Quiz...');
+    console.log('Capturing Live Academy Quiz...');
     const quizNavBtn = await page.$('.dc-quiz-nav-item');
     if (quizNavBtn) {
       await quizNavBtn.click();
       await new Promise((r) => setTimeout(r, 1500));
-      await page.screenshot({ path: path.join(ARTIFACT_DIR, 'live_vercel_academy_quiz.png') });
-      console.log('Saved live_vercel_academy_quiz.png');
+      await page.screenshot({ path: path.join(ARTIFACT_DIR, 'live_vercel_academy_quiz_restored.png') });
+      console.log('Saved live_vercel_academy_quiz_restored.png');
     }
 
-    console.log('=== LIVE VERCEL REDESIGN VERIFICATION COMPLETE ===');
+    console.log('=== LIVE VERCEL RESTORED REDESIGN VERIFICATION COMPLETE ===');
   } catch (err) {
     console.error('Error during live verification:', err);
   } finally {
