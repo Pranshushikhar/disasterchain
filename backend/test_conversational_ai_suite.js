@@ -87,11 +87,9 @@ console.log('================================================================');
     assert(/children|elderly|formula|medication|mobility/i.test(res.reply));
   });
 
-  await asyncTest('Calms user on "I am worried about the heavy rain"', async () => {
+  await asyncTest('Calms user on "I am worried about the heavy rain" with precautions and safety advice', async () => {
     const res = await processConversationalChat({ message: 'I am worried about the heavy rain' });
-    assert(/understandable|normal|proactive|rain|weather/i.test(res.reply));
-    assert.strictEqual(res.action?.type, 'NAVIGATE');
-    assert.strictEqual(res.action?.target, '/weather');
+    assert(/rain|precautions|water|safe|guidelines/i.test(res.reply));
   });
 
   // --- 3. Multi-Turn Context-Aware Follow-ups ---
@@ -146,26 +144,43 @@ console.log('================================================================');
     assert(/communication|hygiene|digital|community/i.test(res.reply));
   });
 
-  // --- 4. Tool & Feature Triggering ---
-  console.log('\n--- 4. Feature Actions & Tool Calling ---');
-  await asyncTest('Maps "Show me the shelters" to /shelters action', async () => {
-    const res = await processConversationalChat({ message: 'Show me the shelters.' });
-    assert.ok(res.action);
-    assert.strictEqual(res.action.type, 'NAVIGATE');
-    assert.strictEqual(res.action.target, '/shelters');
+  // --- 4. Tool & Feature Triggering & WeatherGPT Unified Capabilities ---
+  console.log('\n--- 4. Feature Actions & Tool Calling (Unified WeatherGPT) ---');
+  await asyncTest('Answers "What is the weather like today?" directly inside chat (action: null)', async () => {
+    const res = await processConversationalChat({ message: 'What is the weather like today?' });
+    assert.strictEqual(res.action, null);
+    assert(/temperature|weather|clear|cloud|humidity|wind/i.test(res.reply));
   });
 
-  await asyncTest('Maps "What is the weather like?" to /weather (not WeatherGPT)', async () => {
-    const res = await processConversationalChat({ message: 'What is the weather like today?' });
+  await asyncTest('Answers "Will it rain tomorrow?" inside chat using forecast telemetry', async () => {
+    const res = await processConversationalChat({ message: 'Will it rain tomorrow?' });
+    assert.strictEqual(res.action, null);
+    assert(/tomorrow|rain|precipitation|risk|outlook/i.test(res.reply));
+  });
+
+  await asyncTest('Answers "Should I carry an umbrella?" inside chat with rain advice', async () => {
+    const res = await processConversationalChat({ message: 'Should I carry an umbrella?' });
+    assert.strictEqual(res.action, null);
+    assert(/rain|umbrella|probability|safe|precipitation/i.test(res.reply));
+  });
+
+  await asyncTest('Answers "What precautions should I take during heavy rain?" with safety directives', async () => {
+    const res = await processConversationalChat({ message: 'What precautions should I take during heavy rain?' });
+    assert.strictEqual(res.action, null);
+    assert(/waterlogged|electrical|drains|precautions/i.test(res.reply));
+  });
+
+  await asyncTest('Explains WeatherGPT integration on "Show me WeatherGPT" without opening another window', async () => {
+    const res = await processConversationalChat({ message: 'Show me WeatherGPT' });
+    assert.strictEqual(res.action, null);
+    assert(/unified|weathergpt|doppler|telemetry|forecast/i.test(res.reply));
+  });
+
+  await asyncTest('Navigates to /weather ONLY on explicit "Open the weather page"', async () => {
+    const res = await processConversationalChat({ message: 'Open the weather page' });
     assert.ok(res.action);
     assert.strictEqual(res.action.type, 'NAVIGATE');
     assert.strictEqual(res.action.target, '/weather');
-  });
-
-  await asyncTest('Maps "Open WeatherGPT" specifically to OPEN_WEATHERGPT', async () => {
-    const res = await processConversationalChat({ message: 'Open WeatherGPT.' });
-    assert.ok(res.action);
-    assert.strictEqual(res.action.type, 'OPEN_WEATHERGPT');
   });
 
   await asyncTest('Maps "Open the map" to /map', async () => {

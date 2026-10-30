@@ -227,15 +227,15 @@ export const WeatherGPTProvider = ({ children }) => {
 
   const openWeatherGPT = useCallback(
     (initialPrompt = null) => {
-      setIsOpen(true);
+      setIsOpen(false);
       setIsMinimized(false);
-      if (initialPrompt && typeof initialPrompt === 'string') {
-        setTimeout(() => {
-          sendMessage(initialPrompt);
-        }, 120);
-      }
+      window.dispatchEvent(
+        new CustomEvent('dc:openUnifiedAssistant', {
+          detail: { prompt: initialPrompt },
+        })
+      );
     },
-    [sendMessage]
+    []
   );
 
   const closeWeatherGPT = useCallback(() => {

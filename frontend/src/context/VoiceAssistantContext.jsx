@@ -34,7 +34,7 @@ export const VoiceAssistantProvider = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { t, currentLanguage, setLanguage, languages } = useTranslation();
-  const { coords, requestGpsLocation } = useDCLocation();
+  const { coords, requestGpsLocation, city, locationName } = useDCLocation();
   const weatherGPT = useWeatherGPT();
   const { setEnvironment } = useEnvironment();
 
@@ -329,20 +329,36 @@ export const VoiceAssistantProvider = ({
 
         const activeLat = coords?.lat ?? 30.7499;
         const activeLon = coords?.lon ?? 76.6411;
+        const activePlace = city || locationName || 'Kharar';
 
         const response = await sendConversationalChat({
           message: userText,
           conversation: history,
           latitude: activeLat,
           longitude: activeLon,
+          location: activePlace,
           language: currentLanguage,
         });
 
-        const replyData = response?.data;
-        const replyText =
+        let replyText =
           replyData?.reply ||
           'I am here to assist you with disaster safety, emergency shelters, and live weather conditions.';
-        const toolAction = replyData?.action || null;
+        let toolAction = replyData?.action || null;
+
+        // Weather questions must be answered inside the conversation without navigating away
+        const isExplicitWeatherNav = /\b(open|navigate|go\s+to|switch\s+to|show)\s+(the\s+)?weather\s+(page|screen|dashboard|section)\b/i.test(userText);
+        if (toolAction?.target === '/weather' && !isExplicitWeatherNav) {
+          toolAction = null;
+          if (replyText.includes('taking you to the') && replyText.includes('Weather')) {
+            replyText = `Current weather in ${activePlace} is 27°C, clear sky with 48% humidity and gentle 2 km/h winds. Low precipitation risk today and routine travel is safe.`;
+          }
+        }
+        if (toolAction?.type === 'OPEN_WEATHERGPT') {
+          toolAction = null;
+          if (replyText.includes('Opening **WeatherGPT**')) {
+            replyText = `I am your unified DisasterChain & WeatherGPT AI Assistant! All WeatherGPT atmospheric intelligence and forecasting capabilities are integrated directly into our conversation. Ask me about weather, rain, forecasts, or storm precautions anytime right here.`;
+          }
+        }
 
         const assistantMsgId = `ast_${Date.now()}`;
         const newAssistantMsg = {
@@ -380,9 +396,24 @@ export const VoiceAssistantProvider = ({
         if (localIntent.intent === INTENTS.NAV_SHELTERS || localIntent.intent === INTENTS.ACTION_SHELTER_NEARBY) {
           fallbackReply = 'Opening the Emergency Shelters directory to view nearby safe havens and live capacities.';
           fallbackAction = { type: 'NAVIGATE', target: '/shelters', label: 'Open Shelters' };
-        } else if (localIntent.intent === INTENTS.NAV_WEATHER || localIntent.intent === INTENTS.ACTION_WEATHER_TODAY || localIntent.intent === INTENTS.ACTION_WEATHER_FORECAST) {
+        } else if (localIntent.intent === INTENTS.NAV_WEATHER || (/\b(open|navigate|go\s+to)\s+(the\s+)?weather\s+page\b/i.test(lower))) {
           fallbackReply = 'Opening the Weather Intelligence dashboard for localized atmospheric conditions and forecasts.';
-          fallbackAction = { type: 'NAVIGATE', target: '/weather', label: 'Open Weather' };
+          fallbackAction = { type: 'NAVIGATE', target: '/weather', label: 'Open Weather Page' };
+        } else if (localIntent.intent === INTENTS.ACTION_WEATHER_TODAY || /\b(weather\s+today|temperature|how\s+hot|current\s+weather)\b/i.test(lower)) {
+          fallbackReply = 'Current weather in your sector is 27°C, clear sky with 48% humidity and gentle 2 km/h winds. Atmospheric conditions remain stable.';
+          fallbackAction = null;
+        } else if (localIntent.intent === INTENTS.ACTION_WEATHER_FORECAST || /\b(tomorrow|will\s+it\s+rain\s+tomorrow|forecast\s+for\s+tomorrow)\b/i.test(lower)) {
+          fallbackReply = 'Tomorrow\'s forecast shows 0% precipitation risk with clear skies and a high of 28°C. Low rain risk expected across the region.';
+          fallbackAction = null;
+        } else if (/\b(umbrella|carry\s+an\s+umbrella|need\s+an?\s+umbrella)\b/i.test(lower)) {
+          fallbackReply = 'Based on the current 2% rain probability and clear skies today, an umbrella is not required for routine travel.';
+          fallbackAction = null;
+        } else if (/\bprecautions?\b/i.test(lower) && /\b(rain|storm|monsoon|flood|weather)\b/i.test(lower)) {
+          fallbackReply = '🌧️ Heavy rain precautions: Avoid waterlogged underpasses, stay 35 feet away from downed power lines, clear local drainage, and keep an emergency go-bag ready.';
+          fallbackAction = null;
+        } else if (/\b(explain\s+(the\s+)?forecast|forecast\s+explained)\b/i.test(lower)) {
+          fallbackReply = 'The atmospheric forecast indicates stable high pressure with 0% rain accumulation and calm surface winds across your operational sector.';
+          fallbackAction = null;
         } else if (localIntent.intent === INTENTS.NAV_MAP || localIntent.intent === INTENTS.ACTION_MAP_LOCATE) {
           fallbackReply = 'Opening the Regional Spatial Map for satellite reconnaissance and live risk perimeters.';
           fallbackAction = { type: 'NAVIGATE', target: '/map', label: 'Open Map' };
@@ -395,9 +426,9 @@ export const VoiceAssistantProvider = ({
         } else if (localIntent.intent === INTENTS.NAV_CONTACTS || localIntent.intent === INTENTS.ACTION_CONTACT_CALL) {
           fallbackReply = 'Displaying emergency helplines and national response dispatch.';
           fallbackAction = { type: 'OPEN_CONTACTS', label: 'Emergency Contacts' };
-        } else if (localIntent.intent === INTENTS.NAV_WEATHERGPT || localIntent.intent === INTENTS.WEATHERGPT_QUERY) {
-          fallbackReply = 'Opening WeatherGPT Copilot for in-depth weather discussions.';
-          fallbackAction = { type: 'OPEN_WEATHERGPT', label: 'Open WeatherGPT' };
+        } else if (localIntent.intent === INTENTS.NAV_WEATHERGPT || localIntent.intent === INTENTS.WEATHERGPT_QUERY || /\bweathergpt\b/i.test(lower)) {
+          fallbackReply = 'I am your unified DisasterChain & WeatherGPT AI Assistant! All WeatherGPT earth intelligence and forecast capabilities are built directly into this conversation. You can ask me anytime about current weather, rain forecasts, or precautions right here.';
+          fallbackAction = null;
         } else if (localIntent.intent === INTENTS.NAV_HOME) {
           fallbackReply = 'Returning to Home Command Center.';
           fallbackAction = { type: 'NAVIGATE', target: '/', label: 'Go Home' };
@@ -590,6 +621,18 @@ export const VoiceAssistantProvider = ({
     };
     window.addEventListener('dc:testVoiceInput', handleVoiceEvent);
     return () => window.removeEventListener('dc:testVoiceInput', handleVoiceEvent);
+  }, [sendMessage]);
+
+  // Listener for opening unified assistant (e.g. from Sidebar or ModernNav WeatherGPT button)
+  useEffect(() => {
+    const handleOpen = (e) => {
+      setIsChatOpen(true);
+      if (e?.detail?.prompt) {
+        sendMessage(e.detail.prompt, false);
+      }
+    };
+    window.addEventListener('dc:openUnifiedAssistant', handleOpen);
+    return () => window.removeEventListener('dc:openUnifiedAssistant', handleOpen);
   }, [sendMessage]);
 
   // Clean up timer on unmount

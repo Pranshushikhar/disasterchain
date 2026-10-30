@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const BUILD_DIR = path.join(__dirname, '../frontend/build');
-const PORT = 4175;
+const PORT = 4177;
 const ARTIFACT_DIR = 'C:\\Users\\shikh\\.gemini\\antigravity-ide\\brain\\04542bf0-b323-41ac-a81d-2056569b8398';
 
 const MIME_TYPES = {
@@ -72,30 +72,30 @@ function startServer() {
       localStorage.setItem('disasterchain_tour_completed', 'true');
     });
 
-    page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
-    page.on('pageerror', (err) => console.log('PAGE ERROR:', err.message));
-
-    console.log('\n--- 1. Testing Persistent Floating Voice Assistant UI ---');
+    console.log('\n--- 1. Testing Single Floating Assistant Button Verification ---');
     await page.goto(`http://127.0.0.1:${PORT}/?skip_intro=1`, { waitUntil: 'networkidle0', timeout: 30000 });
     await sleep(2000);
 
-    // Verify Voice Assistant button is visible on page
-    const debugInfo = await page.evaluate(() => {
-      const btn = document.getElementById('dc-global-voice-assistant-btn');
+    // Verify ONLY ONE floating AI Assistant button exists
+    const buttonChecks = await page.evaluate(() => {
+      const aiBtn = document.getElementById('dc-global-voice-assistant-btn');
+      const gptBtn = document.getElementById('dc-weathergpt-floating-btn');
       return {
-        hasBtn: Boolean(btn),
-        offsetH: btn ? btn.offsetHeight : 0,
-        offsetW: btn ? btn.offsetWidth : 0,
-        display: btn ? window.getComputedStyle(btn).display : 'none',
-        container: Boolean(document.querySelector('.dc-voice-assistant-container')),
-        appLayout: Boolean(document.querySelector('.dc-app-layout')),
+        hasUnifiedAIBtn: Boolean(aiBtn && aiBtn.offsetHeight > 0),
+        hasSeparateWeatherGPTBtn: Boolean(gptBtn && gptBtn.offsetHeight > 0),
       };
     });
-    console.log('DOM Debug Info:', debugInfo);
-    if (!debugInfo.hasBtn) throw new Error('Global voice assistant button missing from page!');
+    console.log('Button Checks:', buttonChecks);
+    if (!buttonChecks.hasUnifiedAIBtn) {
+      throw new Error('Unified AI Assistant floating button missing!');
+    }
+    if (buttonChecks.hasSeparateWeatherGPTBtn) {
+      throw new Error('Separate WeatherGPT floating button must be removed! Only ONE button allowed.');
+    }
+    console.log('✓ Verified: Exactly ONE floating AI Assistant button exists; separate WeatherGPT button is removed.');
 
-    // Click Voice Assistant button to open Conversational Assistant Window
-    console.log('Clicking global assistant capsule to open conversational window...');
+    // Open Unified Conversational Assistant
+    console.log('Clicking unified AI assistant button...');
     await page.click('#dc-global-voice-assistant-btn');
     await sleep(800);
 
@@ -110,44 +110,63 @@ function startServer() {
     if (!hasChatWindow) throw new Error('Conversational assistant window failed to open!');
 
     // =========================================================================
-    // 2. Testing Conversational Text & Natural Q&A Interaction
+    // 2. Testing Weather Q&A Inside The Same Conversation (WeatherGPT Unified)
     // =========================================================================
-    console.log('\n--- 2. Testing Conversational Text & Natural Q&A ---');
-    await page.type('#dc-voice-chat-input', 'Why is disaster preparedness important?');
-    await sleep(300);
+    console.log('\n--- 2. Testing Weather Questions Answered Inside Conversation ---');
+    
+    // Q1: What's the weather today?
+    console.log('Sending: "What is the weather today?"');
+    await page.type('#dc-voice-chat-input', 'What is the weather today?');
     await page.click('#dc-voice-send-btn');
-    await sleep(1800);
+    await sleep(1500);
+
+    let curPath = await page.evaluate(() => window.location.pathname);
+    if (curPath !== '/') {
+      throw new Error(`Weather query should NOT navigate away from current page! Navigated to ${curPath}`);
+    }
+    console.log('✓ Verified: "What is the weather today?" remained inside conversation without navigating.');
+
+    // Q2: Will it rain tomorrow?
+    console.log('Sending follow-up: "Will it rain tomorrow?"');
+    await page.type('#dc-voice-chat-input', 'Will it rain tomorrow?');
+    await page.click('#dc-voice-send-btn');
+    await sleep(1500);
+
+    // Q3: Should I carry an umbrella?
+    console.log('Sending follow-up: "Should I carry an umbrella?"');
+    await page.type('#dc-voice-chat-input', 'Should I carry an umbrella?');
+    await page.click('#dc-voice-send-btn');
+    await sleep(1500);
+
+    // Q4: Heavy rain precautions
+    console.log('Sending: "What precautions should I take during heavy rain?"');
+    await page.type('#dc-voice-chat-input', 'What precautions should I take during heavy rain?');
+    await page.click('#dc-voice-send-btn');
+    await sleep(1500);
+
+    // Q5: Show me WeatherGPT
+    console.log('Sending: "Show me WeatherGPT"');
+    await page.type('#dc-voice-chat-input', 'Show me WeatherGPT');
+    await page.click('#dc-voice-send-btn');
+    await sleep(1500);
 
     const messageCount = await page.evaluate(() => {
       const msgs = document.querySelectorAll('.dc-voice-msg-row');
       return msgs.length;
     });
-    console.log('Conversation message count after sending query:', messageCount);
-    if (messageCount < 2) {
-      throw new Error('Conversational message thread did not append user/assistant messages!');
+    console.log('Total conversational messages in thread:', messageCount);
+    if (messageCount < 10) {
+      throw new Error('Expected at least 10 messages from continuous multi-turn weather dialogue!');
     }
+    console.log('✓ Verified continuous conversational weather Q&A thread.');
 
     // =========================================================================
-    // 3. Testing Context-Aware Follow-up
+    // 3. Testing Explicit Navigation Actions
     // =========================================================================
-    console.log('\n--- 3. Testing Context-Aware Follow-up ---');
-    await page.type('#dc-voice-chat-input', 'Can you explain this in simpler words?');
-    await sleep(300);
-    await page.click('#dc-voice-send-btn');
-    await sleep(1800);
-
-    const followUpCount = await page.evaluate(() => {
-      return document.querySelectorAll('.dc-voice-msg-row').length;
-    });
-    console.log('Message count after follow-up simplification:', followUpCount);
-
-    // =========================================================================
-    // 4. Testing Conversational Feature Actions & Voice Navigation
-    // =========================================================================
-    console.log('\n--- 4. Testing Feature Actions & Tool Calling ---');
+    console.log('\n--- 3. Testing Explicit Navigation Actions ---');
     const navTests = [
+      { cmd: 'Open the weather page.', path: '/weather' },
       { cmd: 'Show me the shelters.', path: '/shelters' },
-      { cmd: 'What is the weather like today?', path: '/weather' },
       { cmd: 'Open the spatial map.', path: '/map' },
       { cmd: 'Show incident reports.', path: '/incidents' },
       { cmd: 'Open safety guidelines.', path: '/safety' },
@@ -155,30 +174,28 @@ function startServer() {
     ];
 
     for (const t of navTests) {
-      console.log(`Testing natural voice: "${t.cmd}" -> expected: ${t.path}`);
+      console.log(`Testing explicit voice command: "${t.cmd}" -> expected: ${t.path}`);
       await page.evaluate((cmdText) => {
         window.dispatchEvent(new CustomEvent('dc:testVoiceInput', { detail: { text: cmdText } }));
       }, t.cmd);
       await sleep(1800);
-      const currentUrl = await page.evaluate(() => window.location.pathname);
-      console.log(`Current path: ${currentUrl}`);
-      if (currentUrl !== t.path) {
-        throw new Error(`Voice navigation mismatch for "${t.cmd}": expected ${t.path}, got ${currentUrl}`);
+      const urlPath = await page.evaluate(() => window.location.pathname);
+      console.log(`Current path: ${urlPath}`);
+      if (urlPath !== t.path) {
+        throw new Error(`Voice navigation mismatch for "${t.cmd}": expected ${t.path}, got ${urlPath}`);
       }
       console.log(`✓ Navigated cleanly to ${t.path}`);
     }
 
     // =========================================================================
-    // 5. Testing Critical SOS Voice Protocol
+    // 4. Testing Critical SOS Voice Protocol
     // =========================================================================
-    console.log('\n--- 5. Testing Critical SOS Voice Commands ---');
-    // Trigger SOS via voice command "SOS"
+    console.log('\n--- 4. Testing Critical SOS Voice Commands ---');
     await page.evaluate(() => {
       window.dispatchEvent(new CustomEvent('dc:testVoiceInput', { detail: { text: 'SOS' } }));
     });
     await sleep(1200);
 
-    // Verify SOS modal and confirmation banner appear
     const sosActive = await page.evaluate(() => {
       const modal = document.getElementById('dc-voice-sos-modal') || document.querySelector('.dc-voice-sos-overlay');
       return Boolean(modal && modal.offsetHeight > 0);
@@ -189,7 +206,6 @@ function startServer() {
     }
 
     // Test voice cancellation: "Cancel SOS"
-    console.log('Testing voice cancellation: "Cancel SOS"');
     await page.evaluate(() => {
       window.dispatchEvent(new CustomEvent('dc:testVoiceInput', { detail: { text: 'Cancel SOS' } }));
     });
@@ -204,40 +220,19 @@ function startServer() {
       throw new Error('SOS was not cancelled by voice command "Cancel SOS"!');
     }
 
-    // =========================================================================
-    // 6. Testing WeatherGPT Distinction
-    // =========================================================================
-    console.log('\n--- 6. Testing WeatherGPT Two-Way Voice Integration ---');
-    // Open WeatherGPT
-    await page.evaluate(() => {
-      const gptBtn = document.getElementById('dc-weathergpt-floating-btn') || document.getElementById('dc-sidebar-weathergpt');
-      if (gptBtn) gptBtn.click();
-    });
-    await sleep(1200);
-
-    const hasChatMic = await page.evaluate(() => {
-      const mic = document.getElementById('dc-weathergpt-mic-btn');
-      return Boolean(mic && mic.offsetHeight > 0);
-    });
-    console.log('WeatherGPT in-chat microphone button present:', hasChatMic);
-    if (!hasChatMic) throw new Error('In-chat microphone button missing from WeatherGPT!');
-
-    // =========================================================================
-    // 7. Visual Artifact Capture
-    // =========================================================================
-    // Re-open conversational assistant to capture visual proof
+    // Capture visual screenshot
     await page.evaluate(() => {
       const btn = document.getElementById('dc-global-voice-assistant-btn');
       if (btn) btn.click();
     });
     await sleep(800);
 
-    const screenshotPath = path.join(ARTIFACT_DIR, 'e2e_conversational_ai_verified.png');
+    const screenshotPath = path.join(ARTIFACT_DIR, 'unified_ai_assistant_verified.png');
     await page.screenshot({ path: screenshotPath, fullPage: false });
     console.log('Saved visual verification screenshot to:', screenshotPath);
 
     console.log('\n======================================================');
-    console.log('🎉 ALL CONVERSATIONAL AI SCENARIOS VERIFIED CLEANLY!');
+    console.log('🎉 ALL UNIFIED AI ASSISTANT SCENARIOS VERIFIED CLEANLY!');
     console.log('======================================================');
 
     await page.close();

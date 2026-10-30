@@ -280,10 +280,7 @@ const AppLayout = () => {
         {!isPublicStandalone && <Footer />}
       </main>
 
-      {/* 4. PERSISTENT WEATHERGPT FLOATING ASSISTANT */}
-      {!isPublicStandalone && <ModernWeatherGPT />}
-
-      {/* 4.5. PERSISTENT GLOBAL VOICE ASSISTANT */}
+      {/* 4. UNIFIED CONVERSATIONAL AI ASSISTANT (INTEGRATES DISASTERCHAIN + WEATHERGPT) */}
       {!isPublicStandalone && <GlobalVoiceAssistant />}
 
       {/* 5. PERSISTENT EMERGENCY SOS MODAL */}

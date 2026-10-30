@@ -365,17 +365,24 @@ export default function GlobalVoiceAssistant() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleSuggestionClick('Show me the shelters.')}
-                        className="dc-voice-suggestion-chip"
-                      >
-                        "Show me the shelters"
-                      </button>
-                      <button
-                        type="button"
                         onClick={() => handleSuggestionClick('What is the weather like today?')}
                         className="dc-voice-suggestion-chip"
                       >
                         "What is the weather today?"
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSuggestionClick('Will it rain tomorrow?')}
+                        className="dc-voice-suggestion-chip"
+                      >
+                        "Will it rain tomorrow?"
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSuggestionClick('Show me the shelters.')}
+                        className="dc-voice-suggestion-chip"
+                      >
+                        "Show me the shelters"
                       </button>
                     </div>
                   </div>
@@ -588,12 +595,14 @@ export default function GlobalVoiceAssistant() {
                 </div>
 
                 <div className="dc-voice-help-category">
-                  <h4>🧭 Platform Actions & Navigation</h4>
+                  <h4>🌦️ Unified WeatherGPT & Tools</h4>
                   <ul>
-                    <li><code>"Show me the shelters."</code> (Navigates to /shelters)</li>
-                    <li><code>"What is the weather like?"</code> (Navigates to /weather)</li>
-                    <li><code>"Open WeatherGPT."</code> (Opens WeatherGPT copilot)</li>
-                    <li><code>"Open the map."</code> (Navigates to /map)</li>
+                    <li><code>"What is the weather today?"</code> (Live telemetry)</li>
+                    <li><code>"Will it rain tomorrow?"</code> (Forecast data)</li>
+                    <li><code>"Should I carry an umbrella?"</code></li>
+                    <li><code>"Open the weather page"</code> (Navigates to /weather)</li>
+                    <li><code>"Show me the shelters"</code> (Navigates to /shelters)</li>
+                    <li><code>"Open the map"</code> (Navigates to /map)</li>
                   </ul>
                 </div>
 

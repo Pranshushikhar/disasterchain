@@ -172,6 +172,7 @@ exports.handleConversationalAIChat = async (req, res) => {
       conversation: cleanConversation,
       latitude: validLat,
       longitude: validLon,
+      location: req.body.location && typeof req.body.location === 'string' ? req.body.location.trim() : null,
       language: selectedLanguage,
       userRole,
     });

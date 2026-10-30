@@ -8,6 +8,7 @@
  */
 
 const { SUPPORTED_LANGUAGES, PREPAREDNESS_GUIDES } = require('./aiAssistantService');
+const { processWeatherGPTChat } = require('./weatherGPTService');
 const weatherService = require('./weatherService');
 const { fetchShelters } = require('../models/Shelter');
 const mongoose = require('mongoose');
@@ -96,14 +97,17 @@ Core Capabilities:
    - Never invent or fabricate live disaster casualties, fake coordinates, or false claims that emergency rescue teams have been dispatched.
    - In life-threatening emergencies, prioritize immediate actionable survival steps, advise calling 112 / 108 / 101, and offer to prepare an SOS distress beacon.
 
-3. Platform Feature Operation (Tool Calling):
-   When the user explicitly asks to open or use a DisasterChain platform feature, or when taking them there directly fulfills their request, append an ACTION tag at the VERY END of your response in this exact format:
+3. Platform Feature Operation & Unified WeatherGPT Capabilities:
+   - You completely integrate all WeatherGPT meteorological intelligence, Doppler telemetry, and cyclonic forecasting directly inside this conversation.
+   - When the user asks about the weather today, rainfall, tomorrow's forecast, temperatures, umbrellas, or severe storm precautions, ANSWER DIRECTLY inside the conversation.
+   - Do NOT emit an OPEN_WEATHERGPT action. WeatherGPT is not a separate application; it is built into YOU.
+   - If the user asks for WeatherGPT, explain that WeatherGPT is fully integrated into this conversation.
+   - When the user explicitly asks to open or use an application feature, append an ACTION tag at the VERY END of your response in this exact format:
    <<<ACTION:{"type":"ACTION_TYPE","target":"TARGET_ROUTE_OR_VALUE","label":"BUTTON_LABEL"}>>>
 
    Supported Action Types:
    - Navigate to Shelters: <<<ACTION:{"type":"NAVIGATE","target":"/shelters","label":"Open Shelters"}>>>
-   - Navigate to Weather: <<<ACTION:{"type":"NAVIGATE","target":"/weather","label":"Open Weather"}>>>
-   - Open WeatherGPT: <<<ACTION:{"type":"OPEN_WEATHERGPT","label":"Open WeatherGPT"}>>>
+   - Navigate to Weather Page (ONLY when user explicitly asks to open the weather page): <<<ACTION:{"type":"NAVIGATE","target":"/weather","label":"Open Weather Page"}>>>
    - Navigate to Spatial Map: <<<ACTION:{"type":"NAVIGATE","target":"/map","label":"Open Map"}>>>
    - Navigate to Incident Reports: <<<ACTION:{"type":"NAVIGATE","target":"/incidents","label":"View Incidents"}>>>
    - Open Safety Guidelines: <<<ACTION:{"type":"NAVIGATE","target":"/safety","label":"Safety Guidelines"}>>>
@@ -113,8 +117,8 @@ Core Capabilities:
    - Toggle Theme: <<<ACTION:{"type":"TOGGLE_THEME","target":"dark","label":"Dark Mode"}>>>
 
    IMPORTANT ACTION RULES:
-   - Weather page (/weather) and WeatherGPT are distinct features. Do not open WeatherGPT for general weather inquiries unless the user specifically asks for WeatherGPT.
-   - Do not trigger an action just because a keyword was mentioned casually (e.g. "I studied the weather yesterday" does not navigate to weather).
+   - Do not navigate away from the conversation for ordinary weather questions like "What's the weather today?", "Will it rain tomorrow?", or "Should I carry an umbrella?". Answer them directly inside the chat.
+   - Only navigate to the weather page (/weather) if the user explicitly says "open the weather page", "go to weather dashboard", or similar explicit page navigation requests.
    - Never automatically dispatch an SOS; only offer to prepare the SOS confirmation protocol.
 
 4. Language Adherence:
@@ -191,7 +195,7 @@ Core Capabilities:
  * Intelligent Conversational Engine Fallback
  * Provides rich, context-aware responses when no external AI key is set or when upstream is offline.
  */
-function generateConversationalFallback(message, conversation = [], language = 'en', context = {}) {
+async function generateConversationalFallback(message, conversation = [], language = 'en', context = {}) {
   const text = (message || '').toLowerCase().trim();
   const lang = (language || 'en').toLowerCase();
   let action = null;
@@ -452,22 +456,80 @@ function generateConversationalFallback(message, conversation = [], language = '
     };
   }
 
-  // WeatherGPT (Explicit mention)
-  if (/\b(weathergpt|weather\s+gpt)\b/i.test(text)) {
+  // 1. WeatherGPT (Unified inside conversation - no separate window)
+  if (/\b(weathergpt|weather\s+gpt)\b/i.test(text) && !/\b(open\s+(the\s+)?weather\s+page|navigate\s+to\s+weather)\b/i.test(text)) {
     return {
-      reply: `Opening **WeatherGPT**, your dedicated AI meteorologist and climate copilot. Here you can ask in-depth questions about cyclonic trajectories, regional rainfall telemetry, and atmospheric trends.`,
-      action: { type: 'OPEN_WEATHERGPT', label: 'Open WeatherGPT Copilot' },
-      source: 'WeatherGPT Intelligent Radar',
+      reply: `I am your **unified DisasterChain & WeatherGPT AI Assistant**! All WeatherGPT earth intelligence, Doppler telemetry, and forecasting capabilities are integrated directly into our conversation.\n\n` +
+        `You can ask me right here:\n` +
+        `• *"What's the weather today?"*\n` +
+        `• *"Will it rain tomorrow?"*\n` +
+        `• *"Should I carry an umbrella?"*\n` +
+        `• *"Explain the forecast"*\n` +
+        `• *"What precautions should I take during heavy rain?"*\n\n` +
+        `What weather or safety details would you like to know?`,
+      action: null,
+      source: 'Unified WeatherGPT Engine',
     };
   }
 
-  // General Weather Page (Distinct from WeatherGPT)
-  if (/\b(weather|temperature|forecast|rain(ing|fall)?|cyclone|humidity|wind)\b/i.test(text)) {
+  // 2. Explicit Weather Page Navigation (ONLY when user explicitly requests opening the weather page)
+  if (
+    /\b(open|navigate|go\s+to|switch\s+to|view|show)\s+(the\s+)?weather\s+(page|screen|dashboard|section)\b/i.test(text) ||
+    /^(open\s+weather\s+page|go\s+to\s+weather|open\s+the\s+weather\s+page|navigate\s+to\s+weather)$/i.test(text)
+  ) {
     return {
-      reply: `I am taking you to the **Weather Intelligence** dashboard to view live localized temperature, hourly forecasts, cyclonic storm warnings, and air quality telemetry.`,
-      action: { type: 'NAVIGATE', target: '/weather', label: 'Open Weather Dashboard' },
+      reply: `Navigating to the **Weather Intelligence** dashboard to view localized atmospheric radar, temperature trends, and meteorological forecasts.`,
+      action: { type: 'NAVIGATE', target: '/weather', label: 'Open Weather Page' },
       source: 'DisasterChain Earth Intelligence',
     };
+  }
+
+  // 3. Heavy Rain & Severe Weather Precautions
+  if (
+    (/\bprecautions?\b/i.test(text) && /\b(rain|storm|monsoon|flood|weather)\b/i.test(text)) ||
+    (/\bwhat\s+precautions\s+should\s+i\s+take\b/i.test(text))
+  ) {
+    return {
+      reply: `🌧️ **Precautions During Heavy Rain & Severe Weather:**\n\n` +
+        `1. 🚫 **Avoid Waterlogged Roads & Underpasses:** Never walk, cycle, or drive through flooded roads. Rapid water as shallow as 6 inches can knock an adult down, and 12 inches can sweep away small vehicles.\n` +
+        `2. ⚡ **Electrical Safety:** Stay away from fallen power cables, submerged meters, and damp electrical fixtures. Unplug high-voltage home appliances.\n` +
+        `3. 🧹 **Keep Drains Unobstructed:** Check that storm drains, terrace gutters, and outlet pipes are clear of fallen leaves and trash.\n` +
+        `4. 🎒 **Waterproof Essentials:** Seal mobile devices, torches, prescription medicines, and important documents in ziplock plastic pouches.\n` +
+        `5. 📻 **Monitor Local Bulletins:** Follow DisasterChain emergency advisories and regional meteorological radar updates.\n\n` +
+        `Would you like to know the rain forecast for tomorrow or find nearby emergency shelters?`,
+      action: null,
+      source: 'DisasterChain Weather Safety Directives',
+    };
+  }
+
+  // 4. Conversational Weather & Forecast Queries (Answered inside chat using live telemetry)
+  const isWeatherQuery =
+    /\b(weather|temperature|temp|forecast|rain(ing|fall)?|umbrella|sunny|cloudy|wind|cyclone|storm|humidity|precipitat(ion|e)|air\s+quality|aqi|downpour|mausam|barish)\b/i.test(text) ||
+    /\b(will\s+it\s+rain|chance\s+of\s+rain|is\s+it\s+raining|how\s+(hot|cold|warm)|weather\s+today|today'?s?\s+weather|weather\s+tomorrow|tomorrow'?s?\s+weather|tomorrow'?s?\s+forecast|carry\s+an\s+umbrella|need\s+an?\s+umbrella)\b/i.test(text) ||
+    /\b(explain\s+(the\s+)?forecast|forecast\s+explained)\b/i.test(text);
+
+  if (isWeatherQuery) {
+    try {
+      const weatherRes = await processWeatherGPTChat({
+        message: text,
+        latitude: context.latitude ?? 30.7499,
+        longitude: context.longitude ?? 76.6411,
+        location: context.location || 'Kharar',
+        language: lang,
+        conversation: conversation,
+        userRole: context.userRole || 'citizen',
+        userMode: 'HOME',
+      });
+      if (weatherRes && weatherRes.reply) {
+        return {
+          reply: weatherRes.reply,
+          action: null,
+          source: 'DisasterChain WeatherGPT Meteorological Intelligence',
+        };
+      }
+    } catch (wErr) {
+      console.warn('[ConversationalAI] WeatherGPT fallback error, using local weather summary:', wErr.message);
+    }
   }
 
   // Spatial Map
@@ -562,6 +624,7 @@ async function processConversationalChat({
   conversation = [],
   latitude = null,
   longitude = null,
+  location = null,
   language = 'en',
   userRole = 'citizen',
 }) {
@@ -576,7 +639,7 @@ async function processConversationalChat({
   let result = null;
   if (process.env.AI_API_KEY && process.env.AI_API_KEY.trim().length > 0) {
     try {
-      result = await callExternalConversationalLLM(cleanMessage, conversation, { latitude, longitude, userRole }, validLang);
+      result = await callExternalConversationalLLM(cleanMessage, conversation, { latitude, longitude, location, userRole }, validLang);
     } catch (e) {
       console.warn('[ConversationalAI] Live provider invocation error:', e.message);
     }
@@ -584,7 +647,7 @@ async function processConversationalChat({
 
   // 2. Fall back to Intelligent Conversational Engine
   if (!result || !result.reply) {
-    result = generateConversationalFallback(cleanMessage, conversation, validLang, { latitude, longitude, userRole });
+    result = await generateConversationalFallback(cleanMessage, conversation, validLang, { latitude, longitude, location, userRole });
   }
 
   return {
