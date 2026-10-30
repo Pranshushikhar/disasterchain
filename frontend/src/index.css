@@ -9622,7 +9622,7 @@ body.drawer-open {
 .dc-voice-assistant-container {
   position: fixed;
   bottom: 24px;
-  right: 164px;
+  right: 24px;
   z-index: 1049;
   font-family: inherit;
 }
@@ -9630,18 +9630,22 @@ body.drawer-open {
 @media (max-width: 768px) {
   .dc-voice-assistant-container {
     bottom: calc(var(--bottom-nav-height, 64px) + 16px + env(safe-area-inset-bottom, 0px));
-    right: 144px;
+    right: 16px;
   }
 }
 
 @media (max-width: 480px) {
   .dc-voice-assistant-container {
-    right: 120px;
+    bottom: calc(var(--bottom-nav-height, 64px) + 16px + env(safe-area-inset-bottom, 0px));
+    right: 14px;
   }
 }
 
 .dc-voice-capsule-wrapper {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .dc-voice-capsule-btn {
@@ -9649,44 +9653,85 @@ body.drawer-open {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
+  min-height: 40px;
   border-radius: 999px;
-  border: 1px solid rgba(88, 214, 141, 0.35);
-  background: rgba(18, 28, 22, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: #FFFDF8;
+  border: 1px solid rgba(38, 63, 53, 0.18);
+  background: #FFFDF8;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #263F35;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 16px -2px rgba(38, 63, 53, 0.12), 0 2px 6px -1px rgba(38, 63, 53, 0.08);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
 }
 
 .dc-voice-capsule-btn:hover {
-  background: rgba(28, 42, 34, 0.96);
-  border-color: rgba(88, 214, 141, 0.6);
-  box-shadow: 0 10px 28px -2px rgba(88, 214, 141, 0.25);
+  background: #F8F5EE;
+  color: #1B2E26;
+  border-color: rgba(38, 63, 53, 0.32);
+  box-shadow: 0 6px 20px -2px rgba(38, 63, 53, 0.18), 0 2px 8px -1px rgba(38, 63, 53, 0.1);
+}
+
+.dc-voice-capsule-btn:focus-visible {
+  outline: 2px solid #263F35;
+  outline-offset: 2px;
+}
+
+.dc-voice-capsule-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(38, 63, 53, 0.18);
+  background: #FFFDF8;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #263F35;
+  cursor: pointer;
+  box-shadow: 0 4px 16px -2px rgba(38, 63, 53, 0.12), 0 2px 6px -1px rgba(38, 63, 53, 0.08);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.dc-voice-capsule-close-btn:hover {
+  background: #F8F5EE;
+  color: #C94B4B;
+  border-color: rgba(201, 75, 75, 0.35);
+  box-shadow: 0 6px 20px -2px rgba(38, 63, 53, 0.18), 0 2px 8px -1px rgba(38, 63, 53, 0.1);
+}
+
+.dc-voice-capsule-close-btn:focus-visible {
+  outline: 2px solid #263F35;
+  outline-offset: 2px;
 }
 
 .dc-voice-capsule-btn.listening {
-  background: rgba(231, 76, 60, 0.3);
+  background: rgba(231, 76, 60, 0.08);
   border-color: #E74C3C;
-  color: #FFF;
-  box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+  color: #C0392B;
+  box-shadow: 0 0 16px rgba(231, 76, 60, 0.35);
 }
 
 .dc-voice-capsule-btn.speaking {
-  background: rgba(52, 152, 219, 0.3);
+  background: rgba(52, 152, 219, 0.08);
   border-color: #3498DB;
-  color: #FFF;
-  box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+  color: #2980B9;
+  box-shadow: 0 0 16px rgba(52, 152, 219, 0.35);
 }
 
 .dc-voice-capsule-btn.processing {
-  background: rgba(243, 156, 18, 0.3);
+  background: rgba(243, 156, 18, 0.08);
   border-color: #F39C12;
-  color: #FFF;
+  color: #D68910;
 }
 
 .dc-voice-mic-icon-wrap {
@@ -9696,6 +9741,8 @@ body.drawer-open {
   justify-content: center;
   width: 18px;
   height: 18px;
+  color: inherit;
+  flex-shrink: 0;
 }
 
 .dc-voice-pulsing-rings {
@@ -9742,6 +9789,7 @@ body.drawer-open {
 .dc-voice-capsule-text {
   letter-spacing: -0.01em;
   white-space: nowrap;
+  color: inherit;
 }
 
 @media (max-width: 540px) {
@@ -9754,8 +9802,9 @@ body.drawer-open {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #58D68D;
-  box-shadow: 0 0 6px #58D68D;
+  background: #496B5A;
+  box-shadow: 0 0 6px rgba(73, 107, 90, 0.6);
+  flex-shrink: 0;
 }
 
 .dc-voice-capsule-led.active {
@@ -9766,6 +9815,11 @@ body.drawer-open {
 .dc-voice-capsule-led.speaking {
   background: #3498DB;
   box-shadow: 0 0 8px #3498DB;
+}
+
+.dc-voice-capsule-led.thinking {
+  background: #F39C12;
+  box-shadow: 0 0 8px #F39C12;
 }
 
 /* Expanded Voice Transcript Card */

@@ -531,7 +531,7 @@ export default function GlobalVoiceAssistant() {
           )}
         </AnimatePresence>
 
-        {/* Floating Persistent Activation Pill */}
+        {/* Floating Persistent Activation Pill & Companion Controls */}
         <div className="dc-voice-capsule-wrapper">
           <motion.button
             id="dc-global-voice-assistant-btn"
@@ -578,6 +578,20 @@ export default function GlobalVoiceAssistant() {
                 isListening ? 'active' : isSpeaking ? 'speaking' : isThinking ? 'thinking' : 'ready'
               }`}
             />
+          </motion.button>
+
+          {/* Persistent Companion X Button beside the AI Assistant Button */}
+          <motion.button
+            id="dc-global-voice-assistant-close-btn"
+            type="button"
+            onClick={closeAssistant}
+            className="dc-voice-capsule-close-btn"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.94 }}
+            aria-label={t('common.close', 'Close AI Assistant')}
+            title="Close AI Assistant"
+          >
+            <X size={15} />
           </motion.button>
         </div>
       </div>
