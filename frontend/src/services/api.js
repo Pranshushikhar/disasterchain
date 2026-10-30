@@ -281,6 +281,7 @@ export const sendConversationalChat = async ({
   conversation,
   latitude,
   longitude,
+  location,
   language,
 } = {}) => {
   const res = await api.post('/ai/conversational-chat', {
@@ -288,6 +289,7 @@ export const sendConversationalChat = async ({
     conversation,
     latitude,
     longitude,
+    location,
     language,
   });
   return res.data;

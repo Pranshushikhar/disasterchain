@@ -92,35 +92,192 @@ console.log('================================================================');
     assert(/rain|precautions|water|safe|guidelines/i.test(res.reply));
   });
 
-  // --- 3. Multi-Turn Context-Aware Follow-ups ---
-  console.log('\n--- 3. Multi-Turn Context Memory ---');
-  await asyncTest('Understands follow-up "What if I am inside my house?" after flood question', async () => {
-    const conversation = [
-      { role: 'user', content: 'What should I do during a flood?' },
-      { role: 'assistant', content: 'During a flood, move to higher ground immediately.' },
+  // --- 3. Multi-Turn Context-Aware Follow-ups & Direct Answers ---
+  console.log('\n--- 3. Multi-Turn Context Memory & Direct Answers ---');
+
+  // CONVERSATION A: Shelters -> "Will it be?" -> "What if I arrive at night?"
+  console.log('\n>>> Testing Multi-Turn Conversation A (Shelters) <<<');
+  await asyncTest('Conv A1: "Will the shelters be open tomorrow?" directly answers open status', async () => {
+    const res = await processConversationalChat({
+      message: 'Will the shelters be open tomorrow?',
+      conversation: [],
+    });
+    assert.strictEqual(res.action?.target, '/shelters');
+    assert(/yes|open|24\/7/i.test(res.reply));
+  });
+
+  await asyncTest('Conv A2: "Will it be?" resolves "it" to shelter open status without generic boilerplate', async () => {
+    const convA1 = [
+      { role: 'user', content: 'Will the shelters be open tomorrow?' },
+      { role: 'assistant', content: 'Yes, emergency relief shelters will be open tomorrow. Designated relief shelters in your operational sector operate on a 24/7 basis.' },
+    ];
+    const res = await processConversationalChat({
+      message: 'Will it be?',
+      conversation: convA1,
+    });
+    assert.strictEqual(res.action?.target, '/shelters');
+    assert(/yes|open|24\/7|safe accommodation|around the clock/i.test(res.reply));
+    assert(!res.reply.includes('I understand your message'));
+  });
+
+  await asyncTest('Conv A3: "What if I arrive at night?" directly explains 24-hour intake at shelters', async () => {
+    const convA2 = [
+      { role: 'user', content: 'Will the shelters be open tomorrow?' },
+      { role: 'assistant', content: 'Yes, emergency relief shelters will be open tomorrow.' },
+      { role: 'user', content: 'Will it be?' },
+      { role: 'assistant', content: 'Yes, emergency shelters remain open around the clock.' },
+    ];
+    const res = await processConversationalChat({
+      message: 'What if I arrive at night?',
+      conversation: convA2,
+    });
+    assert(/arrive at any hour|at night|24-hour reception|intake|bedding/i.test(res.reply));
+  });
+
+  // CONVERSATION B: Weather -> Jacket -> Evening -> Umbrella
+  console.log('\n>>> Testing Multi-Turn Conversation B (Weather Intelligence) <<<');
+  await asyncTest('Conv B1: "What\'s the weather tomorrow?" gives actual forecast directly', async () => {
+    const res = await processConversationalChat({
+      message: "What's the weather tomorrow?",
+      conversation: [],
+    });
+    assert.strictEqual(res.action, null);
+    assert(/tomorrow|forecast|high|low|precipitation|rain/i.test(res.reply));
+  });
+
+  await asyncTest('Conv B2: "Will I need a jacket?" directly answers jacket question first based on forecast', async () => {
+    const convB1 = [
+      { role: 'user', content: "What's the weather tomorrow?" },
+      { role: 'assistant', content: "Tomorrow's forecast shows a high of 28°C and a low of 18°C with clear skies and 0% precipitation risk." },
+    ];
+    const res = await processConversationalChat({
+      message: 'Will I need a jacket?',
+      conversation: convB1,
+    });
+    assert.strictEqual(res.action, null);
+    // Directly answers jacket first!
+    assert(/probably won't need a jacket|jacket|layer/i.test(res.reply));
+    assert(!res.reply.includes('I understand your message'));
+  });
+
+  await asyncTest('Conv B3: "What about in the evening?" directly gives evening temperature and conditions', async () => {
+    const convB2 = [
+      { role: 'user', content: "What's the weather tomorrow?" },
+      { role: 'assistant', content: "Tomorrow's forecast shows a high of 28°C and a low of 18°C." },
+      { role: 'user', content: 'Will I need a jacket?' },
+      { role: 'assistant', content: "You probably won't need a jacket during the day if the forecast is around 28°C." },
+    ];
+    const res = await processConversationalChat({
+      message: 'What about in the evening?',
+      conversation: convB2,
+    });
+    assert.strictEqual(res.action, null);
+    assert(/evening|cool down|temperatures|layer|sunset/i.test(res.reply));
+  });
+
+  await asyncTest('Conv B4: "Should I carry an umbrella?" directly answers umbrella question first based on rain probability', async () => {
+    const convB3 = [
+      { role: 'user', content: "What's the weather tomorrow?" },
+      { role: 'assistant', content: "Tomorrow's forecast shows a high of 28°C and a low of 18°C with 0% rain." },
+      { role: 'user', content: 'Will I need a jacket?' },
+      { role: 'assistant', content: "You probably won't need a jacket during the day." },
+      { role: 'user', content: 'What about in the evening?' },
+      { role: 'assistant', content: 'In the evening, temperatures will cool down to around 20°C.' },
+    ];
+    const res = await processConversationalChat({
+      message: 'Should I carry an umbrella?',
+      conversation: convB3,
+    });
+    assert.strictEqual(res.action, null);
+    // Directly answers umbrella first!
+    assert(/umbrella/i.test(res.reply));
+    assert(/won't need an umbrella|unlikely|low|clear/i.test(res.reply));
+  });
+
+  // CONVERSATION C: Heavy Rain Worry -> "What should I do?" -> Inside House -> Electricity
+  console.log('\n>>> Testing Multi-Turn Conversation C (Heavy Rain Safety) <<<');
+  await asyncTest('Conv C1: "I am worried about heavy rain." reassures and gives initial precautions', async () => {
+    const res = await processConversationalChat({
+      message: 'I am worried about heavy rain.',
+      conversation: [],
+    });
+    assert(/normal to feel concerned|heavy rain|precautions|drains|charge/i.test(res.reply));
+  });
+
+  await asyncTest('Conv C2: "What should I do?" directly provides immediate heavy rain safety steps', async () => {
+    const convC1 = [
+      { role: 'user', content: 'I am worried about heavy rain.' },
+      { role: 'assistant', content: 'It is completely normal to feel concerned when severe rain is falling.' },
+    ];
+    const res = await processConversationalChat({
+      message: 'What should I do?',
+      conversation: convC1,
+    });
+    assert(/drains|charge|avoid travel|waterproof/i.test(res.reply));
+  });
+
+  await asyncTest('Conv C3: "What if I am inside my house?" gives indoor flood and storm safety protocol', async () => {
+    const convC2 = [
+      { role: 'user', content: 'I am worried about heavy rain.' },
+      { role: 'assistant', content: 'It is completely normal to feel concerned.' },
+      { role: 'user', content: 'What should I do?' },
+      { role: 'assistant', content: 'Here are immediate proactive steps: clear drains, charge devices...' },
     ];
     const res = await processConversationalChat({
       message: 'What if I am inside my house?',
-      conversation,
+      conversation: convC2,
     });
     assert(/breaker|electrical|higher floors|attic|water/i.test(res.reply));
   });
 
-  await asyncTest('Understands follow-up "What about electricity?" after flood context', async () => {
-    const conversation = [
-      { role: 'user', content: 'What should I do during a flood?' },
-      { role: 'assistant', content: 'Move to higher floors.' },
+  await asyncTest('Conv C4: "What about electricity?" gives electrical storm safety protocol', async () => {
+    const convC3 = [
+      { role: 'user', content: 'I am worried about heavy rain.' },
+      { role: 'assistant', content: 'It is completely normal to feel concerned.' },
+      { role: 'user', content: 'What should I do?' },
+      { role: 'assistant', content: 'Here are immediate proactive steps...' },
       { role: 'user', content: 'What if I am inside my house?' },
-      { role: 'assistant', content: 'Turn off the main breaker.' },
+      { role: 'assistant', content: 'Turn off the main electrical breaker...' },
     ];
     const res = await processConversationalChat({
       message: 'What about electricity?',
-      conversation,
+      conversation: convC3,
     });
-    assert(/conducts electricity|breaker|wire|current|outlets/i.test(res.reply));
+    assert(/water conducts electricity|breaker|wire|power lines|unplug/i.test(res.reply));
   });
 
-  await asyncTest('Simplifies previous answer when asked "Can you explain this in simpler words?"', async () => {
+  // Additional follow-up questions
+  await asyncTest('Ambiguous "Will it be?" with no context asks a polite clarifying question', async () => {
+    const res = await processConversationalChat({
+      message: 'Will it be?',
+      conversation: [],
+    });
+    assert(/clarify|referring to|weather|shelter|safe/i.test(res.reply));
+  });
+
+  await asyncTest('"Is it safe to drive tomorrow?" evaluates road safety from forecast', async () => {
+    const res = await processConversationalChat({
+      message: 'Is it safe to drive tomorrow?',
+      conversation: [],
+    });
+    assert(/safe|driving|travel|conditions|skies|rain/i.test(res.reply));
+  });
+
+  await asyncTest('"Do I need one?" resolves to umbrella when previous message was about umbrella', async () => {
+    const conv = [
+      { role: 'user', content: 'Is rain expected tomorrow?' },
+      { role: 'assistant', content: 'The forecast shows low precipitation probability.' },
+      { role: 'user', content: 'Carry an umbrella?' },
+      { role: 'assistant', content: 'Rain is unlikely tomorrow.' },
+    ];
+    const res = await processConversationalChat({
+      message: 'Do I need one?',
+      conversation: conv,
+    });
+    assert(/umbrella|rain|low/i.test(res.reply));
+  });
+
+  await asyncTest('Simplifies previous answer on "Can you explain this in simpler words?"', async () => {
     const conversation = [
       { role: 'user', content: 'Explain flood safety to me.' },
       { role: 'assistant', content: 'A comprehensive multi-hazard guide with hydrological mitigation...' },
@@ -141,7 +298,7 @@ console.log('================================================================');
       message: 'Tell me more',
       conversation,
     });
-    assert(/communication|hygiene|digital|community/i.test(res.reply));
+    assert(/communication|hygiene|digital|community|supplies/i.test(res.reply));
   });
 
   // --- 4. Tool & Feature Triggering & WeatherGPT Unified Capabilities ---

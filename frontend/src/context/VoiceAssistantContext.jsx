@@ -340,6 +340,7 @@ export const VoiceAssistantProvider = ({
           language: currentLanguage,
         });
 
+        const replyData = response?.data || response;
         let replyText =
           replyData?.reply ||
           'I am here to assist you with disaster safety, emergency shelters, and live weather conditions.';
@@ -385,7 +386,7 @@ export const VoiceAssistantProvider = ({
 
         // Fallback to local client-side conversational intelligence
         const localIntent = parseVoiceIntent(userText, { currentPath: location.pathname });
-        let fallbackReply = 'I am here to assist with disaster safety and emergency coordination.';
+        let fallbackReply = 'The assistant is temporarily reconnecting. Please try your question again in a moment. Your conversation context has been preserved.';
         let fallbackAction = null;
 
         const lower = userText.toLowerCase();
