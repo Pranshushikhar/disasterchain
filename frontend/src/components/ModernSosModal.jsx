@@ -11,10 +11,22 @@ import {
 } from 'lucide-react';
 import { createSosRequest } from '../services/api';
 import { useTranslation } from '../i18n/i18n';
+import { useDCLocation } from '../context/LocationContext';
 
 export default function ModernSosModal({ isOpen, onClose, onSosSubmitted }) {
   const { t } = useTranslation();
-  const [coords, setCoords] = useState({ lat: 28.6139, lon: 77.209 });
+  const { coords: activeCoords } = useDCLocation();
+  const [coords, setCoords] = useState(() => ({
+    lat: activeCoords?.lat ?? 30.7499,
+    lon: activeCoords?.lon ?? 76.6411,
+  }));
+
+  // Keep coords aligned with active selected location
+  useEffect(() => {
+    if (activeCoords?.lat != null && activeCoords?.lon != null) {
+      setCoords({ lat: activeCoords.lat, lon: activeCoords.lon });
+    }
+  }, [activeCoords]);
   const [beaconStatus, setBeaconStatus] = useState('idle'); // 'idle' | 'sending' | 'sent'
 
   // Get precise GPS

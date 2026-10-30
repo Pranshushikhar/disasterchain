@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   CloudRain,
@@ -59,15 +59,18 @@ export default function ModernWeatherPage() {
 
   const [timeline, setTimeline] = useState([]);
   const [forecast, setForecast] = useState([]);
+  const weatherReqIdRef = useRef(0);
 
   // Fetch Weather Telemetry for active coords
   const loadWeather = useCallback(async () => {
     if (!coords || coords.lat == null || coords.lon == null) return;
+    const currentReqId = ++weatherReqIdRef.current;
     setLoading(true);
     setError(null);
 
     try {
       const data = await fetchCompleteWeather(coords.lat, coords.lon);
+      if (currentReqId !== weatherReqIdRef.current) return;
       if (!data) throw new Error('No weather data received');
 
       const cur = data.current || {};
@@ -133,10 +136,13 @@ export default function ModernWeatherPage() {
         new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       );
     } catch (err) {
+      if (currentReqId !== weatherReqIdRef.current) return;
       console.warn('Weather telemetry load failure:', err.message);
       setError(err.message || 'Unable to sync atmospheric telemetry.');
     } finally {
-      setLoading(false);
+      if (currentReqId === weatherReqIdRef.current) {
+        setLoading(false);
+      }
     }
   }, [coords, t]);
 

@@ -2,20 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { createIncident } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/i18n';
+import { useDCLocation } from '../context/LocationContext';
 import Icon from './Icons';
 
 const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { coords: activeCoords, locationName: activeLocationName } = useDCLocation();
 
   const [formData, setFormData] = useState({
     title: '',
     type: 'Blocked emergency exit',
     description: '',
     severity: 'Medium',
-    location: '',
-    latitude: 28.6139,
-    longitude: 77.2090,
+    location: activeLocationName || '',
+    latitude: activeCoords?.lat ?? 30.7499,
+    longitude: activeCoords?.lon ?? 76.6411,
     imageUrl: '',
     reporterName: user?.name || 'Anonymous Student',
   });
@@ -30,12 +32,15 @@ const IncidentModal = ({ isOpen, onClose, onIncidentSubmitted }) => {
     if (isOpen) {
       setFormData((prev) => ({
         ...prev,
+        location: prev.location || activeLocationName || '',
+        latitude: activeCoords?.lat ?? prev.latitude,
+        longitude: activeCoords?.lon ?? prev.longitude,
         reporterName: user?.name || prev.reporterName || 'Anonymous Student',
       }));
       setErrorMessage('');
       setSubmittedIncident(null);
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, activeCoords, activeLocationName]);
 
   if (!isOpen) return null;
 

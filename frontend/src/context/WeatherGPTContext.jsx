@@ -38,49 +38,25 @@ export const WeatherGPTProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState('');
 
-  // Geolocation & Station Telemetry
-  const [locationCoordinates, setLocationCoordinates] = useState({
-    latitude: 30.7333,
-    longitude: 76.7794,
-  });
-  const [locationName, setLocationName] = useState({
-    displayName: 'Chandigarh Operations Center',
-    city: 'Chandigarh',
-    state: 'Punjab',
-    country: 'India',
-    isResolving: false,
-  });
+  // Authoritative Location synchronized with useDCLocation
+  const locationCoordinates = useMemo(
+    () => ({
+      latitude: coords?.lat ?? 30.7499,
+      longitude: coords?.lon ?? 76.6411,
+    }),
+    [coords]
+  );
 
-  // Background Geolocation Bootstrap
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const lat = Number(pos.coords.latitude.toFixed(4));
-          const lon = Number(pos.coords.longitude.toFixed(4));
-          setLocationCoordinates({ latitude: lat, longitude: lon });
-          setLocationName((prev) => ({ ...prev, isResolving: true }));
-          try {
-            const rev = await reverseGeocode(lat, lon);
-            const resolved = rev?.displayName || rev?.city || `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`;
-            setLocationName({
-              displayName: resolved,
-              city: rev?.city || resolved,
-              state: rev?.region || rev?.state || '',
-              country: rev?.country || '',
-              isResolving: false,
-            });
-          } catch (e) {
-            setLocationName((prev) => ({ ...prev, isResolving: false }));
-          }
-        },
-        () => {
-          // Graceful fallback to default station coordinates
-        },
-        { timeout: 7000, enableHighAccuracy: false }
-      );
-    }
-  }, []);
+  const locationName = useMemo(
+    () => ({
+      displayName: globalLocationName || `${globalCity || 'Kharar'}, India`,
+      city: globalCity || (globalLocationName ? globalLocationName.split(',')[0].trim() : 'Kharar'),
+      state: '',
+      country: 'India',
+      isResolving: false,
+    }),
+    [globalLocationName, globalCity]
+  );
 
   // Screen Context Awareness (Dynamically adapts to current route without breaking chat)
   const currentScreenContext = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -73,8 +73,9 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
   // Operational intelligence (Alerts & Shelters)
   const [alerts, setAlerts] = useState([]);
   const [shelters, setShelters] = useState([]);
+  const weatherReqIdRef = useRef(0);
 
-  // Time-of-day greeting (e.g. "Good morning, Kharar.")
+  // Time-of-day greeting authoritatively bound to active location
   const greetingText = useMemo(() => {
     const hour = new Date().getHours();
     const salutation =
@@ -83,29 +84,28 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
         : hour < 17
         ? t('common.goodAfternoon', 'Good afternoon')
         : t('common.goodEvening', 'Good evening');
-    return `${salutation}, ${city}.`;
-  }, [city, t]);
+    const targetCity = city || (locationName ? locationName.split(',')[0].trim() : '') || 'Sector';
+    return `${salutation}, ${targetCity}.`;
+  }, [city, locationName, t]);
 
-  // Fetch real atmospheric telemetry from Open-Meteo
+  // Fetch real atmospheric telemetry from Open-Meteo for active coordinates
   useEffect(() => {
-    let isMounted = true;
+    if (!coords || coords.lat == null || coords.lon == null) return;
+    const currentReqId = ++weatherReqIdRef.current;
     setWeatherLoading(true);
 
     fetchCompleteWeather(coords.lat, coords.lon)
       .then((data) => {
-        if (!isMounted) return;
+        // Discard stale responses if user switched location rapidly
+        if (currentReqId !== weatherReqIdRef.current) return;
         setWeatherData(data);
         setWeatherLoading(false);
       })
       .catch((err) => {
-        if (!isMounted) return;
+        if (currentReqId !== weatherReqIdRef.current) return;
         console.warn('Weather fetch error:', err);
         setWeatherLoading(false);
       });
-
-    return () => {
-      isMounted = false;
-    };
   }, [coords.lat, coords.lon, refreshKey]);
 
   // Fetch verified alerts and relief shelters
@@ -127,14 +127,49 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
     };
   }, [refreshKey]);
 
-  // Find the single most important active verified warning, if any
+  // Strict regional advisory verification: only display warnings confirmed to apply to selected location
   const primaryAlert = useMemo(() => {
     if (!alerts || alerts.length === 0) return null;
-    const warning = alerts.find(
+    const activeCityLower = (city || '').toLowerCase().trim();
+    const activeStateLower = (locationName || '').toLowerCase();
+
+    const localAlerts = alerts.filter((a) => {
+      if (!a) return false;
+      const alertLoc = (a.location || a.target || a.area || '').toLowerCase();
+      const alertTitle = (a.title || '').toLowerCase();
+      const alertDesc = (a.description || a.message || '').toLowerCase();
+
+      // Nationwide or pan-India advisories apply everywhere
+      const isNationwide =
+        alertLoc.includes('national') ||
+        alertLoc.includes('pan-india') ||
+        alertLoc.includes('all india') ||
+        alertLoc.includes('nationwide');
+      if (isNationwide) return true;
+
+      // Active city match
+      if (activeCityLower && (alertLoc.includes(activeCityLower) || alertTitle.includes(activeCityLower) || alertDesc.includes(activeCityLower))) {
+        return true;
+      }
+
+      // State-level match
+      if (activeStateLower.includes('punjab') && alertLoc.includes('punjab')) return true;
+      if (activeStateLower.includes('maharashtra') && alertLoc.includes('maharashtra')) return true;
+      if (activeStateLower.includes('delhi') && alertLoc.includes('delhi')) return true;
+      if (activeStateLower.includes('karnataka') && alertLoc.includes('karnataka')) return true;
+      if (activeStateLower.includes('tamil nadu') && alertLoc.includes('tamil nadu')) return true;
+      if (activeStateLower.includes('bengal') && alertLoc.includes('bengal')) return true;
+
+      return false;
+    });
+
+    if (localAlerts.length === 0) return null;
+
+    const warning = localAlerts.find(
       (a) => a.severity === 'Warning' || a.severity === 'Critical' || a.priority === 'High'
     );
-    return warning || alerts[0];
-  }, [alerts]);
+    return warning || localAlerts[0];
+  }, [alerts, city, locationName]);
 
   // Current temperature and weather condition
   const currentTemp = weatherData?.current?.temp ?? 25;

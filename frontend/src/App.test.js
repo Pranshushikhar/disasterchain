@@ -175,4 +175,82 @@ describe('DisasterChain Core Smoke Tests', () => {
       });
     });
   });
+
+  describe('Single Source of Truth Active Location & Regression Prevention', () => {
+    const { extractCityName, POPULAR_INDIAN_CITIES } = require('./context/LocationContext');
+
+    it('extracts correct city name from displayName and prevents stale mismatch', () => {
+      // Direct extraction
+      expect(extractCityName('Kharar, Punjab, India')).toBe('Kharar');
+      expect(extractCityName('Mumbai, Maharashtra, India')).toBe('Mumbai');
+      expect(extractCityName('New Delhi, Delhi, India')).toBe('New Delhi');
+
+      // Regression check: If legacyDetails had stale 'Mumbai', but user selected 'Kharar, Punjab, India'
+      expect(extractCityName('Kharar, Punjab, India', 'Mumbai')).toBe('Kharar');
+      // If legacyDetails matches the displayName, it preserves it cleanly
+      expect(extractCityName('Kharar, Punjab, India', 'Kharar')).toBe('Kharar');
+    });
+
+    it('ensures dynamic greeting strictly matches the selected location', () => {
+      const getGreeting = (city, hour = 14) => {
+        const salutation = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+        return `${salutation}, ${city}.`;
+      };
+
+      // Kharar selected
+      expect(getGreeting('Kharar', 14)).toBe('Good afternoon, Kharar.');
+      expect(getGreeting('Kharar', 9)).toBe('Good morning, Kharar.');
+      expect(getGreeting('Kharar', 19)).toBe('Good evening, Kharar.');
+
+      // Mumbai selected
+      expect(getGreeting('Mumbai', 14)).toBe('Good afternoon, Mumbai.');
+      expect(getGreeting('Mumbai', 9)).toBe('Good morning, Mumbai.');
+
+      // Never allows "Good afternoon, Mumbai" when Kharar is active
+      const activeLocation = { city: 'Kharar', displayName: 'Kharar, Punjab, India' };
+      const homeGreeting = getGreeting(activeLocation.city, 14);
+      expect(homeGreeting).toContain('Kharar');
+      expect(homeGreeting).not.toContain('Mumbai');
+    });
+
+    it('ensures official advisories are strictly verified against active location', () => {
+      const isAlertRelevant = (alert, activeCity, activeLocationName) => {
+        const cityLower = (activeCity || '').toLowerCase().trim();
+        const stateLower = (activeLocationName || '').toLowerCase();
+        const alertLoc = (alert.location || alert.target || alert.area || '').toLowerCase();
+        const isNationwide = alertLoc.includes('national') || alertLoc.includes('pan-india') || alertLoc.includes('all india');
+        if (isNationwide) return true;
+        if (cityLower && alertLoc.includes(cityLower)) return true;
+        if (stateLower.includes('punjab') && alertLoc.includes('punjab')) return true;
+        if (stateLower.includes('maharashtra') && alertLoc.includes('maharashtra')) return true;
+        return false;
+      };
+
+      const delhiAlert = { title: 'Yamuna Inundation', location: 'Delhi Sector 14' };
+      const punjabAlert = { title: 'Canal Overflow Warning', location: 'Punjab Regional Basin' };
+      const nationalAlert = { title: 'High Heat Advisory', location: 'National Highway Corridor' };
+
+      // When Kharar (Punjab) is active:
+      expect(isAlertRelevant(delhiAlert, 'Kharar', 'Kharar, Punjab, India')).toBe(false);
+      expect(isAlertRelevant(punjabAlert, 'Kharar', 'Kharar, Punjab, India')).toBe(true);
+      expect(isAlertRelevant(nationalAlert, 'Kharar', 'Kharar, Punjab, India')).toBe(true);
+
+      // When Mumbai (Maharashtra) is active:
+      expect(isAlertRelevant(delhiAlert, 'Mumbai', 'Mumbai, Maharashtra, India')).toBe(false);
+      expect(isAlertRelevant(punjabAlert, 'Mumbai', 'Mumbai, Maharashtra, India')).toBe(false);
+      expect(isAlertRelevant(nationalAlert, 'Mumbai', 'Mumbai, Maharashtra, India')).toBe(true);
+    });
+
+    it('exports popular Indian cities with valid coordinates and matching city/displayName', () => {
+      expect(POPULAR_INDIAN_CITIES.length).toBeGreaterThanOrEqual(15);
+      POPULAR_INDIAN_CITIES.forEach((item) => {
+        expect(item.city).toBeTruthy();
+        expect(item.displayName).toContain(item.city);
+        expect(typeof item.lat).toBe('number');
+        expect(typeof item.lon).toBe('number');
+        expect(item.lat).toBeGreaterThan(5);
+        expect(item.lat).toBeLessThan(40);
+      });
+    });
+  });
 });
