@@ -144,6 +144,13 @@ export const SUPPORTED_LANGUAGES = [
     isRtl: false,
     fontFamily: "'Noto Sans Bengali', 'Noto Sans Meetei Mayek', 'Nirmala UI', sans-serif",
   },
+  {
+    code: 'hinglish',
+    name: 'Hinglish',
+    nativeName: 'Hinglish (Hindi + English)',
+    isRtl: false,
+    fontFamily: 'inherit',
+  },
 ];
 
 export const DEFAULT_LANGUAGE = 'en';

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from
 import { AnimatePresence } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './i18n/i18n';
+import { LocationProvider } from './context/LocationContext';
 import { PWAProvider } from './context/PWAContext';
 import { WeatherGPTProvider, useWeatherGPT } from './context/WeatherGPTContext';
 import { EnvironmentProvider } from './context/EnvironmentContext';
@@ -20,6 +21,7 @@ import ModernIncidentsPage from './pages/ModernIncidentsPage';
 import ModernSafetyPage from './pages/ModernSafetyPage';
 import ModernWeatherGPT from './components/ModernWeatherGPT';
 import ModernSosModal from './components/ModernSosModal';
+import CitySelectorModal from './components/CitySelectorModal';
 import Footer from './components/Footer';
 
 // Existing Secondary Pages & Modals (Preserved functionality)
@@ -291,7 +293,10 @@ const AppLayout = () => {
         onClose={() => setIsAppModalOpen(false)}
       />
 
-      {/* 7. INTERACTIVE FIRST-VISIT ONBOARDING TOUR */}
+      {/* 7. GLOBAL CITY / LOCATION SELECTOR MODAL */}
+      <CitySelectorModal />
+
+      {/* 8. INTERACTIVE FIRST-VISIT ONBOARDING TOUR */}
       {!isPublicStandalone && (
         <OnboardingTour
           isActive={showTour}
@@ -300,7 +305,7 @@ const AppLayout = () => {
         />
       )}
 
-      {/* 8. PWA INSTALL & UPDATE PROMPTS */}
+      {/* 9. PWA INSTALL & UPDATE PROMPTS */}
       <PWAInstallPrompt />
       <PWAUpdateToast />
     </div>
@@ -323,15 +328,17 @@ export default function App() {
     <ErrorBoundary>
       <PWAProvider>
         <LanguageProvider>
-          <AuthProvider>
-            <EnvironmentProvider>
-              <Router>
-                <WeatherGPTProvider>
-                  <AppLayout />
-                </WeatherGPTProvider>
-              </Router>
-            </EnvironmentProvider>
-          </AuthProvider>
+          <LocationProvider>
+            <AuthProvider>
+              <EnvironmentProvider>
+                <Router>
+                  <WeatherGPTProvider>
+                    <AppLayout />
+                  </WeatherGPTProvider>
+                </Router>
+              </EnvironmentProvider>
+            </AuthProvider>
+          </LocationProvider>
         </LanguageProvider>
       </PWAProvider>
     </ErrorBoundary>

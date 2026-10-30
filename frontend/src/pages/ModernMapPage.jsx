@@ -10,6 +10,8 @@ import {
   MapPin,
 } from 'lucide-react';
 import { fetchAffectedAreas, fetchIncidents, fetchShelters } from '../services/api';
+import { useDCLocation } from '../context/LocationContext';
+import { useTranslation } from '../i18n/i18n';
 
 // Minimalist, high-contrast pin icons
 const createCustomMarker = (type, color) =>
@@ -49,9 +51,17 @@ function ChangeView({ center, zoom }) {
 }
 
 export default function ModernMapPage() {
+  const { t } = useTranslation();
+  const { coords, locationName, openCitySelector } = useDCLocation();
   const [filter, setFilter] = useState('ALL'); // 'ALL' | 'HAZARDS' | 'INCIDENTS' | 'SHELTERS'
-  const [center, setCenter] = useState([28.6139, 77.209]); // Delhi coordinates
+  const [center, setCenter] = useState(() => [coords.lat, coords.lon]);
   const [selectedEntity, setSelectedEntity] = useState(null);
+
+  useEffect(() => {
+    if (coords && coords.lat && coords.lon) {
+      setCenter([coords.lat, coords.lon]);
+    }
+  }, [coords]);
 
   const [hazards, setHazards] = useState([
     {

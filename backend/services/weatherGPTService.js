@@ -58,6 +58,7 @@ const SUPPORTED_LANGUAGES = {
   mai: { name: 'Maithili', rtl: false },
   sd: { name: 'Sindhi', rtl: true },
   mni: { name: 'Manipuri', rtl: false },
+  hinglish: { name: 'Hinglish (Roman Hindi + English)', rtl: false },
 };
 
 // Conversational Session Memory (TTL 30 minutes)
@@ -1200,7 +1201,11 @@ STRICT RULES:
 6. For normal conditions, start with: ✓ SAFE / NORMAL and keep answer concise.
 7. If user is in an immediate life-threatening emergency, show: 🚨 LIFE-SAFETY ALERT, state concise actions, and advise calling 112. WeatherGPT must NEVER claim to automatically submit an SOS.
 8. If user asks off-topic questions, politely deflect: "I’m WeatherGPT. I can help with weather, forecasts, air quality, severe-weather alerts, and weather-related safety."
-9. Provide the response in ${SUPPORTED_LANGUAGES[language]?.name || 'English'}.
+${
+  language === 'hinglish'
+    ? '9. Provide the response naturally in Hinglish (Roman Hindi mixed with English), for example: "Aaj aapke area mein heavy rain ka chance hai. Bahar jaate waqt sawdhani rakhein." Keep emergency safety instructions clear.'
+    : `9. Provide the response in ${SUPPORTED_LANGUAGES[language]?.name || 'English'}.`
+}
 10. Distinguish LIVE TELEMETRY from AI interpretation.
 
 VERIFIED TELEMETRY FOR CONTEXT:

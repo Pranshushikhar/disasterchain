@@ -11,12 +11,11 @@ import {
   Radio,
 } from 'lucide-react';
 import { fetchShelters, fetchAlerts } from '../services/api';
-import { fetchCompleteWeather, reverseGeocode } from '../services/weatherApi';
+import { fetchCompleteWeather } from '../services/weatherApi';
+import { useDCLocation } from '../context/LocationContext';
+import { useTranslation } from '../i18n/i18n';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-
-const COORDS_STORAGE_KEY = 'disasterchain_user_coords';
-const LOCATION_STORAGE_KEY = 'disasterchain_user_location';
 
 // Helper to dynamically re-center Leaflet map when coordinates change
 function MapRecenter({ center }) {
@@ -53,26 +52,18 @@ const createShelterPinIcon = () =>
 
 export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  // Location & Geolocation state (initialized with localStorage persistence)
-  const [coords, setCoords] = useState(() => {
-    try {
-      const saved = localStorage.getItem(COORDS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return { lat: 30.7499, lon: 76.6411 }; // Kharar / Mohali default
-  });
-
-  const [locationName, setLocationName] = useState(() => {
-    try {
-      const saved = localStorage.getItem(LOCATION_STORAGE_KEY);
-      if (saved) return saved;
-    } catch (e) {}
-    return 'Kharar, Punjab, India';
-  });
-
-  const [isGpsLocked, setIsGpsLocked] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
+  // Centralized unified location state & controls
+  const {
+    coords,
+    locationName,
+    city,
+    isGpsLocked,
+    isLocating,
+    requestGpsLocation,
+    openCitySelector,
+  } = useDCLocation();
 
   // Weather & Conditions state
   const [weatherData, setWeatherData] = useState(null);
@@ -86,42 +77,13 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
   const greetingText = useMemo(() => {
     const hour = new Date().getHours();
     const salutation =
-      hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-    const city = locationName.split(',')[0].trim() || 'Kharar';
+      hour < 12
+        ? t('common.goodMorning', 'Good morning')
+        : hour < 17
+        ? t('common.goodAfternoon', 'Good afternoon')
+        : t('common.goodEvening', 'Good evening');
     return `${salutation}, ${city}.`;
-  }, [locationName]);
-
-  // Request live GPS location from browser
-  const requestGpsLocation = useCallback(() => {
-    if (!navigator.geolocation) return;
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const newCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-        setCoords(newCoords);
-        setIsGpsLocked(true);
-        setIsLocating(false);
-        try {
-          localStorage.setItem(COORDS_STORAGE_KEY, JSON.stringify(newCoords));
-        } catch (e) {}
-        try {
-          const rev = await reverseGeocode(newCoords.lat, newCoords.lon);
-          if (rev?.city || rev?.county || rev?.state) {
-            const locStr = [rev.city || rev.county, rev.state, rev.countryName || 'India']
-              .filter(Boolean)
-              .join(', ');
-            setLocationName(locStr);
-            localStorage.setItem(LOCATION_STORAGE_KEY, locStr);
-          }
-        } catch (e) {}
-      },
-      (err) => {
-        console.warn('Geolocation access fallback:', err.message);
-        setIsLocating(false);
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
-  }, []);
+  }, [city, t]);
 
   // Fetch real atmospheric telemetry from Open-Meteo
   useEffect(() => {
@@ -204,15 +166,23 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
           {/* Small Location Greeting */}
           <div className="dc-home-greeting-bar">
             <span className="dc-home-greeting-text">{greetingText}</span>
-            <div className="dc-home-location-pill" title="Active monitoring sector">
+            <div
+              className="dc-home-location-pill"
+              onClick={openCitySelector}
+              style={{ cursor: 'pointer' }}
+              title={t('common.selectLocation', 'Click to change location')}
+            >
               <MapPin size={13} className="dc-location-icon" />
               <span>{locationName}</span>
               <button
                 type="button"
-                onClick={requestGpsLocation}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  requestGpsLocation();
+                }}
                 disabled={isLocating}
                 className="dc-detect-gps-icon-btn"
-                title="Detect live GPS location"
+                title={t('common.useDeviceLocation', 'Detect live GPS location')}
               >
                 <RefreshCw size={11} className={isLocating ? 'dc-spin' : ''} />
               </button>
@@ -221,10 +191,10 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
 
           {/* Main Editorial Heading */}
           <h1 className="dc-home-editorial-title">
-            Stay informed. Stay safe.
+            {t('home.heroTitle', 'Stay informed. Stay safe.')}
           </h1>
           <p className="dc-home-editorial-sub">
-            Earth intelligence, localized conditions, and emergency coordination for your sector.
+            {t('home.heroSubtitle', 'Earth intelligence, localized conditions, and emergency coordination for your sector.')}
           </p>
         </header>
 
@@ -242,7 +212,9 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
                 <span className="dc-clean-temp-value">{Math.round(currentTemp)}°</span>
                 <div className="dc-clean-condition-meta">
                   <span className="dc-clean-condition-text">{currentCondition}</span>
-                  <span className="dc-clean-feels-like">Feels like {feelsLike}°C</span>
+                  <span className="dc-clean-feels-like">
+                    {t('weather.feelsLike', 'Feels like')} {feelsLike}°C
+                  </span>
                 </div>
               </div>
 
@@ -263,7 +235,7 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
                 onClick={() => navigate('/weather')}
                 className="dc-clean-link-btn"
               >
-                <span>View complete weather forecast & telemetry</span>
+                <span>{t('home.viewWeather', 'View complete weather forecast & telemetry')}</span>
                 <ArrowRight size={14} />
               </button>
             </div>
@@ -337,7 +309,7 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
               className="dc-open-full-map-btn"
               title="Open full interactive map"
             >
-              <span>Open Full Map</span>
+              <span>{t('common.openFullMap', 'Open Full Map')}</span>
               <ArrowRight size={14} />
             </button>
           </div>
@@ -362,7 +334,7 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
               <Marker position={[coords.lat, coords.lon]} icon={createUserPinIcon()}>
                 <Popup>
                   <div className="dc-map-popup-clean">
-                    <strong>Your Location</strong>
+                    <strong>{t('common.yourLocation', 'Your Location')}</strong>
                     <p>{locationName}</p>
                   </div>
                 </Popup>
@@ -401,10 +373,10 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
             id="dc-quick-report"
             onClick={onOpenIncident}
             className="dc-quick-action-btn dc-action-report"
-            title="Submit a verified community hazard report"
+            title={t('home.reportHazard', 'Submit a verified community hazard report')}
           >
             <PlusCircle size={18} />
-            <span>Report Incident</span>
+            <span>{t('home.reportHazard', 'Report Incident')}</span>
           </button>
 
           {/* Action 2: Find Shelter */}
@@ -413,10 +385,10 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
             id="dc-quick-help"
             onClick={() => navigate('/shelters')}
             className="dc-quick-action-btn dc-action-shelter"
-            title="Browse verified emergency shelters and relief centers"
+            title={t('home.findShelter', 'Browse verified emergency shelters and relief centers')}
           >
             <Home size={18} />
-            <span>Find Shelter</span>
+            <span>{t('home.findShelter', 'Find Shelter')}</span>
           </button>
 
           {/* Action 3: Emergency SOS */}
@@ -425,10 +397,10 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
             id="dc-home-sos-btn"
             onClick={onOpenSos}
             className="dc-quick-action-btn dc-action-sos"
-            title="Broadcast emergency SOS distress beacon"
+            title={t('emergency.broadcastSos', 'Broadcast emergency SOS distress beacon')}
           >
             <Radio size={18} className="dc-pulse-icon" />
-            <span>Emergency SOS</span>
+            <span>{t('emergency.broadcastSos', 'Emergency SOS')}</span>
           </button>
         </section>
       </div>

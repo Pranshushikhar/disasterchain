@@ -94,7 +94,9 @@ exports.handleWeatherGPTChat = async (req, res) => {
     let validLang = 'en';
     if (language && typeof language === 'string') {
       const code = language.trim().toLowerCase();
-      if (SUPPORTED_LANGUAGES[code]) {
+      if (code === 'hi-en' || code === 'hinglish') {
+        validLang = 'hinglish';
+      } else if (SUPPORTED_LANGUAGES[code]) {
         validLang = code;
       }
     }

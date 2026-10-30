@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { useLocation } from 'react-router-dom';
 import { sendWeatherGPTChat } from '../services/api';
 import { reverseGeocode } from '../services/weatherApi';
+import { useDCLocation } from './LocationContext';
+import { useTranslation } from '../i18n/i18n';
 
 const WeatherGPTContext = createContext(null);
 
@@ -15,10 +17,20 @@ export const useWeatherGPT = () => {
 
 export const WeatherGPTProvider = ({ children }) => {
   const location = useLocation();
+  const { coords, locationName: globalLocationName, city: globalCity } = useDCLocation();
+  const { currentLanguage } = useTranslation();
 
   // Assistant Window State (Persistent across navigation)
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [chatLanguage, setChatLanguage] = useState(() => currentLanguage || 'hinglish');
+
+  // Keep chat language in sync when global language changes
+  useEffect(() => {
+    if (currentLanguage) {
+      setChatLanguage(currentLanguage);
+    }
+  }, [currentLanguage]);
 
   // Conversation State
   const [conversationId, setConversationId] = useState(() => `wgpt_${Date.now()}`);
@@ -162,13 +174,17 @@ export const WeatherGPTProvider = ({ children }) => {
       recentHistory.push({ role: 'user', content: text });
 
       try {
-        const placeLabel = locationName.city || locationName.displayName || 'Operations Area';
+        const placeLabel = globalCity || globalLocationName || locationName.city || locationName.displayName || 'Operations Area';
+        const activeLat = coords?.lat ?? locationCoordinates.latitude;
+        const activeLon = coords?.lon ?? locationCoordinates.longitude;
+        const activeLang = chatLanguage || currentLanguage || 'hinglish';
+
         const res = await sendWeatherGPTChat({
           message: text,
-          latitude: locationCoordinates.latitude,
-          longitude: locationCoordinates.longitude,
+          latitude: activeLat,
+          longitude: activeLon,
           location: placeLabel,
-          language: 'en',
+          language: activeLang,
           conversationId,
           conversation: recentHistory,
           userMode: currentScreenContext.id,
@@ -222,8 +238,13 @@ export const WeatherGPTProvider = ({ children }) => {
       isLoading,
       messages,
       currentScreenContext,
+      globalCity,
+      globalLocationName,
       locationName,
       locationCoordinates,
+      coords,
+      chatLanguage,
+      currentLanguage,
       conversationId,
     ]
   );
@@ -271,6 +292,8 @@ export const WeatherGPTProvider = ({ children }) => {
     currentScreenContext,
     locationCoordinates,
     locationName,
+    chatLanguage,
+    setChatLanguage,
     openWeatherGPT,
     closeWeatherGPT,
     minimizeWeatherGPT,

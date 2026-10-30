@@ -55,7 +55,8 @@ const INTENTS = {
 const EMERGENCY_KEYWORDS = [
   'trapped', 'drowning', 'water rising fast', 'flash flood', 'dying', 'cannot breathe',
   'house collapsed', 'buried', 'sos', 'save me', 'life threat', 'severe injury',
-  'बचाओ', 'मदद', 'सहायता', 'বাঁচাও', 'உதவி', 'సహాయం', 'مدد'
+  'बचाओ', 'मदद', 'सहायता', 'বাঁচাও', 'உதவி', 'సహాయం', 'مدد',
+  'bachao', 'madad', 'khatra', 'fas gaya', 'fas gaye', 'paani bhar gaya'
 ];
 
 const OFF_TOPIC_KEYWORDS = [
@@ -557,10 +558,10 @@ function routeIntent(message, conversationContext = {}) {
   }
 
   // 17. Rain & Precipitation (including timing inquiries)
-  if (!rawResult && (/\b(rain|raining|umbrella|drizzle|showers|precipitation|downpour|wet|when will it rain|when will rain stop|chance of rain)\b/i.test(text) || /(बारिश|वर्षा|बरसात|छाता|बूंदाबांदी)/i.test(text))) {
+  if (!rawResult && (/\b(rain|raining|umbrella|drizzle|showers|precipitation|downpour|wet|when will it rain|when will rain stop|chance of rain|baarish|barish|barsat|chhaata|chhata|boondabandi|paani barsega)\b/i.test(text) || /(बारिश|वर्षा|बरसात|छाता|बूंदाबांदी)/i.test(text))) {
     rawResult = {
       primaryIntent: INTENTS.RAIN,
-      isRainTiming: /\b(when will|what time|how long will|duration)\b/i.test(text) || /(कब होगी|कब तक|किस समय)/i.test(text),
+      isRainTiming: /\b(when will|what time|how long will|duration|kab hogi|kab tak|kis samay|kab rukegi)\b/i.test(text) || /(कब होगी|कब तक|किस समय)/i.test(text),
     };
   }
 

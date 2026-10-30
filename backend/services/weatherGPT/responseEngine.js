@@ -170,6 +170,26 @@ const I18N_DICTIONARY = {
     noReliableData: 'આ ક્ષણે વિશ્વસનીય ડેટા ઉપલબ્ધ નથી.',
     disasterChainQualifier: 'નીચાણવાળા વિસ્તારોમાં પાણી ભરાવાની શક્યતા રહી શકે છે.',
   },
+  hinglish: {
+    currentWeather: 'Abhi ka Mausam',
+    forecast: 'Mausam Forecast',
+    riskAssessment: 'Risk Assessment',
+    recommendation: 'Recommendation',
+    observed: 'Observed Telemetry',
+    aiInterpretation: 'AI Risk Interpretation',
+    officialAlert: 'Official Alert',
+    dataSource: 'Data Source',
+    updated: 'Updated',
+    noRain: 'Baarish ka chance bahut kam hai',
+    rainLikely: 'Baarish hone ka poora chance hai',
+    carryUmbrella: 'Chhata ya raincoat saath rakhna behtar rahega.',
+    safetyFirst: 'Kripya apni immediate safety ko pehli priority dein.',
+    callEmergency: 'Emergency situation mein turant 112 par call karein ya disaster helpline se contact karein.',
+    askTravelTime: 'Agar aap apne travel ka time ya route batayein, toh main exact hourly conditions bata sakta hoon.',
+    askLocation: 'Aap kis sheher ya area ka mausam jaanna chahte hain?',
+    noReliableData: 'Abhi is specific metric ka reliable live telemetry available nahi hai.',
+    disasterChainQualifier: 'Low-lying areas mein paani bharne (waterlogging) ka risk ho sakta hai.',
+  },
 };
 
 function getI18n(lang = 'en') {
@@ -357,14 +377,25 @@ function generateAnalyticalResponse({
   // 1. EMERGENCY INTENT
   if (primaryIntent === 'EMERGENCY') {
     format = 'EMERGENCY';
-    content = `🚨 LIFE-SAFETY ALERT\n\n` +
-      `⚠️ **${i18n.safetyFirst}**\n\n` +
-      `If you or someone around you is in immediate danger, please immediately contact emergency services at **112** or your state disaster management helpline.\n\n` +
-      `• **Move away from hazards**: If water is rising, ascend immediately to higher floors or elevated sturdy ground. Never attempt to wade or swim through fast-moving floodwater.\n` +
-      `• **Electrical safety**: Disconnect or stay away from submerged electrical panels and downed utility wires.\n` +
-      `• **Keep communications open**: Conserve mobile phone battery and alert neighbors or emergency responders of your exact coordinates.\n\n` +
-      `*(Current local weather in ${locationName}: ${current.temperature}°C, ${current.conditionDescription}, Wind: ${current.windSpeed} km/h)*\n\n` +
-      `Safety Protection Note:\nWeatherGPT does not dispatch emergency units automatically. Please verify your situation before submitting an SOS request.`;
+    if (language === 'hinglish') {
+      content = `🚨 LIFE-SAFETY ALERT\n\n` +
+        `⚠️ **${i18n.safetyFirst}**\n\n` +
+        `Agar aap ya aapke aas-paas koi immediate danger mein hai, toh turant national emergency services **112** ya state disaster helpline se contact karein.\n\n` +
+        `• **Hazards se door rahein**: Agar paani badh raha hai, toh turant unche floor ya elevated surakshit ground par shift ho jayein. Tezi se behte floodwater mein chalne ya gaadi chalane ki koshish bilkul na karein.\n` +
+        `• **Electrical safety**: Submerged electrical panels aur toote utility wires se door rahein.\n` +
+        `• **Communications open rakhein**: Mobile phone battery bachayein aur emergency teams ko apni exact location share karein.\n\n` +
+        `*(Current local weather in ${locationName}: ${current.temperature}°C, ${current.conditionDescription}, Wind: ${current.windSpeed} km/h)*\n\n` +
+        `Safety Protection Note:\nWeatherGPT automatic SOS units dispatch nahi karta. Kripya emergency SOS broadcast karne se pehle apni situation verify kar lein.`;
+    } else {
+      content = `🚨 LIFE-SAFETY ALERT\n\n` +
+        `⚠️ **${i18n.safetyFirst}**\n\n` +
+        `If you or someone around you is in immediate danger, please immediately contact emergency services at **112** or your state disaster management helpline.\n\n` +
+        `• **Move away from hazards**: If water is rising, ascend immediately to higher floors or elevated sturdy ground. Never attempt to wade or swim through fast-moving floodwater.\n` +
+        `• **Electrical safety**: Disconnect or stay away from submerged electrical panels and downed utility wires.\n` +
+        `• **Keep communications open**: Conserve mobile phone battery and alert neighbors or emergency responders of your exact coordinates.\n\n` +
+        `*(Current local weather in ${locationName}: ${current.temperature}°C, ${current.conditionDescription}, Wind: ${current.windSpeed} km/h)*\n\n` +
+        `Safety Protection Note:\nWeatherGPT does not dispatch emergency units automatically. Please verify your situation before submitting an SOS request.`;
+    }
   }
 
   // 2. OFF_TOPIC INTENT
@@ -374,6 +405,8 @@ function generateAnalyticalResponse({
       content = 'मैं WeatherGPT हूँ। मैं मौसम, पूर्वानुमान, वायु गुणवत्ता (AQI), चक्रवात, बाढ़, गंभीर मौसम चेतावनियों और आपदा सुरक्षा मार्गदर्शन में आपकी सहायता कर सकता हूँ।';
     } else if (language === 'ur') {
       content = 'میں ویدر جی پی ٹی ہوں۔ میں موسم، پیش گوئی، ہوا کے معیار (AQI)، طوفان، سیلاب، شدید موسم کے انتباہات اور ہنگامی حفاظتی رہنمائی میں آپ کی مدد کر سکتا ہوں۔';
+    } else if (language === 'hinglish') {
+      content = 'Main WeatherGPT hoon. Main mausam, forecast, air quality (AQI), baarish, toofan aur emergency disaster safety guidance mein aapki madad kar sakta hoon.';
     } else {
       content = "I’m WeatherGPT. I can help with weather, forecasts, air quality, severe-weather alerts, and weather-related safety.";
     }
@@ -882,6 +915,13 @@ function generateAnalyticalResponse({
           (peak?.hasSignificantRain ? `• **बारिश का समय:** सबसे अधिक संभावना **${peak.window}** के दौरान है (लगभग **${peak.maxProb}%**)।\n` : '') +
           `• **हवा की गति:** लगभग ${windSpeed} km/h।\n\n` +
           `**विश्लेषण:** ${prob >= 50 ? 'कल बारिश होने की प्रबल संभावना है। छाता या रेनकोट साथ रखना उचित रहेगा।' : 'कल मौसम मुख्य रूप से शुष्क और सामान्य रहने का अनुमान है।'}`;
+      } else if (language === 'hinglish') {
+        content = `### 📅 ${locationName} mein Kal ka Mausam Forecast\n\n` +
+          `• **Temperature:** Maximum lagbhag **${tMax}°C** aur minimum **${tMin}°C** rehne ka chance hai.\n` +
+          `• **Baarish ka chance:** **${prob}%** (${cond}).\n` +
+          (peak?.hasSignificantRain ? `• **Baarish ka time:** Sabse zyada probability **${peak.window}** ke dauraan hai (lagbhag **${peak.maxProb}%**).\n` : '') +
+          `• **Hawa ki speed:** Lagbhag ${windSpeed} km/h.\n\n` +
+          `**Analysis:** ${prob >= 50 ? 'Kal baarish hone ka poora chance hai. Bahar jaate waqt sawdhani rakhein aur chhata saath rakhein.' : 'Kal mausam mostly saaf aur general outdoor plans ke liye stable rehne ki ummeed hai.'}`;
       } else {
         content = `### 📅 Tomorrow's Forecast for ${locationName}\n\n` +
           `• **Temperature:** Expected high of **${tMax}°C** and low of **${tMin}°C**.\n` +
@@ -921,6 +961,8 @@ function generateAnalyticalResponse({
         content = `**${locationName}** में वर्तमान तापमान **${current.temperature}°C** है (महसूस: **${current.feelsLike}°C**)।`;
       } else if (language === 'ur') {
         content = `**${locationName}** میں موجودہ درجہ حرارت **${current.temperature}°C** ہے (محسوس: **${current.feelsLike}°C**)۔`;
+      } else if (language === 'hinglish') {
+        content = `**${locationName}** mein abhi current temperature **${current.temperature}°C** hai (feels like: **${current.feelsLike}°C**).`;
       } else {
         content = `The temperature in **${locationName}** is **${current.temperature}°C** (feels like **${current.feelsLike}°C**) with ${current.conditionDescription.toLowerCase()}.`;
       }
@@ -941,6 +983,13 @@ function generateAnalyticalResponse({
           `• **نمی اور دباؤ:** ${current.humidity}% | ${current.pressureHpa} hPa\n` +
           `• **ہوا کی رفتار:** ${current.windSpeed} km/h\n\n` +
           `**رجحان:** ${trend.description}`;
+      } else if (language === 'hinglish') {
+        content = `### 📍 ${locationName} mein ${i18n.currentWeather}\n\n` +
+          `• **Temperature:** ${current.temperature}°C (Feels like: ${current.feelsLike}°C)\n` +
+          `• **Mausam ki sthiti:** ${current.conditionDescription} (Cloud cover: ${current.cloudCover}%)\n` +
+          `• **Humidity & Pressure:** ${current.humidity}% | ${current.pressureHpa || current.pressureMsl || 1013} hPa\n` +
+          `• **Hawa ki speed:** ${current.windSpeed} km/h (Gusts: ${current.windGusts || current.windSpeed} km/h)\n\n` +
+          `**Immediate Trend:** ${trend.description}`;
       } else {
         content = `### 📍 ${i18n.currentWeather} in ${locationName}\n\n` +
           `• **Temperature:** ${current.temperature}°C (Feels like: ${current.feelsLike}°C)\n` +

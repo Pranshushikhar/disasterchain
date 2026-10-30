@@ -145,7 +145,8 @@
     "system": "सिस्टम",
     "tagline": "सरल, सुरक्षित आपातकालीन प्रतिक्रिया",
     "signIn": "साइन इन करें",
-    "installApp": "ऐप इंस्टॉल करें"
+    "installApp": "ऐप इंस्टॉल करें",
+    "more": "अधिक"
   },
   "emergency": {
     "sosTitle": "आपातकालीन SOS बीकन",
@@ -1074,13 +1075,6 @@
     "prevBlockHash": "पिछला ब्लॉक हैश",
     "digitalSignature": "डिजिटल हस्ताक्षर",
     "verifiedLedger": "100% क्रिप्टोग्राफिक सत्यापन"
-  },
-  "nav": {
-    "more": "अधिक",
-    "dashboard": "डैशबोर्ड",
-    "weather": "मौसम",
-    "map": "मानचित्र",
-    "alerts": "अलर्ट"
   },
   "weather": {
     "liveData": "लाइव डेटा",

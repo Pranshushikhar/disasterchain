@@ -23,7 +23,8 @@ import {
   fetchAlerts,
   fetchIncidents,
 } from '../services/api';
-import { reverseGeocode } from '../services/weatherApi';
+import { useDCLocation } from '../context/LocationContext';
+import { useTranslation } from '../i18n/i18n';
 
 const CHECKLIST_STORAGE_KEY = 'disasterchain_safety_checklist';
 const SAVED_PLACES_STORAGE_KEY = 'disasterchain_saved_places';
@@ -62,9 +63,8 @@ const DEFAULT_PLACES = [
 export default function ModernSafetyPage({ onOpenSos }) {
   const navigate = useNavigate();
 
-  // Coordinates & Location
-  const [coords, setCoords] = useState({ lat: 28.6139, lon: 77.209 }); // Delhi default
-  const [locationName, setLocationName] = useState('Delhi NCR, India');
+  const { t } = useTranslation();
+  const { coords, locationName, openCitySelector } = useDCLocation();
   const [assessmentTimestamp, setAssessmentTimestamp] = useState(null);
 
   // Real operational data
@@ -102,29 +102,6 @@ export default function ModernSafetyPage({ onOpenSos }) {
     ],
     []
   );
-
-  // Geolocation
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const lat = Number(pos.coords.latitude.toFixed(4));
-          const lon = Number(pos.coords.longitude.toFixed(4));
-          setCoords({ lat, lon });
-          try {
-            const geo = await reverseGeocode(lat, lon);
-            if (geo?.city) {
-              setLocationName(
-                `${geo.city}${geo.state ? `, ${geo.state}` : ''}${geo.country ? `, ${geo.country}` : ''}`
-              );
-            }
-          } catch (e) {}
-        },
-        () => {},
-        { timeout: 7000 }
-      );
-    }
-  }, []);
 
   // Load real backend data for perimeter assessment and shelters
   useEffect(() => {

@@ -54,6 +54,7 @@ const SUPPORTED_LANGUAGES = {
   mai: 'Maithili',
   sd: 'Sindhi',
   mni: 'Manipuri',
+  hinglish: 'Hinglish',
 };
 
 // Emergency Life-Threat Keywords

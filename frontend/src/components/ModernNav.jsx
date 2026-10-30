@@ -24,10 +24,13 @@ import {
   Volume2,
   VolumeX,
   Check,
+  Globe,
+  Search,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useWeatherGPT } from '../context/WeatherGPTContext';
 import { useEnvironment, ENVIRONMENTS } from '../context/EnvironmentContext';
+import { useTranslation } from '../i18n/i18n';
 
 const SIDEBAR_COLLAPSED_KEY = 'disasterchain_sidebar_collapsed';
 
@@ -37,6 +40,7 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
   const { user, isAuthenticated, logout } = useAuth();
   const weatherGPT = useWeatherGPT();
   const { environment, setEnvironment, currentMeta, isSoundEnabled, toggleSound } = useEnvironment();
+  const { t, currentLanguage, setLanguage, languages, languageConfig, isRtl } = useTranslation();
 
   // Collapsed state on desktop (persisted in localStorage)
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -47,10 +51,11 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
     }
   });
 
-  // Mobile drawer & modal states
+  // Mobile drawer, settings & search states
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isContactsOpen, setIsContactsOpen] = useState(false);
+  const [langSearch, setLangSearch] = useState('');
 
   // Sync CSS variable --dc-sidebar-width to root document for smooth layout adaptation
   useEffect(() => {
@@ -85,11 +90,11 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
 
   // Main 5 core navigation items
   const mainItems = [
-    { to: '/', label: 'Home', icon: Home, exact: true, id: 'dc-sidebar-home' },
-    { to: '/weather', label: 'Weather', icon: CloudRain, id: 'dc-sidebar-weather' },
-    { to: '/map', label: 'Map', icon: MapPin, id: 'dc-sidebar-map' },
-    { to: '/incidents', label: 'Incidents', icon: AlertTriangle, id: 'dc-sidebar-incidents' },
-    { to: '/safety', label: 'Safety', icon: Shield, id: 'dc-sidebar-safety' },
+    { to: '/', label: t('nav.home', 'Home'), icon: Home, exact: true, id: 'dc-sidebar-home' },
+    { to: '/weather', label: t('nav.weather', 'Weather'), icon: CloudRain, id: 'dc-sidebar-weather' },
+    { to: '/map', label: t('nav.map', 'Map'), icon: MapPin, id: 'dc-sidebar-map' },
+    { to: '/incidents', label: t('nav.incidents', 'Incidents'), icon: AlertTriangle, id: 'dc-sidebar-incidents' },
+    { to: '/safety', label: t('nav.safety', 'Safety'), icon: Shield, id: 'dc-sidebar-safety' },
   ];
 
   // Emergency Contacts quick registry
@@ -137,7 +142,11 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
         <div className="dc-sidebar-scroll-body dc-sidebar-nav">
           {/* SECTION: MAIN */}
           <div className="dc-sidebar-section">
-            {!isCollapsed && <span className="dc-sidebar-section-title">MAIN</span>}
+            {!isCollapsed && (
+              <span className="dc-sidebar-section-title">
+                {t('nav.main', 'MAIN')}
+              </span>
+            )}
             <nav className="dc-sidebar-items" aria-label="Main Operations">
               {mainItems.map((item) => {
                 const active = isCurrentActive(item.to, item.exact);
@@ -161,16 +170,22 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
 
           {/* SECTION: RESOURCES */}
           <div className="dc-sidebar-section">
-            {!isCollapsed && <span className="dc-sidebar-section-title">RESOURCES</span>}
+            {!isCollapsed && (
+              <span className="dc-sidebar-section-title">
+                {t('nav.resources', 'RESOURCES')}
+              </span>
+            )}
             <nav className="dc-sidebar-items" aria-label="Emergency Resources">
               <NavLink
                 to="/shelters"
                 id="dc-sidebar-shelters"
                 className={`dc-sidebar-link ${isCurrentActive('/shelters') ? 'active' : ''}`}
-                title={isCollapsed ? 'Shelters' : undefined}
+                title={isCollapsed ? t('nav.shelters', 'Shelters') : undefined}
               >
                 <Home size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Shelters</span>}
+                {!isCollapsed && (
+                  <span className="dc-sidebar-label">{t('nav.shelters', 'Shelters')}</span>
+                )}
                 {isCurrentActive('/shelters') && <span className="dc-sidebar-active-indicator" />}
               </NavLink>
 
@@ -179,10 +194,14 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                 id="dc-sidebar-contacts"
                 onClick={() => setIsContactsOpen(true)}
                 className="dc-sidebar-link dc-sidebar-action-btn"
-                title={isCollapsed ? 'Emergency Contacts' : undefined}
+                title={isCollapsed ? t('nav.emergencyContacts', 'Emergency Contacts') : undefined}
               >
                 <PhoneCall size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Emergency Contacts</span>}
+                {!isCollapsed && (
+                  <span className="dc-sidebar-label">
+                    {t('nav.emergencyContacts', 'Emergency Contacts')}
+                  </span>
+                )}
               </button>
 
               <button
@@ -211,7 +230,11 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
 
           {/* SECTION: OTHER */}
           <div className="dc-sidebar-section">
-            {!isCollapsed && <span className="dc-sidebar-section-title">OTHER</span>}
+            {!isCollapsed && (
+              <span className="dc-sidebar-section-title">
+                {t('nav.system', 'OTHER')}
+              </span>
+            )}
             <nav className="dc-sidebar-items" aria-label="System Tools">
               <button
                 type="button"
@@ -220,10 +243,12 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                   if (onStartTour) onStartTour();
                 }}
                 className="dc-sidebar-link dc-sidebar-action-btn"
-                title={isCollapsed ? 'Help & Interactive Guide' : undefined}
+                title={isCollapsed ? t('nav.helpTour', 'Help & Tour') : undefined}
               >
                 <Compass size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Help & Tour</span>}
+                {!isCollapsed && (
+                  <span className="dc-sidebar-label">{t('nav.helpTour', 'Help & Tour')}</span>
+                )}
               </button>
 
               <button
@@ -231,10 +256,33 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                 id="dc-sidebar-settings"
                 onClick={() => setIsSettingsOpen(true)}
                 className="dc-sidebar-link dc-sidebar-action-btn"
-                title={isCollapsed ? 'Settings & Atmosphere' : undefined}
+                title={isCollapsed ? t('nav.settings', 'Settings') : undefined}
               >
                 <Settings size={18} className="dc-sidebar-icon" />
-                {!isCollapsed && <span className="dc-sidebar-label">Settings</span>}
+                {!isCollapsed && (
+                  <span className="dc-sidebar-label">{t('nav.settings', 'Settings')}</span>
+                )}
+              </button>
+
+              {/* Quick Language Switcher Trigger */}
+              <button
+                type="button"
+                id="dc-sidebar-language"
+                onClick={() => setIsSettingsOpen(true)}
+                className="dc-sidebar-link dc-sidebar-action-btn"
+                title={`Language: ${languageConfig?.nativeName || languageConfig?.name || 'English'}`}
+              >
+                <Globe size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span className="dc-sidebar-label">
+                      {languageConfig?.nativeName?.split('/')[0]?.trim() || languageConfig?.name || 'English'}
+                    </span>
+                    <span style={{ fontSize: '0.68rem', padding: '1px 5px', borderRadius: 4, background: 'rgba(73, 107, 90, 0.14)', color: 'var(--dc-earth-green)', fontWeight: 700 }}>
+                      {currentLanguage.toUpperCase()}
+                    </span>
+                  </div>
+                )}
               </button>
             </nav>
           </div>
@@ -252,7 +300,7 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
             aria-label="Broadcast Emergency SOS"
           >
             <Radio size={16} className="dc-pulse-icon" />
-            {!isCollapsed && <span>EMERGENCY SOS</span>}
+            {!isCollapsed && <span>{t('emergency.broadcastSos', 'EMERGENCY SOS')}</span>}
           </button>
 
           {/* Operator / Account Row */}
@@ -599,6 +647,68 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
               </div>
 
               <div className="dc-settings-modal-body">
+                {/* 0. Global Language Selector (20 Indian Regional Languages + Hinglish + English) */}
+                <div className="dc-settings-section">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span className="dc-settings-section-title" style={{ margin: 0 }}>
+                      {t('common.language', 'Language')} ({languages.length})
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--dc-earth-green)', fontWeight: 600 }}>
+                      Active: {languageConfig?.nativeName || 'English'}
+                    </span>
+                  </div>
+                  <div style={{ position: 'relative', marginBottom: 10 }}>
+                    <Search size={14} style={{ position: 'absolute', left: 10, top: 9, color: 'var(--text-muted)' }} />
+                    <input
+                      type="text"
+                      value={langSearch}
+                      onChange={(e) => setLangSearch(e.target.value)}
+                      placeholder={t('common.searchLanguage', 'Search language (e.g. Hindi, Punjabi, Bengali, Hinglish)...')}
+                      style={{
+                        width: '100%',
+                        padding: '7px 12px 7px 32px',
+                        borderRadius: 8,
+                        border: '1px solid var(--border-subtle)',
+                        background: 'var(--dc-surface)',
+                        fontSize: '0.82rem',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <div className="dc-lang-grid">
+                    {languages
+                      .filter((l) =>
+                        l.name.toLowerCase().includes(langSearch.toLowerCase()) ||
+                        l.nativeName.toLowerCase().includes(langSearch.toLowerCase()) ||
+                        l.code.toLowerCase().includes(langSearch.toLowerCase())
+                      )
+                      .map((lang) => {
+                        const isSelected = currentLanguage === lang.code;
+                        return (
+                          <button
+                            key={lang.code}
+                            type="button"
+                            onClick={() => setLanguage(lang.code)}
+                            className={`dc-lang-card-btn ${isSelected ? 'active' : ''}`}
+                          >
+                            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                              {lang.nativeName}
+                            </span>
+                            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                              {lang.name} {lang.isRtl ? '· RTL' : ''}
+                            </span>
+                            {isSelected && (
+                              <span style={{ fontSize: '0.7rem', color: 'var(--dc-earth-green)', fontWeight: 700, marginTop: 2 }}>
+                                ✓ Active
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                  </div>
+                </div>
+
                 {/* 1. Atmospheric Canvas Environment */}
                 <div className="dc-settings-section">
                   <span className="dc-settings-section-title">Living Atmosphere Canvas</span>

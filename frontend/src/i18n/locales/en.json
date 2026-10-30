@@ -145,7 +145,8 @@
     "system": "SYSTEM",
     "tagline": "Emergency response, simplified",
     "signIn": "Sign In",
-    "installApp": "Install App"
+    "installApp": "Install App",
+    "more": "More"
   },
   "emergency": {
     "sosTitle": "EMERGENCY SOS BEACON",
@@ -1074,13 +1075,6 @@
     "prevBlockHash": "PREVIOUS BLOCK HASH",
     "digitalSignature": "DIGITAL SIGNATURE",
     "verifiedLedger": "100% Cryptographic Verification"
-  },
-  "nav": {
-    "more": "More",
-    "dashboard": "Dashboard",
-    "weather": "Weather",
-    "map": "Map",
-    "alerts": "Alerts"
   },
   "weather": {
     "liveData": "LIVE DATA",
