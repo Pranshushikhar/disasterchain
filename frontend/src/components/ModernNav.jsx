@@ -231,6 +231,22 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                 {isCurrentActive('/offline') && <span className="dc-sidebar-active-indicator" />}
               </NavLink>
 
+              <NavLink
+                to="/transparency"
+                id="dc-sidebar-transparency"
+                className={`dc-sidebar-link ${isCurrentActive('/transparency') ? 'active' : ''}`}
+                title={isCollapsed ? t('nav.transparencyLedger', 'Transparency Ledger') : undefined}
+              >
+                <FileText size={18} className="dc-sidebar-icon" />
+                {!isCollapsed && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span className="dc-sidebar-label">{t('nav.transparencyLedger', 'Transparency Ledger')}</span>
+                    <span className="dc-copilot-badge" style={{ background: 'rgba(73, 107, 90, 0.15)', color: 'var(--dc-earth-green)' }}>LEDGER</span>
+                  </div>
+                )}
+                {isCurrentActive('/transparency') && <span className="dc-sidebar-active-indicator" />}
+              </NavLink>
+
               <button
                 type="button"
                 id="dc-sidebar-contacts"
@@ -556,6 +572,18 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                   >
                     <WifiOff size={18} />
                     <span>Offline Emergency Mode</span>
+                  </NavLink>
+
+                  <NavLink
+                    to="/transparency"
+                    onClick={() => setIsMobileDrawerOpen(false)}
+                    className={`dc-drawer-link ${isCurrentActive('/transparency') ? 'active' : ''}`}
+                  >
+                    <FileText size={18} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      <span>{t('nav.transparencyLedger', 'Transparency Ledger')}</span>
+                      <span className="dc-copilot-badge" style={{ background: 'rgba(73, 107, 90, 0.15)', color: 'var(--dc-earth-green)' }}>LEDGER</span>
+                    </div>
                   </NavLink>
 
                   <button

@@ -14,6 +14,7 @@ const IncidentWitness = require('../models/IncidentWitness');
 const IncidentVerificationAudit = require('../models/IncidentVerificationAudit');
 const Alert = require('../models/Alert');
 const memoryStore = require('../config/memoryStore');
+const blockchainService = require('../services/blockchainService');
 const { analyzeIncidentMedia, computePerceptualHash } = require('../services/aiMediaAnalysisService');
 const {
   calculateDistanceKm,
@@ -433,6 +434,35 @@ async function handleAdminVerificationAction({ req, res, action, newStatus, defa
   if (newStatus) {
     incident.verificationStatus = newStatus;
     incident.status = newStatus;
+  }
+
+  // When action is VERIFY, mint cryptographic blockchain block
+  if (action === 'VERIFY') {
+    try {
+      const block = await blockchainService.recordTransaction({
+        entityType: 'IncidentVerification',
+        entityId: incident.incidentId || String(incident._id),
+        donorOrSource: incident.reporterName || 'Civilian Witness',
+        destination: incident.location || 'Emergency Command Verification Node',
+        resourceName: `${incident.type || 'Hazard'}: ${incident.title}`,
+        quantity: 1,
+        unit: 'report',
+        status: 'Officially Verified',
+      });
+      if (block) {
+        incident.blockchainTransactionId = block.transactionId;
+        incident.blockHash = block.blockHash;
+        metadata.blockchainTransactionId = block.transactionId;
+        metadata.blockHash = block.blockHash;
+        metadata.blockNumber = block.blockNumber;
+
+        if (!isDbConnected() && !memoryStore.blockchainRecords.some((r) => r.transactionId === block.transactionId)) {
+          memoryStore.blockchainRecords.unshift(block);
+        }
+      }
+    } catch (bcErr) {
+      console.warn('[IncidentVerification] Blockchain mint error:', bcErr);
+    }
   }
 
   // Record in immutable audit log

@@ -221,6 +221,14 @@ const incidentSchema = new mongoose.Schema({
     severity: { type: String, default: '' },
     distanceKm: { type: Number, default: null },
   },
+  blockchainTransactionId: {
+    type: String,
+    default: null,
+  },
+  blockHash: {
+    type: String,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

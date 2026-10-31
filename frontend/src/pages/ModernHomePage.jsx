@@ -458,6 +458,18 @@ export default function ModernHomePage({ onOpenSos, onOpenIncident, refreshKey }
             <Radio size={18} className="dc-pulse-icon" />
             <span>{t('emergency.broadcastSos', 'Emergency SOS')}</span>
           </button>
+
+          {/* Action 4: Transparency Ledger & Blockchain Verification */}
+          <button
+            type="button"
+            id="dc-quick-transparency"
+            onClick={() => navigate('/transparency')}
+            className="dc-quick-action-btn dc-action-transparency"
+            title={t('transparency.transparencySubtitle', 'Inspect cryptographic blockchain verification records and aid distribution proofs')}
+          >
+            <ShieldCheck size={18} />
+            <span>{t('nav.transparencyLedger', 'Transparency Ledger')}</span>
+          </button>
         </section>
       </div>
     </div>

@@ -164,6 +164,21 @@ export const fetchBlockchainTransactions = async (params = {}) => {
   return res.data.data || [];
 };
 
+export const fetchBlockchainStats = async () => {
+  const res = await api.get('/blockchain/stats');
+  return res.data.data;
+};
+
+export const verifyBlockchainIntegrity = async (idOrHash) => {
+  const res = await api.get('/blockchain/verify/' + encodeURIComponent(idOrHash));
+  return res.data;
+};
+
+export const recordBlockchainTransaction = async (blockData) => {
+  const res = await api.post('/blockchain/record', blockData);
+  return res.data;
+};
+
 // ================= PREPAREDNESS GUIDES API =================
 export const fetchPreparednessGuides = async () => {
   const res = await api.get('/preparedness');

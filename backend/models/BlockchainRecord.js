@@ -8,7 +8,7 @@ const blockchainRecordSchema = new mongoose.Schema({
   },
   entityType: {
     type: String,
-    enum: ['Donation', 'Distribution', 'ShelterAllocation', 'EmergencySupply'],
+    enum: ['Donation', 'Distribution', 'ShelterAllocation', 'EmergencySupply', 'IncidentVerification'],
     required: true,
   },
   entityId: {

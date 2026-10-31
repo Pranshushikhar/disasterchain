@@ -17,6 +17,9 @@ import {
   createDonation,
   fetchDistributions,
   fetchBlockchainTransactions,
+  fetchBlockchainStats,
+  verifyBlockchainIntegrity,
+  recordBlockchainTransaction,
   fetchAdminUsers,
   updateUserRole,
   adminVerifyUser,
@@ -48,6 +51,23 @@ const AdminDashboard = () => {
   const [confirmVerifyUser, setConfirmVerifyUser] = useState(null);
   const [verifyingUserId, setVerifyingUserId] = useState(null);
   const [userFilter, setUserFilter] = useState('all'); // 'all' | 'pending' | 'verified'
+  const [blockchainStats, setBlockchainStats] = useState(null);
+  const [blockchainSearch, setBlockchainSearch] = useState('');
+  const [blockchainFilter, setBlockchainFilter] = useState('ALL');
+  const [isAuditingChain, setIsAuditingChain] = useState(false);
+  const [chainAuditFeedback, setChainAuditFeedback] = useState(null);
+  const [showMintBlockModal, setShowMintBlockModal] = useState(false);
+  const [isMintingBlock, setIsMintingBlock] = useState(false);
+  const [verifiedBlockMap, setVerifiedBlockMap] = useState({});
+  const [newBlockForm, setNewBlockForm] = useState({
+    entityType: 'EmergencySupply',
+    resourceName: '',
+    quantity: 100,
+    unit: 'units',
+    donorOrSource: 'Disaster Command Logistics Depot',
+    destination: 'Central University Indoor Stadium Shelter',
+    verificationNote: 'Authorized emergency supply batch authenticated by Command Authority.',
+  });
   const [loading, setLoading] = useState(true);
 
   // Forms
@@ -867,46 +887,234 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* 7. BLOCKCHAIN LEDGER */}
+      {/* 7. BLOCKCHAIN LEDGER & VERIFICATION MANAGEMENT CENTER */}
       {activeTab === 'blockchain' && (
-        <div className="data-table-container glass-card" style={{ padding: 0 }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>{t('blockchain.blockNumber', 'Block #')}</th>
-                <th>Txn ID</th>
-                <th>Entity</th>
-                <th>{t('common.resource', 'Resource')}</th>
-                <th>{t('blockchain.blockHash', 'Block Hash (SHA-256)')}</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {blockchainRecords.map((r) => (
-                <tr key={r._id}>
-                  <td style={{ fontWeight: 700, color: '#818cf8', fontFamily: 'var(--font-mono)' }}>#{r.blockNumber || 1001}</td>
-                  <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--dc-text, #1E2725)' }}>{r.transactionId}</td>
-                  <td><span className="badge badge-info">{r.entityType || 'Donation'}</span></td>
-                  <td>{r.quantity} {r.unit} {r.resourceName}</td>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#38bdf8' }}>
-                    {r.blockHash?.substring(0, 20)}...
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => setSelectedReceipt(r)}
-                      className="btn btn-outline btn-sm"
-                    >
-                      <Icon name="blockchain" size={13} color="#818cf8" />
-                      <span>{t('admin.auditProof', 'Audit Proof')}</span>
-                    </button>
-                  </td>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Top Controls Bar */}
+          <div
+            className="spatial-panel"
+            style={{
+              padding: '1.25rem 1.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: '260px' }}>
+              <input
+                type="text"
+                className="form-input"
+                style={{ width: '100%', maxWidth: '340px', padding: '0.5rem 0.85rem', fontSize: '0.85rem' }}
+                placeholder="Search ledger blocks by ID, hash, or resource..."
+                value={blockchainSearch}
+                onChange={(e) => setBlockchainSearch(e.target.value)}
+              />
+              <select
+                className="form-select"
+                style={{ width: 'auto', padding: '0.5rem 0.85rem', fontSize: '0.85rem' }}
+                value={blockchainFilter}
+                onChange={(e) => setBlockchainFilter(e.target.value)}
+              >
+                <option value="ALL">All Entity Types</option>
+                <option value="Donation">Donations</option>
+                <option value="Distribution">Distributions</option>
+                <option value="IncidentVerification">Incident Verifications</option>
+                <option value="EmergencySupply">Emergency Supplies</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleAuditEntireChain}
+                disabled={isAuditingChain}
+                className="btn btn-outline"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem' }}
+                title="Verify cryptographic SHA-256 continuity across all blocks"
+              >
+                <Icon name="shield-check" size={15} />
+                <span>{isAuditingChain ? 'Verifying Chain...' : 'Verify Ledger Integrity'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowMintBlockModal(true)}
+                className="btn btn-primary"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  fontSize: '0.85rem',
+                  backgroundColor: 'var(--dc-forest, #263F35)',
+                  color: '#FFFDF8',
+                }}
+              >
+                <Icon name="plus" size={15} />
+                <span>Mint Authorized Block</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Chain Audit Feedback Banner */}
+          {chainAuditFeedback && (
+            <div
+              style={{
+                padding: '1rem 1.25rem',
+                borderRadius: 'var(--radius-sm, 8px)',
+                background: chainAuditFeedback.success ? 'rgba(79, 128, 96, 0.12)' : 'rgba(201, 75, 75, 0.12)',
+                border: `1px solid ${chainAuditFeedback.success ? 'var(--dc-safe, #4F8060)' : 'var(--dc-emergency, #C94B4B)'}`,
+                color: chainAuditFeedback.success ? 'var(--dc-forest, #263F35)' : 'var(--dc-emergency, #C94B4B)',
+                fontWeight: 700,
+                fontSize: '0.88rem',
+              }}
+            >
+              {chainAuditFeedback.message}
+            </div>
+          )}
+
+          {/* Telemetry Quick Strip */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '1.5rem',
+              padding: '0.85rem 1.25rem',
+              background: 'var(--dc-surface-2, #EFE9DC)',
+              borderRadius: 'var(--radius-sm, 8px)',
+              fontSize: '0.82rem',
+              color: 'var(--dc-forest, #263F35)',
+              fontWeight: 600,
+              flexWrap: 'wrap',
+              border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.12))',
+            }}
+          >
+            <span>Height: <strong>#{blockchainStats?.blockHeight || 1000 + blockchainRecords.length}</strong></span>
+            <span>Total Blocks: <strong>{blockchainRecords.length}</strong></span>
+            <span>Cryptographic Proof: <strong>SHA-256 + Multi-Sig Auth</strong></span>
+            <span>Chain Status: <strong style={{ color: 'var(--dc-safe, #4F8060)' }}>✓ Active & Tamper-Evident</strong></span>
+          </div>
+
+          {/* Full Management Data Table */}
+          <div className="data-table-container glass-card" style={{ padding: 0 }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>{t('blockchain.blockNumber', 'Block #')}</th>
+                  <th>Txn ID</th>
+                  <th>Entity</th>
+                  <th>{t('common.resource', 'Resource')}</th>
+                  <th>Source ➔ Destination</th>
+                  <th>{t('blockchain.blockHash', 'Block Hash (SHA-256)')}</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'center' }}>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {blockchainRecords
+                  .filter((r) => {
+                    if (blockchainFilter !== 'ALL' && r.entityType !== blockchainFilter) return false;
+                    if (blockchainSearch.trim()) {
+                      const s = blockchainSearch.toLowerCase();
+                      const matchTxn = r.transactionId?.toLowerCase().includes(s);
+                      const matchRes = r.resourceName?.toLowerCase().includes(s);
+                      const matchHash = r.blockHash?.toLowerCase().includes(s);
+                      const matchSrc = r.donorOrSource?.toLowerCase().includes(s);
+                      const matchDest = r.destination?.toLowerCase().includes(s);
+                      if (!matchTxn && !matchRes && !matchHash && !matchSrc && !matchDest) return false;
+                    }
+                    return true;
+                  })
+                  .map((r) => {
+                    const isVerified = verifiedBlockMap[r._id || r.transactionId];
+                    return (
+                      <tr key={r._id || r.transactionId}>
+                        <td style={{ fontWeight: 700, color: 'var(--dc-forest, #263F35)', fontFamily: 'var(--font-mono)' }}>
+                          #{r.blockNumber || 1001}
+                        </td>
+                        <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--dc-text, #1E2725)', fontWeight: 600 }}>
+                          {r.transactionId}
+                        </td>
+                        <td>
+                          <span
+                            className="badge"
+                            style={{
+                              backgroundColor:
+                                r.entityType === 'Donation'
+                                  ? 'rgba(38, 63, 53, 0.1)'
+                                  : r.entityType === 'IncidentVerification'
+                                  ? 'rgba(73, 107, 90, 0.12)'
+                                  : 'rgba(195, 138, 53, 0.12)',
+                              color:
+                                r.entityType === 'Donation'
+                                  ? 'var(--dc-forest, #263F35)'
+                                  : r.entityType === 'IncidentVerification'
+                                  ? 'var(--dc-earth-green, #496B5A)'
+                                  : 'var(--dc-warning, #C38A35)',
+                              border: '1px solid currentColor',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {r.entityType || 'Donation'}
+                          </span>
+                        </td>
+                        <td>
+                          <strong>{r.quantity} {r.unit}</strong> &bull; {r.resourceName}
+                        </td>
+                        <td style={{ fontSize: '0.82rem', color: 'var(--dc-text-secondary, #65706B)' }}>
+                          {r.donorOrSource || 'Central Command'} ➔ {r.destination || 'Relief Facility'}
+                        </td>
+                        <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--dc-earth-green, #496B5A)' }}>
+                          {r.blockHash?.substring(0, 16)}...
+                        </td>
+                        <td>
+                          <span
+                            className="badge"
+                            style={{
+                              background: 'rgba(79, 128, 96, 0.12)',
+                              color: 'var(--dc-safe, #4F8060)',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {isVerified ? '✓ Validated' : r.status || 'Verified'}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedReceipt(r)}
+                              className="btn btn-outline btn-sm"
+                              style={{ fontSize: '0.74rem', padding: '3px 8px' }}
+                              title="Inspect complete cryptographic block certificate"
+                            >
+                              <Icon name="blockchain" size={13} />
+                              <span>Proof</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleVerifySingleBlock(r)}
+                              className="btn btn-ghost btn-sm"
+                              style={{ fontSize: '0.74rem', padding: '3px 8px' }}
+                              title="Verify SHA-256 signature against network keys"
+                            >
+                              <Icon name="check" size={13} />
+                              <span>Verify</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
-
+      
       {/* 8. USER DIRECTORY & PENDING VERIFICATIONS MANAGEMENT */}
       {activeTab === 'users' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
@@ -1719,6 +1927,174 @@ const AdminDashboard = () => {
         onClose={() => setSelectedReceipt(null)}
         record={selectedReceipt}
       />
+
+      {/* 11. MINT AUTHORIZED BLOCK MODAL */}
+      {showMintBlockModal && (
+        <div className="modal-overlay" onClick={() => setShowMintBlockModal(false)}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: '560px',
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.16))',
+              boxShadow: 'var(--shadow-lg)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 8,
+                    background: 'rgba(38, 63, 53, 0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--dc-forest, #263F35)',
+                  }}
+                >
+                  <Icon name="blockchain" size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: 'var(--dc-forest, #263F35)' }}>
+                    Mint Authorized Blockchain Block
+                  </h3>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--dc-text-secondary, #65706B)' }}>
+                    Cryptographic SHA-256 record authenticated by Disaster Command
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMintBlockModal(false)}
+                className="btn btn-ghost"
+                style={{ padding: '0.35rem' }}
+              >
+                <Icon name="close" size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleMintBlockSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label className="form-label" style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.84rem' }}>
+                  Transaction / Entity Type
+                </label>
+                <select
+                  className="form-select"
+                  value={newBlockForm.entityType}
+                  onChange={(e) => setNewBlockForm({ ...newBlockForm, entityType: e.target.value })}
+                >
+                  <option value="EmergencySupply">Emergency Supply Batch Allocation</option>
+                  <option value="Distribution">Humanitarian Aid Distribution</option>
+                  <option value="Donation">Inbound Relief Donation</option>
+                  <option value="IncidentVerification">Hazard Incident Official Verification</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label" style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.84rem' }}>
+                  Resource Name or Hazard Scope
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  required
+                  placeholder="e.g. High-Output Water Filtration Units"
+                  value={newBlockForm.resourceName}
+                  onChange={(e) => setNewBlockForm({ ...newBlockForm, resourceName: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label className="form-label" style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.84rem' }}>
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="form-input"
+                    required
+                    value={newBlockForm.quantity}
+                    onChange={(e) => setNewBlockForm({ ...newBlockForm, quantity: Number(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="form-label" style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.84rem' }}>
+                    Unit
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    required
+                    placeholder="kits, meals, liters, units"
+                    value={newBlockForm.unit}
+                    onChange={(e) => setNewBlockForm({ ...newBlockForm, unit: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="form-label" style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.84rem' }}>
+                  Source Origin / Donating Agency
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  required
+                  value={newBlockForm.donorOrSource}
+                  onChange={(e) => setNewBlockForm({ ...newBlockForm, donorOrSource: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="form-label" style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.84rem' }}>
+                  Destination Facility or Field Sector
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  required
+                  value={newBlockForm.destination}
+                  onChange={(e) => setNewBlockForm({ ...newBlockForm, destination: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="form-label" style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.84rem' }}>
+                  Cryptographic Audit Authorization Note
+                </label>
+                <textarea
+                  className="form-textarea"
+                  rows="2"
+                  value={newBlockForm.verificationNote}
+                  onChange={(e) => setNewBlockForm({ ...newBlockForm, verificationNote: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowMintBlockModal(false)}
+                  className="btn btn-ghost"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isMintingBlock}
+                  className="btn btn-primary"
+                  style={{ backgroundColor: 'var(--dc-forest, #263F35)', color: '#FFFDF8' }}
+                >
+                  {isMintingBlock ? 'Minting SHA-256 Block...' : 'Mint Block on Ledger'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

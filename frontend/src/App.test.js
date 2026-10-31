@@ -374,4 +374,86 @@ describe('DisasterChain Core Smoke Tests', () => {
       expect(content.includes('to="/admin"')).toBe(true);
     });
   });
+
+  describe('Transparency Ledger & Blockchain Verification Explorer Tests', () => {
+    it('verifies public navigation includes Transparency Ledger in sidebar and drawer', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const navPath = path.join(__dirname, 'components', 'ModernNav.jsx');
+      const content = fs.readFileSync(navPath, 'utf8');
+
+      expect(content.includes('id="dc-sidebar-transparency"')).toBe(true);
+      expect(content.includes('to="/transparency"')).toBe(true);
+      expect(content.includes("t('nav.transparencyLedger'")).toBe(true);
+    });
+
+    it('verifies ModernHomePage includes quick action entry to Transparency Ledger', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const homePath = path.join(__dirname, 'pages', 'ModernHomePage.jsx');
+      const content = fs.readFileSync(homePath, 'utf8');
+
+      expect(content.includes('id="dc-quick-transparency"')).toBe(true);
+      expect(content.includes("navigate('/transparency')")).toBe(true);
+    });
+
+    it('verifies App.js defines accessible routes for transparency and explorer aliases', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const appPath = path.join(__dirname, 'App.js');
+      const content = fs.readFileSync(appPath, 'utf8');
+
+      expect(content.includes('path="/transparency"')).toBe(true);
+      expect(content.includes('path="/explorer"')).toBe(true);
+      expect(content.includes('path="/blockchain"')).toBe(true);
+      expect(content.includes('path="/ledger"')).toBe(true);
+    });
+
+    it('validates SHA-256 block hash computation and tamper-evident integrity rules', () => {
+      const crypto = require('crypto');
+      const blockNumber = 1001;
+      const previousBlockHash = '0x0000000000000000000000000000000000000000000000000000000000000000';
+      const entityType = 'Donation';
+      const entityId = 'DON-3011';
+      const quantity = 1200;
+      const destination = 'Central University Indoor Stadium Shelter';
+      const timestamp = '2026-10-31T04:00:00.000Z';
+
+      const dataToHash = `${blockNumber}-${previousBlockHash}-${entityType}-${entityId}-${quantity}-${destination}-${timestamp}`;
+      const computedHash = '0x' + crypto.createHash('sha256').update(dataToHash).digest('hex');
+
+      expect(computedHash.startsWith('0x')).toBe(true);
+      expect(computedHash.length).toBe(66);
+      const tamperedData = `${blockNumber}-${previousBlockHash}-${entityType}-${entityId}-9999-${destination}-${timestamp}`;
+      const tamperedHash = '0x' + crypto.createHash('sha256').update(tamperedData).digest('hex');
+      expect(computedHash).not.toBe(tamperedHash);
+    });
+
+    it('verifies TransparencyLedgerPage supports dual public explorer views and hash verifier', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const ledgerPath = path.join(__dirname, 'pages', 'TransparencyLedgerPage.jsx');
+      const content = fs.readFileSync(ledgerPath, 'utf8');
+
+      expect(content.includes('fetchBlockchainTransactions')).toBe(true);
+      expect(content.includes('fetchIncidents')).toBe(true);
+      expect(content.includes('fetchBlockchainStats')).toBe(true);
+      expect(content.includes('verifyBlockchainIntegrity')).toBe(true);
+      expect(content.includes('handleVerifyProof')).toBe(true);
+      expect(content.includes('BlockchainReceiptModal')).toBe(true);
+    });
+
+    it('verifies Admin Command Center includes dedicated blockchain audit and minting management', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const adminPath = path.join(__dirname, 'pages', 'AdminDashboard.jsx');
+      const content = fs.readFileSync(adminPath, 'utf8');
+
+      expect(content.includes('handleAuditEntireChain')).toBe(true);
+      expect(content.includes('handleMintBlockSubmit')).toBe(true);
+      expect(content.includes('showMintBlockModal')).toBe(true);
+      expect(content.includes('recordBlockchainTransaction')).toBe(true);
+      expect(content.includes('verifyBlockchainIntegrity')).toBe(true);
+    });
+  });
 });

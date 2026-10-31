@@ -267,6 +267,9 @@ const AppLayout = () => {
             <Route path="/preparedness" element={<DisasterGuidesPage />} />
             <Route path="/donations" element={<DonationsPage />} />
             <Route path="/transparency" element={<TransparencyLedgerPage />} />
+            <Route path="/explorer" element={<TransparencyLedgerPage />} />
+            <Route path="/blockchain" element={<TransparencyLedgerPage />} />
+            <Route path="/ledger" element={<TransparencyLedgerPage />} />
             <Route
               path="/profile"
               element={

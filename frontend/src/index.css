@@ -9000,7 +9000,8 @@ body.drawer-open {
 
 .dc-action-sos:active,
 .dc-action-report:active,
-.dc-action-shelter:active {
+.dc-action-shelter:active,
+.dc-action-transparency:active {
   transform: translateY(0);
 }
 
