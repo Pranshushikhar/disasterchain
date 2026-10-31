@@ -131,7 +131,7 @@ const RegisterPage = () => {
               marginBottom: '1.5rem',
             }}
           >
-            A verification link was dispatched to <strong>{registeredEmail}</strong>. Please check your inbox to activate your account.
+            {t('auth.verificationDispatched', 'A verification link was dispatched to {{email}}. Please check your inbox to activate your account.').replace('{{email}}', registeredEmail)}
           </p>
 
           {resendStatus && (
@@ -165,7 +165,7 @@ const RegisterPage = () => {
                 cursor: resending ? 'not-allowed' : 'pointer',
               }}
             >
-              {resending ? 'Dispatching...' : 'Resend Verification Link'}
+              {resending ? t('common.loading', 'Dispatching...') : t('auth.resendLink', 'Resend Verification Link')}
             </button>
 
             <Link
@@ -224,7 +224,7 @@ const RegisterPage = () => {
               marginBottom: '0.25rem',
             }}
           >
-            CITIZEN & RESPONDER ENROLLMENT
+            {t('auth.registerSubtitle', 'CITIZEN & RESPONDER ENROLLMENT')}
           </div>
           <h1
             style={{
@@ -239,7 +239,7 @@ const RegisterPage = () => {
             Create DisasterChain Account
           </h1>
           <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.45 }}>
-            Register to submit verified hazard reports, access emergency shelter reserves, and coordinate local community relief.
+            {t('auth.registerDesc', 'Register to submit verified hazard reports, access emergency shelter reserves, and coordinate local community relief.')}
           </p>
         </div>
 
@@ -351,10 +351,10 @@ const RegisterPage = () => {
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="citizen">Citizen (General Access & Safety Updates)</option>
-              <option value="volunteer">Volunteer (On-ground Community Aid)</option>
-              <option value="ngo">NGO / Relief Organization</option>
-              <option value="responder">First Responder (Official Dispatch Team)</option>
+              <option value="citizen">{t('auth.roleCitizen', 'Citizen (General Access & Safety Updates)')}</option>
+              <option value="volunteer">{t('auth.roleVolunteer', 'Volunteer (On-ground Community Aid)')}</option>
+              <option value="ngo">{t('auth.roleNgo', 'NGO / Relief Organization')}</option>
+              <option value="responder">{t('auth.roleResponder', 'First Responder (Official Dispatch Team)')}</option>
             </select>
           </div>
 
@@ -405,19 +405,19 @@ const RegisterPage = () => {
             }}
           >
             <span style={{ color: passwordCriteria.hasLength ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-              {passwordCriteria.hasLength ? '✓' : '○'} 8+ Characters
+              {passwordCriteria.hasLength ? '✓' : '○'} {t('auth.criteriaLength', '8+ Characters')}
             </span>
             <span style={{ color: passwordCriteria.hasUpper ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-              {passwordCriteria.hasUpper ? '✓' : '○'} Uppercase Letter
+              {passwordCriteria.hasUpper ? '✓' : '○'} {t('auth.criteriaUpper', 'Uppercase Letter')}
             </span>
             <span style={{ color: passwordCriteria.hasLower ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-              {passwordCriteria.hasLower ? '✓' : '○'} Lowercase Letter
+              {passwordCriteria.hasLower ? '✓' : '○'} {t('auth.criteriaLower', 'Lowercase Letter')}
             </span>
             <span style={{ color: passwordCriteria.hasNumber ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-              {passwordCriteria.hasNumber ? '✓' : '○'} Number (0-9)
+              {passwordCriteria.hasNumber ? '✓' : '○'} {t('auth.criteriaNumber', 'Number (0-9)')}
             </span>
             <span style={{ color: passwordCriteria.hasSpecial ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-              {passwordCriteria.hasSpecial ? '✓' : '○'} Special Symbol (!@#$)
+              {passwordCriteria.hasSpecial ? '✓' : '○'} {t('auth.criteriaSpecial', 'Special Symbol (!@#$)')}
             </span>
           </div>
 
@@ -471,7 +471,7 @@ const RegisterPage = () => {
               boxShadow: 'var(--shadow-sm)',
             }}
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? t('common.loading', 'Creating Account...') : t('auth.registerBtn', 'Create Account')}
           </button>
         </form>
 

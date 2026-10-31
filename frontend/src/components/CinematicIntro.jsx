@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useEnvironment } from '../context/EnvironmentContext';
+import { useTranslation } from '../i18n/i18n';
 
 /**
  * DISASTERCHAIN — PHOTOREALISTIC DISASTER FILM CINEMATIC INTRO
@@ -15,6 +16,7 @@ import { useEnvironment } from '../context/EnvironmentContext';
  */
 export default function CinematicIntro({ onEnter, isReplay = false }) {
   const { environment, isSoundEnabled, toggleSound, initAudio } = useEnvironment();
+  const { t } = useTranslation();
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
   const containerRef = useRef(null);
@@ -797,7 +799,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
               e.currentTarget.style.backgroundColor = 'rgba(20, 28, 25, 0.65)';
             }}
           >
-            Direct to Hub (Skip)
+            {t('cinematic.skip', 'Direct to Hub (Skip)')}
           </button>
         </div>
 
@@ -838,7 +840,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
                   fontWeight: 600,
                 }}
               >
-                EARTH INTELLIGENCE
+                {t('cinematic.earthIntelligence', 'EARTH INTELLIGENCE')}
               </div>
               <h2
                 style={{
@@ -882,7 +884,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
                   marginBottom: 6,
                 }}
               >
-                {sceneIndex === 3 ? 'OCEANIC VOLUMETRIC SWELL' : 'URBAN PRECIPITATION FLOODING'}
+                {sceneIndex === 3 ? t('cinematic.oceanicSwell', 'OCEANIC VOLUMETRIC SWELL') : t('cinematic.urbanFlood', 'URBAN PRECIPITATION FLOODING')}
               </div>
               <div
                 style={{
@@ -892,7 +894,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
                   fontWeight: 400,
                 }}
               >
-                Earth is connected. Risk evolves before impact.
+                {t('cinematic.earthConnected', 'Earth is connected. Risk evolves before impact.')}
               </div>
             </motion.div>
           )}
@@ -929,7 +931,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
                 }}
               >
                 <ShieldCheck size={14} color="#5D8990" />
-                <span>EARTH INTELLIGENCE PLATFORM</span>
+                <span>{t('cinematic.platform', 'EARTH INTELLIGENCE PLATFORM')}</span>
               </div>
 
               {/* Title Wordmark */}
@@ -958,11 +960,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
                   margin: '0 0 16px 0',
                 }}
               >
-                Understand risk.
-                <br />
-                <span style={{ color: '#FFFDF8', fontWeight: 600 }}>
-                  Act before it becomes an emergency.
-                </span>
+                {t('cinematic.tagline', 'Understand risk. Act before it becomes an emergency.')}
               </p>
 
               {/* Tactile Physical ENTER Button */}
@@ -1001,7 +999,7 @@ export default function CinematicIntro({ onEnter, isReplay = false }) {
                     '0 14px 40px -8px rgba(0, 0, 0, 0.55)';
                 }}
               >
-                <span>ENTER DISASTERCHAIN</span>
+                <span>{t('cinematic.enterHub', 'ENTER DISASTERCHAIN')}</span>
                 <ArrowRight size={18} />
               </button>
             </motion.div>

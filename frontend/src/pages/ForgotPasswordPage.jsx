@@ -80,7 +80,7 @@ const ForgotPasswordPage = () => {
               marginBottom: '0.25rem',
             }}
           >
-            PASSWORD RECOVERY
+            {t('auth.credentialReset', 'PASSWORD RECOVERY')}
           </div>
           <h1
             style={{
@@ -95,7 +95,7 @@ const ForgotPasswordPage = () => {
             Account Recovery
           </h1>
           <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.45 }}>
-            Submit your registered email address to verify identity and reset your authentication credentials.
+            {t('auth.forgotPasswordDesc', 'Submit your registered email address to verify identity and reset your authentication credentials.')}
           </p>
         </div>
 
@@ -154,7 +154,7 @@ const ForgotPasswordPage = () => {
                   textDecoration: 'none',
                 }}
               >
-                Enter Recovery Code →
+                {t('auth.enterCode', 'Enter Recovery Code →')}
               </Link>
               <Link
                 to="/login"
@@ -226,7 +226,7 @@ const ForgotPasswordPage = () => {
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
-              {loading ? 'Submitting Request...' : 'Send Recovery Instructions'}
+              {loading ? t('common.loading', 'Submitting Request...') : t('auth.sendResetLink', 'Send Recovery Instructions')}
             </button>
           </form>
         )}
@@ -243,7 +243,7 @@ const ForgotPasswordPage = () => {
           }}
         >
           <Link to="/reset-password" style={{ color: 'var(--dc-earth-green, #496B5A)', fontWeight: 700, textDecoration: 'none' }}>
-            Have a recovery code?
+            {t('auth.enterCode', 'Have a recovery code?')}
           </Link>
           <Link to="/login" style={{ color: 'var(--dc-text-secondary, #65706B)', textDecoration: 'none' }}>
             Back to Sign In

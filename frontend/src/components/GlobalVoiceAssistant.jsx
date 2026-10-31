@@ -124,7 +124,7 @@ export default function GlobalVoiceAssistant() {
               <div className="dc-voice-sos-header">
                 <div className="dc-voice-sos-badge">
                   <ShieldAlert size={18} className="dc-pulse-fast" />
-                  <span>VOICE SOS PROTOCOL ACTIVE</span>
+                  <span>{t('voice.voiceSosProtocol', 'VOICE SOS PROTOCOL ACTIVE')}</span>
                 </div>
                 <div className="dc-voice-sos-timer" title="Auto-abort timer to prevent false alarms">
                   {sosConfirmation.countdown}s
@@ -167,7 +167,7 @@ export default function GlobalVoiceAssistant() {
                   className="dc-voice-sos-confirm-btn"
                 >
                   <Radio size={16} />
-                  <span>Confirm SOS Broadcast</span>
+                  <span>{t('voice.confirmSos', 'Confirm SOS Broadcast')}</span>
                 </button>
 
                 <button
@@ -177,7 +177,7 @@ export default function GlobalVoiceAssistant() {
                   className="dc-voice-sos-cancel-btn"
                 >
                   <X size={16} />
-                  <span>Cancel (Say "Cancel SOS")</span>
+                  <span>{t('voice.cancelSos', 'Cancel (Say "Cancel SOS")')}</span>
                 </button>
               </div>
             </div>
@@ -212,15 +212,15 @@ export default function GlobalVoiceAssistant() {
                     />
                   </div>
                   <div>
-                    <h3 className="dc-voice-chat-title">DisasterChain AI Assistant</h3>
+                    <h3 className="dc-voice-chat-title">{t('auth.emergencyAssistant', 'DisasterChain AI Assistant')}</h3>
                     <div className="dc-voice-chat-status-text">
                       {isListening
                         ? t('voice.listeningState', 'Listening to you...')
                         : isSpeaking
                         ? t('voice.speakingState', 'Speaking response...')
                         : isThinking
-                        ? 'Thinking...'
-                        : 'Conversational Intelligence & Operations'}
+                        ? t('voice.thinkingState', 'Thinking...')
+                        : t('voice.idleState', 'Conversational Intelligence & Operations')}
                     </div>
                   </div>
                 </div>
@@ -230,8 +230,8 @@ export default function GlobalVoiceAssistant() {
                     type="button"
                     onClick={clearConversation}
                     className="dc-voice-tool-btn"
-                    title="Start New Chat"
-                    aria-label="Start New Chat"
+                    title={t('voice.startNewChat', 'Start New Chat')}
+                    aria-label={t('voice.startNewChat', 'Start New Chat')}
                   >
                     <Plus size={15} />
                   </button>
@@ -240,8 +240,8 @@ export default function GlobalVoiceAssistant() {
                     type="button"
                     onClick={() => setIsMuted(!isMuted)}
                     className={`dc-voice-tool-btn ${isMuted ? 'muted' : ''}`}
-                    title={isMuted ? 'Unmute voice' : 'Mute voice'}
-                    aria-label={isMuted ? 'Unmute voice' : 'Mute voice'}
+                    title={isMuted ? t('voice.unmuteVoice', 'Unmute voice') : t('voice.muteVoice', 'Mute voice')}
+                    aria-label={isMuted ? t('voice.unmuteVoice', 'Unmute voice') : t('voice.muteVoice', 'Mute voice')}
                   >
                     {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
                   </button>
@@ -250,8 +250,8 @@ export default function GlobalVoiceAssistant() {
                     type="button"
                     onClick={() => setIsHelpOpen(true)}
                     className="dc-voice-tool-btn"
-                    title="Voice command help"
-                    aria-label="Voice command help"
+                    title={t('voice.help', 'Voice command help')}
+                    aria-label={t('voice.help', 'Voice command help')}
                   >
                     <HelpCircle size={15} />
                   </button>
@@ -321,7 +321,7 @@ export default function GlobalVoiceAssistant() {
                     </div>
 
                     <div className="dc-voice-msg-bubble">
-                      <p className="dc-voice-msg-text">{msg.content}</p>
+                      <p className="dc-voice-msg-text">{msg.id === 'welcome_initial' ? t('voice.welcomeInitial') : msg.content}</p>
 
                       {/* Tool Action Badge */}
                       {msg.action && (
@@ -367,7 +367,7 @@ export default function GlobalVoiceAssistant() {
                         <span className="dot dot-2" />
                         <span className="dot dot-3" />
                       </div>
-                      <span className="dc-voice-thinking-label">Synthesizing intelligence...</span>
+                      <span className="dc-voice-thinking-label">{t('voice.thinkingState', 'Synthesizing intelligence...')}</span>
                     </div>
                   </div>
                 )}
@@ -375,28 +375,28 @@ export default function GlobalVoiceAssistant() {
                 {/* Quick Starter Suggestions (when chat has only initial greeting) */}
                 {messages.length <= 1 && (
                   <div className="dc-voice-suggestions-wrap">
-                    <span className="dc-voice-suggestions-title">Ask or try saying:</span>
+                    <span className="dc-voice-suggestions-title">{t('voice.starterTitle', 'Ask or try saying:')}</span>
                     <div className="dc-voice-suggestions-grid">
                       <button
                         type="button"
                         onClick={() => handleSuggestionClick('What can you help me with?')}
                         className="dc-voice-suggestion-chip"
                       >
-                        "What can you help me with?"
+                        "{t('voice.starter1', 'What can you help me with?')}"
                       </button>
                       <button
                         type="button"
                         onClick={() => handleSuggestionClick('Why is disaster preparedness important?')}
                         className="dc-voice-suggestion-chip"
                       >
-                        "Why is preparedness important?"
+                        "{t('voice.starter2', 'Why is preparedness important?')}"
                       </button>
                       <button
                         type="button"
                         onClick={() => handleSuggestionClick('What should I keep in my emergency kit?')}
                         className="dc-voice-suggestion-chip"
                       >
-                        "What goes in an emergency kit?"
+                        "{t('voice.starter3', 'What goes in an emergency kit?')}"
                       </button>
                       <button
                         type="button"
@@ -465,7 +465,7 @@ export default function GlobalVoiceAssistant() {
                       title="Interrupt speech"
                     >
                       <Square size={12} />
-                      <span>Interrupt</span>
+                      <span>{t('voice.interrupt', 'Interrupt')}</span>
                     </button>
                   )}
                 </div>
@@ -475,7 +475,7 @@ export default function GlobalVoiceAssistant() {
               {permissionState === 'denied' && (
                 <div className="dc-voice-perm-warning">
                   <AlertTriangle size={14} />
-                  <span>Microphone access blocked. Click the lock icon in your URL bar to allow.</span>
+                  <span>{t('voice.micBlocked', 'Microphone access blocked. Click the lock icon in your URL bar to allow.')}</span>
                 </div>
               )}
 
@@ -494,9 +494,7 @@ export default function GlobalVoiceAssistant() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder={
-                    isListening
-                      ? 'Listening... (or type your message)'
-                      : 'Ask a question or say a command...'
+                    isListening ? t('voice.inputListening', 'Listening... (or type your message)') : t('voice.inputPlaceholder', 'Ask a question or say a command...')
                   }
                   className="dc-voice-chat-input"
                   disabled={isThinking}
@@ -567,9 +565,7 @@ export default function GlobalVoiceAssistant() {
                 ? t('voice.listeningState', 'Listening...')
                 : isSpeaking
                 ? t('voice.speakingState', 'Speaking...')
-                : isThinking || isProcessing
-                ? 'Thinking...'
-                : 'AI Assistant'}
+                : isThinking || isProcessing ? t('voice.thinkingState', 'Thinking...') : t('common.ai', 'AI Assistant')}
             </span>
 
             {/* Micro Quick Status Indicator */}

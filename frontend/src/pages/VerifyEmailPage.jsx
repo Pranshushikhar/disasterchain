@@ -99,7 +99,7 @@ const VerifyEmailPage = () => {
               Validating Email Signature...
             </h2>
             <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.85rem' }}>
-              Confirming account registration and initializing operational clearances.
+              {t('auth.validatingDesc', 'Confirming account registration and initializing operational clearances.')}
             </p>
           </div>
         ) : verified ? (
@@ -131,13 +131,13 @@ const VerifyEmailPage = () => {
                 marginBottom: '0.3rem',
               }}
             >
-              EMAIL VERIFIED
+              {t('auth.identityVerified', 'EMAIL VERIFIED')}
             </div>
             <h2 style={{ fontFamily: 'var(--font-display, inherit)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.5rem' }}>
               Account Activated
             </h2>
             <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.5, marginBottom: '1.75rem' }}>
-              Your email credentials have been authenticated. You now possess full active clearance on DisasterChain.
+              {t('auth.identityVerifiedDesc', 'Your email credentials have been authenticated. You now possess full active clearance on DisasterChain.')}
             </p>
 
             <Link
@@ -154,7 +154,7 @@ const VerifyEmailPage = () => {
                 textDecoration: 'none',
               }}
             >
-              Proceed to Sign In →
+              {t('auth.proceedLogin', 'Proceed to Sign In →')}
             </Link>
           </div>
         ) : (
@@ -186,7 +186,7 @@ const VerifyEmailPage = () => {
                 marginBottom: '0.3rem',
               }}
             >
-              VERIFICATION EXPIRED
+              {t('auth.verificationRejected', 'VERIFICATION EXPIRED')}
             </div>
             <h2 style={{ fontFamily: 'var(--font-display, inherit)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--dc-text, #1E2725)', marginBottom: '0.5rem' }}>
               Token Invalid or Expired
@@ -257,7 +257,7 @@ const VerifyEmailPage = () => {
                   cursor: resending ? 'not-allowed' : 'pointer',
                 }}
               >
-                {resending ? 'Sending...' : 'Resend Verification Link'}
+                {resending ? t('common.loading', 'Sending...') : t('auth.resendBtn', 'Resend Verification Link')}
               </button>
             </form>
 

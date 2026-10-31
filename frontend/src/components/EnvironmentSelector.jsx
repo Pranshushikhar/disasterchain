@@ -12,6 +12,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useEnvironment, ENVIRONMENTS } from '../context/EnvironmentContext';
+import { useTranslation } from '../i18n/i18n';
 
 const getEnvIcon = (id, size = 15) => {
   switch (id) {
@@ -31,6 +32,7 @@ const getEnvIcon = (id, size = 15) => {
 };
 
 export default function EnvironmentSelector({ compact = false }) {
+  const { t } = useTranslation();
   const {
     environment,
     setEnvironment,
@@ -175,7 +177,7 @@ export default function EnvironmentSelector({ compact = false }) {
                   color: 'var(--dc-text-muted, #8C938E)',
                 }}
               >
-                LIVING ENVIRONMENT
+                {t('env.livingAtmosphere', 'LIVING ENVIRONMENT')}
               </div>
               <div
                 style={{
@@ -184,7 +186,7 @@ export default function EnvironmentSelector({ compact = false }) {
                   fontWeight: 600,
                 }}
               >
-                Interactive
+                {t('common.active', 'Interactive')}
               </div>
             </div>
 
@@ -192,6 +194,21 @@ export default function EnvironmentSelector({ compact = false }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {ENVIRONMENTS.map((item) => {
                 const isSelected = item.id === environment;
+                const envLabel =
+                  item.id === 'calm'
+                    ? t('env.calm', item.label)
+                    : item.id === 'rain'
+                    ? t('env.rain', item.label)
+                    : item.id === 'storm'
+                    ? t('env.storm', item.label)
+                    : item.id === 'night'
+                    ? t('env.night', item.label)
+                    : item.id === 'snow'
+                    ? t('env.snow', item.label)
+                    : item.id === 'fog'
+                    ? t('env.fog', item.label)
+                    : item.label;
+
                 return (
                   <button
                     key={item.id}
@@ -256,7 +273,7 @@ export default function EnvironmentSelector({ compact = false }) {
                           gap: 6,
                         }}
                       >
-                        <span>{item.label}</span>
+                        <span>{envLabel}</span>
                       </div>
                       <div
                         style={{
@@ -318,7 +335,7 @@ export default function EnvironmentSelector({ compact = false }) {
                   ) : (
                     <VolumeX size={14} color="var(--dc-text-muted, #8C938E)" />
                   )}
-                  <span>Ambient Audio Synthesizer</span>
+                  <span>{t('env.soundTitle', 'Ambient Audio Synthesizer')}</span>
                 </div>
                 <span
                   style={{
@@ -329,7 +346,7 @@ export default function EnvironmentSelector({ compact = false }) {
                     fontWeight: 700,
                   }}
                 >
-                  {isSoundEnabled ? 'ON' : 'OFF'}
+                  {isSoundEnabled ? t('nav.soundOn', 'ON') : t('nav.muted', 'OFF')}
                 </span>
               </button>
             </div>

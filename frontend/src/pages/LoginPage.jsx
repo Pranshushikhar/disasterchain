@@ -120,7 +120,7 @@ const LoginPage = () => {
               marginBottom: '0.25rem',
             }}
           >
-            OPERATOR AUTHENTICATION
+            {t('auth.authSubtitle', 'OPERATOR AUTHENTICATION')}
           </div>
           <h1
             style={{
@@ -135,7 +135,7 @@ const LoginPage = () => {
             {t('auth.loginTitle', 'Sign In to DisasterChain')}
           </h1>
           <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.45 }}>
-            Access real-time crisis intelligence, hazard dispatch, and community safety registries.
+            {t('auth.loginSubtitle', 'Access real-time crisis intelligence, hazard dispatch, and community safety registries.')}
           </p>
         </div>
 
@@ -171,7 +171,7 @@ const LoginPage = () => {
                   fontWeight: 600,
                 }}
               >
-                {resending ? 'Sending verification...' : 'Resend verification email'}
+                {resending ? t('common.loading', 'Sending verification...') : t('auth.resendBtn', 'Resend verification email')}
               </button>
             )}
           </div>
@@ -309,7 +309,7 @@ const LoginPage = () => {
             gap: '8px',
           }}
         >
-          <span>Demo Evaluation:</span>
+          <span>{t('auth.demoAccess', 'Demo Evaluation:')}</span>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button
               type="button"

@@ -174,7 +174,7 @@ export default function AcademyCoursePage() {
         <div className="dc-course-header-top">
           <Link to="/academy" className="dc-back-link">
             <ArrowLeft size={16} />
-            <span>Back to Academy</span>
+            <span>{t('academy.backToAcademy', 'Back to Academy')}</span>
           </Link>
           <div className="dc-course-meta-tags">
             <span className="dc-tag-category">{course.category.toUpperCase()}</span>
@@ -195,8 +195,8 @@ export default function AcademyCoursePage() {
         {/* Progress Bar */}
         <div className="dc-course-progress-bar-wrapper">
           <div className="dc-progress-labels">
-            <span>Course Progress</span>
-            <span>{completedLessonsCount} / {course.lessons.length} Lessons ({progressPercent}%)</span>
+            <span>{t('academy.courseProgress', 'Course Progress')}</span>
+            <span>{completedLessonsCount} / {course.lessons.length} {t('academy.lessons', 'Lessons')} ({progressPercent}%)</span>
           </div>
           <div className="dc-progress-track">
             <div
@@ -213,7 +213,7 @@ export default function AcademyCoursePage() {
         <aside className="dc-course-sidebar" aria-label="Course Syllabus">
           <div className="dc-sidebar-title-row">
             <BookOpen size={16} />
-            <span>Course Curriculum</span>
+            <span>{t('academy.courseCurriculum', 'Course Curriculum')}</span>
           </div>
 
           <div className="dc-lessons-nav-list">
@@ -254,8 +254,8 @@ export default function AcademyCoursePage() {
                 <Award size={16} />
               </div>
               <div className="dc-lesson-nav-text">
-                <span className="dc-lesson-nav-title">Knowledge Assessment</span>
-                <span className="dc-lesson-nav-dur">Final Exam • 4 Questions</span>
+                <span className="dc-lesson-nav-title">{t('academy.knowledgeAssessment', 'Knowledge Assessment')}</span>
+                <span className="dc-lesson-nav-dur">{t('academy.finalExam', 'Final Exam • 4 Questions')}</span>
               </div>
             </button>
           </div>
@@ -268,7 +268,7 @@ export default function AcademyCoursePage() {
             <article className="dc-lesson-article">
               <div className="dc-lesson-header-meta">
                 <span className="dc-lesson-crumb">
-                  Lesson {activeLessonIndex + 1} of {course.lessons.length}
+                  {t('academy.lesson', 'Lesson')} {activeLessonIndex + 1} {t('common.of', 'of')} {course.lessons.length}
                 </span>
                 <button
                   type="button"
@@ -277,7 +277,7 @@ export default function AcademyCoursePage() {
                   title="Ask DisasterChain AI Tutor about this lesson"
                 >
                   <Sparkles size={15} className="dc-sparkle-icon" />
-                  <span>Ask AI Tutor</span>
+                  <span>{t('academy.askAiTutor', 'Ask AI Tutor')}</span>
                 </button>
               </div>
 
@@ -300,7 +300,7 @@ export default function AcademyCoursePage() {
                 <div className="dc-practical-steps-box">
                   <h3 className="dc-steps-title">
                     <ShieldCheck size={18} />
-                    <span>Practical Safety Protocol Checklist</span>
+                    <span>{t('academy.practicalSteps', 'Practical Safety Protocol Checklist')}</span>
                   </h3>
                   <ul className="dc-steps-list">
                     {currentLesson.practicalSteps.map((step, sIdx) => (
@@ -318,7 +318,7 @@ export default function AcademyCoursePage() {
                 <div className="dc-checkpoint-box">
                   <div className="dc-checkpoint-header">
                     <HelpCircle size={18} className="dc-checkpoint-icon" />
-                    <span>Knowledge Checkpoint</span>
+                    <span>{t('academy.checkpoint', 'Knowledge Checkpoint')}</span>
                   </div>
                   <h4 className="dc-checkpoint-question">
                     {currentLesson.checkpoint.question}
@@ -359,7 +359,7 @@ export default function AcademyCoursePage() {
                       onClick={handleCheckpointSubmit}
                       className="dc-btn dc-btn-primary dc-checkpoint-submit-btn"
                     >
-                      Check Understanding
+                      {t('academy.checkUnderstanding', 'Check Understanding')}
                     </button>
                   ) : (
                     <div
@@ -373,12 +373,12 @@ export default function AcademyCoursePage() {
                         {checkpointSelected === currentLesson.checkpoint.correctAnswerIndex ? (
                           <>
                             <CheckCircle size={18} />
-                            <span>Correct! Excellent safety instinct.</span>
+                            <span>{t('academy.checkpointCorrect', 'Correct! Excellent safety instinct.')}</span>
                           </>
                         ) : (
                           <>
                             <AlertTriangle size={18} />
-                            <span>Unsafe choice. Review the explanation:</span>
+                            <span>{t('academy.checkpointIncorrect', 'Unsafe choice. Review the explanation:')}</span>
                           </>
                         )}
                       </div>
@@ -399,7 +399,7 @@ export default function AcademyCoursePage() {
                   className="dc-btn dc-btn-secondary"
                 >
                   <ChevronLeft size={16} />
-                  <span>Previous</span>
+                  <span>{t('academy.previousLesson', 'Previous')}</span>
                 </button>
 
                 <button
@@ -409,8 +409,8 @@ export default function AcademyCoursePage() {
                 >
                   <span>
                     {activeLessonIndex === course.lessons.length - 1
-                      ? 'Proceed to Final Exam'
-                      : 'Mark Complete & Next Lesson'}
+                      ? t('academy.proceedToExam', 'Proceed to Final Exam')
+                      : t('academy.nextLesson', 'Mark Complete & Next Lesson')}
                   </span>
                   <ChevronRight size={16} />
                 </button>
@@ -422,9 +422,9 @@ export default function AcademyCoursePage() {
               <div className="dc-quiz-header">
                 <Award size={28} className="dc-quiz-award-icon" />
                 <div>
-                  <h2 className="dc-quiz-title">Knowledge Assessment: {course.title}</h2>
+                  <h2 className="dc-quiz-title">{t('academy.quizTitle', 'Knowledge Assessment')}: {course.title}</h2>
                   <p className="dc-quiz-sub">
-                    Answer all 4 questions. Score 80% or higher to earn your course achievement badge and verified completion certificate.
+                    {t('academy.quizSubtitle', 'Answer all questions. Score 80% or higher to earn your course achievement badge and verified completion certificate.')}
                   </p>
                 </div>
               </div>
@@ -434,7 +434,7 @@ export default function AcademyCoursePage() {
                 <div className="dc-quiz-questions-list">
                   {course.quiz.map((q, qIdx) => (
                     <div key={qIdx} className="dc-quiz-card">
-                      <div className="dc-quiz-num">Question {qIdx + 1} of {course.quiz.length}</div>
+                      <div className="dc-quiz-num">{t('academy.question', 'Question')} {qIdx + 1} {t('common.of', 'of')} {course.quiz.length}</div>
                       <h3 className="dc-quiz-q-text">{q.question}</h3>
                       <div className="dc-quiz-options-grid">
                         {q.options.map((opt, oIdx) => {
@@ -462,7 +462,7 @@ export default function AcademyCoursePage() {
                       onClick={handleQuizSubmit}
                       className="dc-btn dc-btn-primary dc-btn-large"
                     >
-                      Submit Exam for Evaluation
+                      {t('academy.submitQuiz', 'Submit Exam for Evaluation')}
                     </button>
                   </div>
                 </div>
@@ -472,14 +472,14 @@ export default function AcademyCoursePage() {
                   <div className={`dc-result-hero ${quizScore >= 80 ? 'passed' : 'failed'}`}>
                     <div className="dc-result-score-circle">
                       <span className="dc-score-num">{quizScore}%</span>
-                      <span className="dc-score-label">Score</span>
+                      <span className="dc-score-label">{t('academy.certScore', 'Score')}</span>
                     </div>
 
                     <div className="dc-result-summary">
                       <h3 className="dc-result-heading">
                         {quizScore >= 80
-                          ? 'Congratulations! You Passed the Exam.'
-                          : 'Score Below Passing Threshold (80%)'}
+                          ? t('academy.quizPassed', 'Congratulations! You Passed the Exam.')
+                          : t('academy.quizFailed', 'Score Below Passing Threshold (80%)')}
                       </h3>
                       <p className="dc-result-desc">
                         {quizScore >= 80
@@ -495,7 +495,7 @@ export default function AcademyCoursePage() {
                             className="dc-btn dc-btn-primary"
                           >
                             <FileText size={16} />
-                            <span>View Completion Certificate</span>
+                            <span>{t('academy.viewCertificate', 'View Completion Certificate')}</span>
                           </button>
                         ) : (
                           <button
@@ -504,7 +504,7 @@ export default function AcademyCoursePage() {
                             className="dc-btn dc-btn-primary"
                           >
                             <RotateCcw size={16} />
-                            <span>Retake Assessment</span>
+                            <span>{t('academy.retryQuiz', 'Retake Assessment')}</span>
                           </button>
                         )}
                         <button
@@ -515,7 +515,7 @@ export default function AcademyCoursePage() {
                           }}
                           className="dc-btn dc-btn-secondary"
                         >
-                          Review Course Lessons
+                          {t('academy.reviewCourse', 'Review Course Lessons')}
                         </button>
                       </div>
                     </div>

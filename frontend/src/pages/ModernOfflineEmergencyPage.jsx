@@ -221,16 +221,16 @@ export default function ModernOfflineEmergencyPage() {
       {/* 1. MINIMAL HIGH-CONTRAST STATUS BAR */}
       <header className="dc-offline-status-bar">
         <div className="dc-status-bar-left">
-          <Link to="/" className="dc-offline-exit-link" title="Return to Main Command Center">
+          <Link to="/" className="dc-offline-exit-link" title={t('common.returnHome', 'Return to Hub')}>
             <ArrowLeft size={16} />
-            <span>Main Command</span>
+            <span>{t('offline.mainCommand', 'Main Command')}</span>
           </Link>
 
           {/* Status Indicator Chip */}
           <div className={`dc-connectivity-status-chip ${isOnline ? 'online' : 'offline'}`}>
             <span className={`dc-status-dot ${isOnline ? 'online' : 'offline'}`} />
             <span className="dc-status-label">
-              {isOnline ? 'ONLINE' : 'OFFLINE EMERGENCY MODE'}
+              {isOnline ? t('offline.statusOnline', 'ONLINE') : t('offline.statusOffline', 'OFFLINE EMERGENCY MODE')}
             </span>
           </div>
 
@@ -238,14 +238,14 @@ export default function ModernOfflineEmergencyPage() {
             <Database size={13} />
             <span>
               {lastSync
-                ? `Cached: ${new Date(lastSync).toLocaleDateString()} ${new Date(lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                : 'Pre-cached Core Engine'}
+                ? `${t('offline.cachedData', 'Cached')}: ${new Date(lastSync).toLocaleDateString()} ${new Date(lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                : t('offline.preCached', 'Pre-cached Core Engine')}
             </span>
           </div>
         </div>
 
         <div className="dc-status-bar-right">
-          <span className="dc-version-badge">Version {OFFLINE_GUIDES_VERSION}</span>
+          <span className="dc-version-badge">{t('offline.version', 'Version')} {OFFLINE_GUIDES_VERSION}</span>
         </div>
       </header>
 
@@ -263,9 +263,9 @@ export default function ModernOfflineEmergencyPage() {
           <div className="dc-sos-hero-head">
             <Radio size={24} className="dc-sos-pulse-icon" />
             <div>
-              <h1 className="dc-sos-headline">Offline Emergency Command</h1>
+              <h1 className="dc-sos-headline">{t('offline.title', 'Offline Emergency Command')}</h1>
               <p className="dc-sos-subline">
-                High-contrast, fast-loading emergency survival reference. Works 100% without internet.
+                {t('offline.tagline', 'High-contrast, fast-loading emergency survival reference. Works 100% without internet.')}
               </p>
             </div>
           </div>
@@ -274,13 +274,13 @@ export default function ModernOfflineEmergencyPage() {
           <div className="dc-sos-reality-alert" role="alert">
             <ShieldAlert size={20} className="dc-reality-icon" />
             <div className="dc-reality-text">
-              <strong>CRITICAL CONNECTIVITY PROTOCOL:</strong>
+              <strong>{t('offline.truthNotice', 'CRITICAL CONNECTIVITY PROTOCOL:')}</strong>
               <p>
-                Sending an automated distress beacon, transmitting live GPS coordinates, or requesting online responder dispatch requires an active cellular or data network.
-                <strong> An automated SOS cannot be sent without internet or cellular connectivity.</strong>
+                {t('offline.criticalProtocolDesc', 'Sending an automated distress beacon, transmitting live GPS coordinates, or requesting online responder dispatch requires an active cellular or data network.')}
+                <strong> {t('offline.criticalProtocolNotice', 'An automated SOS cannot be sent without internet or cellular connectivity.')}</strong>
               </p>
               <p className="dc-reality-alternative">
-                If cellular voice calling is available on your device, tap the verified emergency hotlines below for immediate direct telephone dispatch.
+                {t('offline.criticalProtocolAlternative', 'If cellular voice calling is available on your device, tap the verified emergency hotlines below for immediate direct telephone dispatch.')}
               </p>
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function ModernOfflineEmergencyPage() {
           className={`dc-offline-tab-btn ${activeTab === 'hotlines' ? 'active' : ''}`}
         >
           <PhoneCall size={16} />
-          <span>Emergency Hotlines</span>
+          <span>{t('offline.hotlines', 'Emergency Hotlines')}</span>
         </button>
 
         <button
@@ -302,7 +302,7 @@ export default function ModernOfflineEmergencyPage() {
           className={`dc-offline-tab-btn ${activeTab === 'guides' ? 'active' : ''}`}
         >
           <LifeBuoy size={16} />
-          <span>10 Safety Guides</span>
+          <span>{t('offline.safetyGuides', '10 Safety Guides')}</span>
         </button>
 
         <button
@@ -310,7 +310,7 @@ export default function ModernOfflineEmergencyPage() {
           className={`dc-offline-tab-btn ${activeTab === 'checklists' ? 'active' : ''}`}
         >
           <CheckSquare size={16} />
-          <span>Survival Checklists</span>
+          <span>{t('offline.checklists', 'Survival Checklists')}</span>
         </button>
 
         <button
@@ -318,7 +318,7 @@ export default function ModernOfflineEmergencyPage() {
           className={`dc-offline-tab-btn ${activeTab === 'personal' ? 'active' : ''}`}
         >
           <User size={16} />
-          <span>Personal Plan & Contacts</span>
+          <span>{t('offline.personalPlan', 'Personal Plan & Contacts')}</span>
         </button>
 
         <button
@@ -326,7 +326,7 @@ export default function ModernOfflineEmergencyPage() {
           className={`dc-offline-tab-btn ${activeTab === 'shelters' ? 'active' : ''}`}
         >
           <MapPin size={16} />
-          <span>Saved Shelters</span>
+          <span>{t('offline.savedShelters', 'Saved Shelters')}</span>
         </button>
       </nav>
 
@@ -336,9 +336,9 @@ export default function ModernOfflineEmergencyPage() {
       {activeTab === 'hotlines' && (
         <section className="dc-offline-tab-content" aria-label="Verified Emergency Numbers">
           <div className="dc-section-header">
-            <h2 className="dc-section-title">Verified Emergency Hotlines (India & Universal)</h2>
+            <h2 className="dc-section-title">{t('offline.hotlines', 'Verified Emergency Hotlines (India & Universal)')}</h2>
             <p className="dc-section-desc">
-              Direct telephone links. Tap to place a voice call directly from your device’s cellular dialer.
+              {t('offline.criticalProtocolAlternative', 'Direct telephone links. Tap to place a voice call directly from your device’s cellular dialer.')}
             </p>
           </div>
 
@@ -360,7 +360,7 @@ export default function ModernOfflineEmergencyPage() {
                   title={`Dial ${h.name} (${h.number})`}
                 >
                   <PhoneCall size={18} />
-                  <span>Call {h.number}</span>
+                  <span>{t('offline.callNumber', 'Call')} {h.number}</span>
                 </a>
               </div>
             ))}
@@ -369,19 +369,19 @@ export default function ModernOfflineEmergencyPage() {
           {/* Personal Saved Contacts Quick Call Bar */}
           {contacts.length > 0 && (
             <div className="dc-personal-hotlines-block">
-              <h3 className="dc-sub-heading">Your Personal Emergency Contacts</h3>
+              <h3 className="dc-sub-heading">{t('offline.personalContactsTitle', 'Your Personal Emergency Contacts')}</h3>
               <div className="dc-personal-contacts-list">
                 {contacts.map((c) => (
                   <div key={c.id} className="dc-personal-contact-card">
                     <div>
                       <div className="dc-personal-c-name">{c.name}</div>
                       <div className="dc-personal-c-rel">{c.relation}</div>
-                      <div className="dc-personal-c-phone">{c.phone || 'No phone recorded'}</div>
+                      <div className="dc-personal-c-phone">{c.phone || t('common.none', 'No phone recorded')}</div>
                     </div>
                     {c.phone && (
                       <a href={`tel:${c.phone}`} className="dc-btn dc-btn-primary dc-btn-sm">
                         <PhoneCall size={14} />
-                        <span>Dial</span>
+                        <span>{t('offline.callNumber', 'Dial')}</span>
                       </a>
                     )}
                   </div>
@@ -398,9 +398,9 @@ export default function ModernOfflineEmergencyPage() {
       {activeTab === 'guides' && (
         <section className="dc-offline-tab-content" aria-label="Pre-Cached Disaster Guides">
           <div className="dc-section-header">
-            <h2 className="dc-section-title">Authoritative Offline Safety Guides</h2>
+            <h2 className="dc-section-title">{t('offline.survivalDirectivesTitle', 'Authoritative Offline Safety Guides')}</h2>
             <p className="dc-section-desc">
-              Pre-cached emergency instructions. All procedures verified against NDMA and FEMA survival standards.
+              {t('offline.survivalDirectivesDesc', 'Pre-cached emergency instructions. All procedures verified against NDMA and FEMA survival standards.')}
             </p>
           </div>
 
@@ -421,7 +421,7 @@ export default function ModernOfflineEmergencyPage() {
                       <h3 className="dc-guide-title">{guide.title}</h3>
                     </div>
                     <div className="dc-guide-header-right">
-                      <span className="dc-guide-verified-tag">Verified {guide.lastVerified}</span>
+                      <span className="dc-guide-verified-tag">{t('common.verified', 'Verified')} {guide.lastVerified}</span>
                       {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </div>
                   </button>
@@ -432,7 +432,7 @@ export default function ModernOfflineEmergencyPage() {
                       <div className="dc-guide-section immediate">
                         <h4 className="dc-guide-sec-title">
                           <CheckSquare size={16} />
-                          <span>IMMEDIATE ACTIONS (WHAT TO DO NOW)</span>
+                          <span>{t('offline.immediateActions', 'IMMEDIATE ACTIONS (WHAT TO DO NOW)')}</span>
                         </h4>
                         <ul className="dc-guide-bullet-list">
                           {guide.immediateActions.map((act, idx) => (
@@ -445,7 +445,7 @@ export default function ModernOfflineEmergencyPage() {
                       <div className="dc-guide-section avoid">
                         <h4 className="dc-guide-sec-title">
                           <AlertTriangle size={16} />
-                          <span>THINGS TO NEVER DO (LETHAL HAZARDS)</span>
+                          <span>{t('offline.thingsToAvoid', 'THINGS TO NEVER DO (LETHAL HAZARDS)')}</span>
                         </h4>
                         <ul className="dc-guide-bullet-list avoid">
                           {guide.thingsToAvoid.map((avoid, idx) => (
@@ -458,7 +458,7 @@ export default function ModernOfflineEmergencyPage() {
                       <div className="dc-guide-section precautions">
                         <h4 className="dc-guide-sec-title">
                           <Info size={16} />
-                          <span>Safety Precautions & Secondary Risks</span>
+                          <span>{t('offline.precautions', 'Safety Precautions & Secondary Risks')}</span>
                         </h4>
                         <ul className="dc-guide-bullet-list">
                           {guide.safetyPrecautions.map((prec, idx) => (
@@ -470,11 +470,11 @@ export default function ModernOfflineEmergencyPage() {
                       {/* When to Evacuate & Call */}
                       <div className="dc-guide-meta-grid">
                         <div className="dc-guide-meta-cell">
-                          <strong>When to Evacuate:</strong>
+                          <strong>{t('offline.whenToEvacuate', 'When to Evacuate')}:</strong>
                           <p>{guide.whenToEvacuate}</p>
                         </div>
                         <div className="dc-guide-meta-cell">
-                          <strong>When to Contact Emergency Services:</strong>
+                          <strong>{t('offline.whenToCall', 'When to Contact Emergency Services')}:</strong>
                           <p>{guide.whenToContactServices}</p>
                         </div>
                       </div>
@@ -493,9 +493,9 @@ export default function ModernOfflineEmergencyPage() {
       {activeTab === 'checklists' && (
         <section className="dc-offline-tab-content" aria-label="Interactive Checklists">
           <div className="dc-section-header">
-            <h2 className="dc-section-title">Offline Preparedness Checklists</h2>
+            <h2 className="dc-section-title">{t('offline.checklists', 'Offline Preparedness Checklists')}</h2>
             <p className="dc-section-desc">
-              Your checkmarks are saved automatically in your device’s local browser memory.
+              {t('offline.checklistsSubtitle', 'Your checkmarks are saved automatically in your device’s local browser memory.')}
             </p>
           </div>
 
@@ -504,9 +504,9 @@ export default function ModernOfflineEmergencyPage() {
             <div className="dc-checklist-card">
               <div className="dc-checklist-card-head">
                 <CheckSquare size={18} />
-                <h3>72-Hour Emergency Go-Bag Kit</h3>
+                <h3>{t('offline.goBagTitle', '72-Hour Emergency Go-Bag Kit')}</h3>
               </div>
-              <p className="dc-checklist-subtitle">Essential supplies to sustain one person for 3 days.</p>
+              <p className="dc-checklist-subtitle">{t('offline.goBagSubtitle', 'Essential supplies to sustain one person for 3 days.')}</p>
 
               <div className="dc-checklist-items-stack">
                 {kitChecklist.map((item) => (
@@ -531,9 +531,9 @@ export default function ModernOfflineEmergencyPage() {
             <div className="dc-checklist-card">
               <div className="dc-checklist-card-head">
                 <ShieldAlert size={18} />
-                <h3>15-Minute Evacuation Checklist</h3>
+                <h3>{t('offline.evacChecklistTitle', '15-Minute Evacuation Checklist')}</h3>
               </div>
-              <p className="dc-checklist-subtitle">Immediate actions when sudden departure is ordered.</p>
+              <p className="dc-checklist-subtitle">{t('offline.evacChecklistSubtitle', 'Immediate actions when sudden departure is ordered.')}</p>
 
               <div className="dc-checklist-items-stack">
                 {evacChecklist.map((item) => (
@@ -563,9 +563,9 @@ export default function ModernOfflineEmergencyPage() {
       {activeTab === 'personal' && (
         <section className="dc-offline-tab-content" aria-label="Personal Emergency Plan">
           <div className="dc-section-header">
-            <h2 className="dc-section-title">Personal Emergency Plan & Sensitive Data</h2>
+            <h2 className="dc-section-title">{t('offline.personalPlan', 'Personal Emergency Plan & Sensitive Data')}</h2>
             <p className="dc-section-desc">
-              All data below is stored <strong>STRICTLY ON THIS LOCAL DEVICE</strong>. It is never transmitted to any external server or cloud database without your explicit consent.
+              {t('offline.localDataNotice', 'All data below is stored STRICTLY ON THIS LOCAL DEVICE. It is never transmitted to any external server or cloud database without your explicit consent.')}
             </p>
           </div>
 
@@ -574,11 +574,11 @@ export default function ModernOfflineEmergencyPage() {
             <div className="dc-personal-card">
               <div className="dc-card-head">
                 <MapPin size={18} />
-                <h3>Family Muster & Meeting Points</h3>
+                <h3>{t('offline.familyMusterTitle', 'Family Muster & Meeting Points')}</h3>
               </div>
               <div className="dc-form-stack">
                 <div className="dc-form-group">
-                  <label>Tier 1: Immediate Home Muster Point (e.g. tree outside gate)</label>
+                  <label>{t('offline.tier1Label', 'Tier 1: Immediate Home Muster Point (e.g. tree outside gate)')}</label>
                   <input
                     type="text"
                     value={plan.tier1MeetingPoint}
@@ -587,7 +587,7 @@ export default function ModernOfflineEmergencyPage() {
                   />
                 </div>
                 <div className="dc-form-group">
-                  <label>Tier 2: Neighborhood Point (outside immediate street)</label>
+                  <label>{t('offline.tier2Label', 'Tier 2: Neighborhood Point (outside immediate street)')}</label>
                   <input
                     type="text"
                     value={plan.tier2NeighborhoodPoint}
@@ -596,7 +596,7 @@ export default function ModernOfflineEmergencyPage() {
                   />
                 </div>
                 <div className="dc-form-group">
-                  <label>Tier 3: Regional Meeting Point (adjacent town/county)</label>
+                  <label>{t('offline.tier3Label', 'Tier 3: Regional Meeting Point (adjacent town/county)')}</label>
                   <input
                     type="text"
                     value={plan.tier3RegionalPoint}
@@ -605,7 +605,7 @@ export default function ModernOfflineEmergencyPage() {
                   />
                 </div>
                 <div className="dc-form-group">
-                  <label>Designated Out-of-Area Relay Contact (person all text)</label>
+                  <label>{t('offline.relayContactLabel', 'Designated Out-of-Area Relay Contact (person all text)')}</label>
                   <input
                     type="text"
                     value={plan.outOfAreaRelayPerson}
@@ -614,7 +614,7 @@ export default function ModernOfflineEmergencyPage() {
                   />
                 </div>
                 <button type="button" onClick={handleSavePlan} className="dc-btn dc-btn-primary">
-                  Save Meeting Points
+                  {t('offline.savePlan', 'Save Meeting Points')}
                 </button>
               </div>
             </div>
@@ -623,7 +623,7 @@ export default function ModernOfflineEmergencyPage() {
             <div className="dc-personal-card">
               <div className="dc-card-head">
                 <PhoneCall size={18} />
-                <h3>Personal Emergency Contacts</h3>
+                <h3>{t('offline.personalContactsTitle', 'Personal Emergency Contacts')}</h3>
               </div>
 
               <div className="dc-contacts-table">
@@ -631,12 +631,12 @@ export default function ModernOfflineEmergencyPage() {
                   <div key={c.id} className="dc-contact-row">
                     <div className="dc-contact-meta">
                       <strong>{c.name}</strong> ({c.relation})
-                      <span className="dc-contact-num">{c.phone || 'No phone'}</span>
+                      <span className="dc-contact-num">{c.phone || t('common.none', 'No phone')}</span>
                     </div>
                     <div className="dc-contact-row-actions">
                       {c.phone && (
                         <a href={`tel:${c.phone}`} className="dc-btn dc-btn-sm dc-btn-outline">
-                          Dial
+                          {t('offline.callNumber', 'Dial')}
                         </a>
                       )}
                       <button
@@ -659,13 +659,13 @@ export default function ModernOfflineEmergencyPage() {
                   className="dc-btn dc-btn-secondary dc-add-contact-trigger"
                 >
                   <Plus size={16} />
-                  <span>Add Emergency Contact</span>
+                  <span>{t('offline.addContact', 'Add Emergency Contact')}</span>
                 </button>
               ) : (
                 <form onSubmit={handleAddContact} className="dc-add-contact-form">
                   <input
                     type="text"
-                    placeholder="Full Name"
+                    placeholder={t('common.fullName', 'Full Name')}
                     value={newContactName}
                     onChange={(e) => setNewContactName(e.target.value)}
                     required
@@ -673,7 +673,7 @@ export default function ModernOfflineEmergencyPage() {
                   />
                   <input
                     type="tel"
-                    placeholder="Telephone Number"
+                    placeholder={t('auth.phoneNumber', 'Telephone Number')}
                     value={newContactPhone}
                     onChange={(e) => setNewContactPhone(e.target.value)}
                     required
@@ -681,21 +681,21 @@ export default function ModernOfflineEmergencyPage() {
                   />
                   <input
                     type="text"
-                    placeholder="Relationship (e.g. Spouse, Parent)"
+                    placeholder={t('emergencyContacts.relation', 'Relationship (e.g. Spouse, Parent)')}
                     value={newContactRelation}
                     onChange={(e) => setNewContactRelation(e.target.value)}
                     className="dc-input"
                   />
                   <div className="dc-form-actions-row">
                     <button type="submit" className="dc-btn dc-btn-primary dc-btn-sm">
-                      Save Contact
+                      {t('common.save', 'Save Contact')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsAddingContact(false)}
                       className="dc-btn dc-btn-ghost dc-btn-sm"
                     >
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </button>
                   </div>
                 </form>
@@ -706,7 +706,7 @@ export default function ModernOfflineEmergencyPage() {
             <div className="dc-personal-card dc-medical-card">
               <div className="dc-card-head">
                 <HeartPulse size={18} />
-                <h3>Confidential Medical Reference</h3>
+                <h3>{t('offline.medicalReferenceTitle', 'Confidential Medical Reference')}</h3>
               </div>
 
               {/* Explicit Consent Control */}
@@ -718,7 +718,7 @@ export default function ModernOfflineEmergencyPage() {
                     onChange={handleToggleMedicalConsent}
                   />
                   <span>
-                    <strong>Explicit User Consent:</strong> I voluntarily choose to store sensitive medical and prescription details locally in this browser for emergency first-responder reference.
+                    {t('offline.explicitMedicalConsent', 'Explicit User Consent: I voluntarily choose to store sensitive medical and prescription details locally in this browser for emergency first-responder reference.')}
                   </span>
                 </label>
               </div>
@@ -726,7 +726,7 @@ export default function ModernOfflineEmergencyPage() {
               {hasMedicalConsent && medicalInfo ? (
                 <div className="dc-form-stack">
                   <div className="dc-form-group">
-                    <label>Blood Group</label>
+                    <label>{t('offline.bloodGroup', 'Blood Group')}</label>
                     <input
                       type="text"
                       placeholder="e.g. O+, A-, B+"
@@ -736,7 +736,7 @@ export default function ModernOfflineEmergencyPage() {
                     />
                   </div>
                   <div className="dc-form-group">
-                    <label>Known Severe Allergies (Penicillin, Peanuts, Latex, etc.)</label>
+                    <label>{t('offline.allergiesLabel', 'Known Severe Allergies (Penicillin, Peanuts, Latex, etc.)')}</label>
                     <input
                       type="text"
                       placeholder="List all life-threatening allergies"
@@ -746,7 +746,7 @@ export default function ModernOfflineEmergencyPage() {
                     />
                   </div>
                   <div className="dc-form-group">
-                    <label>Chronic Medical Conditions (Asthma, Diabetes, Cardiac, etc.)</label>
+                    <label>{t('offline.chronicConditionsLabel', 'Chronic Medical Conditions (Asthma, Diabetes, Cardiac, etc.)')}</label>
                     <input
                       type="text"
                       placeholder="Diagnosed chronic conditions"
@@ -756,7 +756,7 @@ export default function ModernOfflineEmergencyPage() {
                     />
                   </div>
                   <div className="dc-form-group">
-                    <label>Critical Daily Medications & Dosage</label>
+                    <label>{t('offline.medicationsLabel', 'Critical Daily Medications & Dosage')}</label>
                     <textarea
                       rows={2}
                       placeholder="e.g. Insulin glargine 20u nightly; Albuterol inhaler"
@@ -766,14 +766,14 @@ export default function ModernOfflineEmergencyPage() {
                     />
                   </div>
                   <button type="button" onClick={handleSaveMedicalInfo} className="dc-btn dc-btn-primary">
-                    Save Confidential Medical Data
+                    {t('offline.saveMedicalData', 'Save Confidential Medical Data')}
                   </button>
                 </div>
               ) : (
                 <div className="dc-consent-notice">
                   <Info size={16} />
                   <span>
-                    Medical storage is currently disabled. Check the consent box above to enable local medical records.
+                    {t('offline.medicalDisabledNotice', 'Medical storage is currently disabled. Check the consent box above to enable local medical records.')}
                   </span>
                 </div>
               )}
@@ -783,19 +783,19 @@ export default function ModernOfflineEmergencyPage() {
             <div className="dc-personal-card dc-privacy-card">
               <div className="dc-card-head">
                 <FileText size={18} />
-                <h3>Data Governance & Export</h3>
+                <h3>{t('offline.dataGovernanceTitle', 'Data Governance & Export')}</h3>
               </div>
               <p className="dc-privacy-note">
-                You retain complete sovereignty over your emergency information. You can export a JSON backup to keep in your Go-Bag or erase all records permanently.
+                {t('offline.dataGovernanceDesc', 'You retain complete sovereignty over your emergency information. You can export a JSON backup to keep in your Go-Bag or erase all records permanently.')}
               </p>
               <div className="dc-privacy-actions">
                 <button type="button" onClick={handleExportData} className="dc-btn dc-btn-outline">
                   <Download size={15} />
-                  <span>Export JSON Backup</span>
+                  <span>{t('offline.exportData', 'Export JSON Backup')}</span>
                 </button>
                 <button type="button" onClick={handlePurgeAll} className="dc-btn dc-btn-danger">
                   <Trash2 size={15} />
-                  <span>Erase All Local Data</span>
+                  <span>{t('offline.eraseData', 'Erase All Local Data')}</span>
                 </button>
               </div>
             </div>
@@ -809,9 +809,9 @@ export default function ModernOfflineEmergencyPage() {
       {activeTab === 'shelters' && (
         <section className="dc-offline-tab-content" aria-label="Saved Shelters">
           <div className="dc-section-header">
-            <h2 className="dc-section-title">Saved Locations & Cached Shelters</h2>
+            <h2 className="dc-section-title">{t('offline.savedSheltersTitle', 'Saved Locations & Cached Shelters')}</h2>
             <p className="dc-section-desc">
-              Previously viewed shelters and home coordinates. Note: Live capacity cannot be updated without internet.
+              {t('offline.savedSheltersDesc', 'Previously viewed shelters and home coordinates. Note: Live capacity cannot be updated without internet.')}
             </p>
           </div>
 
@@ -832,7 +832,7 @@ export default function ModernOfflineEmergencyPage() {
                   )}
                   <div className="dc-location-timestamp">
                     <Clock size={12} />
-                    <span>Cached: {loc.lastUpdated}</span>
+                    <span>{t('offline.cachedData', 'Cached')}: {loc.lastUpdated}</span>
                   </div>
                 </div>
               </div>
@@ -842,7 +842,7 @@ export default function ModernOfflineEmergencyPage() {
           <div className="dc-map-disclaimer-box">
             <Info size={16} />
             <span>
-              <strong>Map Data Notice:</strong> Offline maps display previously loaded vector boundaries and pinned shelter coordinates. Turn-by-turn road navigation and live bridge closures require active GPS telemetry and network routing.
+              {t('offline.mapDataNotice', 'Map Data Notice: Offline maps display previously loaded vector boundaries and pinned shelter coordinates. Turn-by-turn road navigation and live bridge closures require active GPS telemetry and network routing.')}
             </span>
           </div>
         </section>

@@ -115,7 +115,7 @@ const ResetPasswordPage = () => {
               marginBottom: '0.25rem',
             }}
           >
-            CREDENTIAL RESET
+            {t('auth.credentialReset', 'CREDENTIAL RESET')}
           </div>
           <h1
             style={{
@@ -130,7 +130,7 @@ const ResetPasswordPage = () => {
             Set New Password
           </h1>
           <p style={{ color: 'var(--dc-text-secondary, #65706B)', fontSize: '0.86rem', lineHeight: 1.45 }}>
-            Enter your verification recovery code and define your new secure account password.
+            {t('auth.resetPasswordDesc', 'Enter your verification recovery code and define your new secure account password.')}
           </p>
         </div>
 
@@ -276,19 +276,19 @@ const ResetPasswordPage = () => {
               }}
             >
               <span style={{ color: passwordCriteria.hasLength ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-                {passwordCriteria.hasLength ? '✓' : '○'} 8+ Characters
+                {passwordCriteria.hasLength ? '✓' : '○'} {t('auth.criteriaLength', '8+ Characters')}
               </span>
               <span style={{ color: passwordCriteria.hasUpper ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-                {passwordCriteria.hasUpper ? '✓' : '○'} Uppercase (A-Z)
+                {passwordCriteria.hasUpper ? '✓' : '○'} {t('auth.criteriaUpper', 'Uppercase (A-Z)')}
               </span>
               <span style={{ color: passwordCriteria.hasLower ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-                {passwordCriteria.hasLower ? '✓' : '○'} Lowercase (a-z)
+                {passwordCriteria.hasLower ? '✓' : '○'} {t('auth.criteriaLower', 'Lowercase (a-z)')}
               </span>
               <span style={{ color: passwordCriteria.hasNumber ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-                {passwordCriteria.hasNumber ? '✓' : '○'} Number (0-9)
+                {passwordCriteria.hasNumber ? '✓' : '○'} {t('auth.criteriaNumber', 'Number (0-9)')}
               </span>
               <span style={{ color: passwordCriteria.hasSpecial ? 'var(--dc-safe, #4F8060)' : 'var(--dc-text-muted, #8C938E)', fontWeight: 600 }}>
-                {passwordCriteria.hasSpecial ? '✓' : '○'} Special (!@#...)
+                {passwordCriteria.hasSpecial ? '✓' : '○'} {t('auth.criteriaSpecial', 'Special (!@#...)')}
               </span>
             </div>
 
@@ -341,13 +341,13 @@ const ResetPasswordPage = () => {
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
-              {loading ? 'Updating Credentials...' : 'Update Password'}
+              {loading ? t('common.loading', 'Updating Credentials...') : t('auth.resetBtn', 'Update Password')}
             </button>
           </form>
         )}
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.82rem', color: 'var(--dc-text-secondary, #65706B)' }}>
-          Don't have a recovery code yet?{' '}
+          {t('auth.dontHaveAccount', "Don't have a recovery code yet?")}{' '}
           <Link to="/forgot-password" style={{ color: 'var(--dc-earth-green, #496B5A)', fontWeight: 700, textDecoration: 'none' }}>
             Request Recovery
           </Link>

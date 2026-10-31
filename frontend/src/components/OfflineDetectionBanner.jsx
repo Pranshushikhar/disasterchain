@@ -3,10 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff, Wifi, ArrowRight, X } from 'lucide-react';
 import { offlineEmergencyStorage } from '../services/offlineEmergencyService';
+import { useTranslation } from '../i18n/i18n';
 
 export default function OfflineDetectionBanner() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator !== 'undefined' ? navigator.onLine : true
@@ -66,7 +68,7 @@ export default function OfflineDetectionBanner() {
                 <WifiOff size={18} />
               </span>
               <div className="dc-offline-banner-text">
-                <strong>Network Offline:</strong> Live operational updates paused. Essential survival guides and verified emergency contacts remain accessible.
+                <strong>{t('offline.networkOffline', 'Network Offline:')}</strong> {t('offline.networkOfflineDesc', 'Live operational updates paused. Essential survival guides and verified emergency contacts remain accessible.')}
               </div>
             </div>
 
@@ -77,7 +79,7 @@ export default function OfflineDetectionBanner() {
                 onClick={() => navigate('/offline')}
                 className="dc-offline-banner-btn"
               >
-                <span>Switch to Offline Emergency Mode</span>
+                <span>{t('offline.switchOfflineMode', 'Switch to Offline Emergency Mode')}</span>
                 <ArrowRight size={15} />
               </button>
               <button
@@ -110,7 +112,7 @@ export default function OfflineDetectionBanner() {
                 <Wifi size={18} />
               </span>
               <div className="dc-offline-banner-text">
-                <strong>Connection Restored:</strong> DisasterChain live earth intelligence and cloud services are active.
+                <strong>{t('offline.connectionRestored', 'Connection Restored:')}</strong> {t('offline.connectionRestoredDesc', 'DisasterChain live earth intelligence and cloud services are active.')}
               </div>
             </div>
             <button

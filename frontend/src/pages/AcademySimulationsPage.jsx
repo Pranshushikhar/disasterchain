@@ -87,13 +87,13 @@ export default function AcademySimulationsPage() {
       <header className="dc-sim-page-header">
         <Link to="/academy" className="dc-back-link">
           <ArrowLeft size={16} />
-          <span>Back to Academy Dashboard</span>
+          <span>{t('academy.backToAcademy', 'Back to Academy Dashboard')}</span>
         </Link>
         <div className="dc-sim-title-group">
-          <span className="dc-sim-badge-tag">INTERACTIVE BRANCHING SCENARIOS</span>
-          <h1 className="dc-sim-main-heading">Disaster Decision Simulations</h1>
+          <span className="dc-sim-badge-tag">{t('academy.branchingTag', 'INTERACTIVE BRANCHING SCENARIOS')}</span>
+          <h1 className="dc-sim-main-heading">{t('academy.simulationsTitle', 'Disaster Decision Simulations')}</h1>
           <p className="dc-sim-sub-text">
-            Immerse yourself in realistic emergency scenarios where every split-second choice has consequences. Learn cause-and-effect safely.
+            {t('academy.simulationsSubtitle', 'Immerse yourself in realistic emergency scenarios where every split-second choice has consequences. Learn cause-and-effect safely.')}
           </p>
         </div>
 
@@ -101,7 +101,7 @@ export default function AcademySimulationsPage() {
         <div className="dc-sim-safety-disclaimer" role="alert">
           <ShieldAlert size={18} className="dc-disclaimer-icon" />
           <span>
-            <strong>TRAINING SIMULATION ONLY:</strong> Scenarios below are educational exercises designed for emergency preparedness practice. They do not reflect live active disaster dispatches.
+            <strong>{t('academy.simDisclaimerStrong', 'TRAINING SIMULATION ONLY:')}</strong> {t('academy.simDisclaimer', 'Scenarios below are educational exercises designed for emergency preparedness practice. They do not reflect live active disaster dispatches.')}
           </span>
         </div>
       </header>
@@ -110,7 +110,7 @@ export default function AcademySimulationsPage() {
       <div className="dc-sim-workspace-layout">
         {/* Left Column: Scenario Selector */}
         <aside className="dc-sim-selector-panel">
-          <h3 className="dc-panel-heading">Select Scenario</h3>
+          <h3 className="dc-panel-heading">{t('academy.selectScenario', 'Select Scenario')}</h3>
           <div className="dc-sim-list">
             {DISASTER_SIMULATIONS.map((sim) => {
               const isSelected = selectedSim.id === sim.id;
@@ -146,7 +146,7 @@ export default function AcademySimulationsPage() {
             </div>
             <div className="dc-sim-score-counter">
               <Award size={16} />
-              <span>Score: <strong>{totalScore} XP</strong></span>
+              <span>{t('academy.certScore', 'Score')}: <strong>{totalScore} XP</strong></span>
             </div>
           </div>
 
@@ -161,7 +161,7 @@ export default function AcademySimulationsPage() {
               {/* Branch Options OR Terminal Outcome */}
               {!currentStep.isTerminal ? (
                 <div className="dc-sim-options-zone">
-                  <h4 className="dc-options-prompt-label">What is your immediate action?</h4>
+                  <h4 className="dc-options-prompt-label">{t('academy.immediateAction', 'What is your immediate action?')}</h4>
                   <div className="dc-sim-options-stack">
                     {currentStep.options?.map((opt) => {
                       const isChosen = selectedOption?.id === opt.id;
@@ -204,12 +204,12 @@ export default function AcademySimulationsPage() {
                           {selectedOption.isSafe ? (
                             <>
                               <CheckCircle size={20} className="dc-icon-safe" />
-                              <span>Safe Strategic Choice (+{selectedOption.points} XP)</span>
+                              <span>{t('academy.safeChoice', 'Safe Strategic Choice')} (+{selectedOption.points} XP)</span>
                             </>
                           ) : (
                             <>
                               <AlertTriangle size={20} className="dc-icon-danger" />
-                              <span>Hazardous Action (0 XP)</span>
+                              <span>{t('academy.hazardAction', 'Hazardous Action')} (0 XP)</span>
                             </>
                           )}
                         </div>
@@ -220,7 +220,7 @@ export default function AcademySimulationsPage() {
                           onClick={handleProceedNext}
                           className="dc-btn dc-btn-primary dc-proceed-btn"
                         >
-                          <span>Proceed to Next Phase</span>
+                          <span>{t('academy.proceedNextPhase', 'Proceed to Next Phase')}</span>
                           <ChevronRight size={16} />
                         </button>
                       </motion.div>
@@ -239,12 +239,12 @@ export default function AcademySimulationsPage() {
                   </div>
 
                   <h3 className="dc-terminal-headline">
-                    {currentStep.passed ? 'Mission Succeeded!' : 'Simulation Failed'}
+                    {currentStep.passed ? t('academy.missionSuccess', 'Mission Succeeded!') : t('academy.simFailed', 'Simulation Failed')}
                   </h3>
                   <p className="dc-terminal-explanation">{currentStep.explanation}</p>
 
                   <div className="dc-terminal-score-box">
-                    <span>Final Training Score:</span>
+                    <span>{t('academy.finalTrainingScore', 'Final Training Score:')}</span>
                     <strong>{totalScore} XP</strong>
                   </div>
 
@@ -255,10 +255,10 @@ export default function AcademySimulationsPage() {
                       className="dc-btn dc-btn-primary"
                     >
                       <RotateCcw size={16} />
-                      <span>Retry Scenario</span>
+                      <span>{t('academy.retryScenario', 'Retry Scenario')}</span>
                     </button>
                     <Link to="/academy" className="dc-btn dc-btn-secondary">
-                      Return to Courses
+                      {t('academy.returnToCourses', 'Return to Courses')}
                     </Link>
                   </div>
                 </div>

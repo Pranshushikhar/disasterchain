@@ -155,25 +155,24 @@ export default function ModernAcademyPage() {
         <div className="dc-academy-hero-content">
           <div className="dc-hero-tag">
             <GraduationCap size={16} />
-            <span>DISASTERCHAIN ACADEMY • CIVILIAN SURVIVAL ACADEMY</span>
+            <span>{t('academy.tagline', 'DISASTERCHAIN ACADEMY • CIVILIAN SURVIVAL ACADEMY')}</span>
           </div>
 
           <h1 className="dc-academy-hero-title">
-            Learn How to Survive Any Disaster
+            {t('academy.heroTitle', 'Learn How to Survive Any Disaster')}
           </h1>
           <p className="dc-academy-hero-subtitle">
-            Master authoritative, evidence-based emergency response through interactive lessons,
-            practical diagrams, decision simulations, and certified skill evaluations.
+            {t('academy.heroSubtitle', 'Master authoritative, evidence-based emergency response through interactive lessons, practical diagrams, decision simulations, and certified skill evaluations.')}
           </p>
 
           <div className="dc-academy-hero-actions">
             <Link to={`/academy/course/${inProgressCourse.id}`} className="dc-btn dc-btn-primary">
               <Play size={16} />
-              <span>Continue Learning</span>
+              <span>{t('academy.continueLearning', 'Continue Learning')}</span>
             </Link>
             <Link to="/academy/simulations" className="dc-btn dc-btn-outline">
               <ShieldAlert size={16} />
-              <span>Interactive Simulations</span>
+              <span>{t('academy.interactiveSimulations', 'Interactive Simulations')}</span>
             </Link>
             <button
               type="button"
@@ -181,7 +180,7 @@ export default function ModernAcademyPage() {
               className="dc-btn dc-btn-ghost dc-ai-tutor-trigger"
             >
               <Sparkles size={16} className="dc-sparkle-icon" />
-              <span>Ask AI Tutor</span>
+              <span>{t('academy.askAiTutor', 'Ask AI Tutor')}</span>
             </button>
           </div>
         </div>
@@ -193,8 +192,8 @@ export default function ModernAcademyPage() {
               <Flame size={24} className="dc-flame-icon" />
             </div>
             <div className="dc-hud-info">
-              <span className="dc-hud-value">{streakCount} Day{streakCount > 1 ? 's' : ''}</span>
-              <span className="dc-hud-label">Daily Learning Streak</span>
+              <span className="dc-hud-value">{streakCount} {streakCount > 1 ? t('academy.streakDays', 'Days') : t('academy.streakDay', 'Day')}</span>
+              <span className="dc-hud-label">{t('academy.dailyStreak', 'Daily Learning Streak')}</span>
             </div>
           </div>
 
@@ -204,7 +203,7 @@ export default function ModernAcademyPage() {
             </div>
             <div className="dc-hud-info">
               <span className="dc-hud-value">{totalXp} XP</span>
-              <span className="dc-hud-label">Total Learning Points</span>
+              <span className="dc-hud-label">{t('academy.learningPoints', 'Total Learning Points')}</span>
             </div>
           </div>
 
@@ -214,7 +213,7 @@ export default function ModernAcademyPage() {
             </div>
             <div className="dc-hud-info">
               <span className="dc-hud-value">{completedCoursesCount} / {totalCourses}</span>
-              <span className="dc-hud-label">Courses Completed</span>
+              <span className="dc-hud-label">{t('academy.coursesCompleted', 'Courses Completed')}</span>
             </div>
           </div>
 
@@ -224,7 +223,7 @@ export default function ModernAcademyPage() {
             </div>
             <div className="dc-hud-info">
               <span className="dc-hud-value">{earnedBadgesCount}</span>
-              <span className="dc-hud-label">Badges Unlocked</span>
+              <span className="dc-hud-label">{t('academy.badges', 'Badges Unlocked')}</span>
             </div>
           </div>
         </div>
@@ -235,7 +234,7 @@ export default function ModernAcademyPage() {
         <section className="dc-continue-learning-section">
           <div className="dc-spotlight-card">
             <div className="dc-spotlight-header">
-              <span className="dc-spotlight-tag">CONTINUE LEARNING</span>
+              <span className="dc-spotlight-tag">{t('academy.continueLearning', 'CONTINUE LEARNING')}</span>
               <span className="dc-spotlight-category">{inProgressCourse.category.toUpperCase()}</span>
             </div>
 
@@ -251,7 +250,7 @@ export default function ModernAcademyPage() {
                   <span>•</span>
                   <span><Award size={13} /> +{inProgressCourse.points} XP</span>
                   <span>•</span>
-                  <span>Badge: {inProgressCourse.badge.title}</span>
+                  <span>{t('academy.badge', 'Badge')}: {inProgressCourse.badge.title}</span>
                 </div>
               </div>
               <div className="dc-spotlight-action">
@@ -259,7 +258,7 @@ export default function ModernAcademyPage() {
                   to={`/academy/course/${inProgressCourse.id}`}
                   className="dc-btn dc-btn-primary dc-resume-btn"
                 >
-                  <span>Resume Course</span>
+                  <span>{t('academy.resumeCourse', 'Resume Course')}</span>
                   <ArrowRight size={16} />
                 </Link>
               </div>
@@ -276,21 +275,21 @@ export default function ModernAcademyPage() {
             className={`dc-tab-btn ${activeTab === 'courses' ? 'active' : ''}`}
           >
             <BookOpen size={16} />
-            <span>Curriculum Courses ({totalCourses})</span>
+            <span>{t('academy.tabCourses', 'Curriculum Courses')} ({totalCourses})</span>
           </button>
           <button
             onClick={() => setActiveTab('simulations')}
             className={`dc-tab-btn ${activeTab === 'simulations' ? 'active' : ''}`}
           >
             <ShieldAlert size={16} />
-            <span>Disaster Simulations</span>
+            <span>{t('academy.tabSimulations', 'Disaster Simulations')}</span>
           </button>
           <button
             onClick={() => setActiveTab('achievements')}
             className={`dc-tab-btn ${activeTab === 'achievements' ? 'active' : ''}`}
           >
             <Award size={16} />
-            <span>Badges & Credentials ({earnedBadgesCount})</span>
+            <span>{t('academy.tabAchievements', 'Badges & Credentials')} ({earnedBadgesCount})</span>
           </button>
         </div>
 
@@ -303,7 +302,7 @@ export default function ModernAcademyPage() {
                 <Search size={18} className="dc-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search 15 emergency courses (e.g. Earthquake, CPR, Water, Flood)..."
+                  placeholder={t('academy.searchPlaceholder', 'Search 15 emergency courses (e.g. Earthquake, CPR, Water, Flood)...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="dc-search-input"
@@ -317,7 +316,17 @@ export default function ModernAcademyPage() {
                     onClick={() => setSelectedCategory(cat.id)}
                     className={`dc-cat-pill ${selectedCategory === cat.id ? 'active' : ''}`}
                   >
-                    {cat.label}
+                    {cat.id === 'all'
+                      ? t('academy.catAll', cat.label)
+                      : cat.id === 'natural'
+                      ? t('academy.catNatural', cat.label)
+                      : cat.id === 'urban'
+                      ? t('academy.catUrban', cat.label)
+                      : cat.id === 'first-aid'
+                      ? t('academy.catFirstAid', cat.label)
+                      : cat.id === 'preparedness'
+                      ? t('academy.catPreparedness', cat.label)
+                      : cat.label}
                   </button>
                 ))}
               </div>
@@ -359,8 +368,8 @@ export default function ModernAcademyPage() {
 
                     <div className="dc-course-card-progress">
                       <div className="dc-progress-labels-compact">
-                        <span>{completedLessons} / {course.lessons.length} Lessons</span>
-                        <span>{isCompleted ? '100% Completed' : `${percent}%`}</span>
+                        <span>{completedLessons} / {course.lessons.length} {t('academy.lessons', 'Lessons')}</span>
+                        <span>{isCompleted ? `100% ${t('academy.completed', 'Completed')}` : `${percent}%`}</span>
                       </div>
                       <div className="dc-progress-track-compact">
                         <div
@@ -380,7 +389,11 @@ export default function ModernAcademyPage() {
                         to={`/academy/course/${course.id}`}
                         className={`dc-btn ${isCompleted ? 'dc-btn-outline' : 'dc-btn-primary'} dc-course-action-btn`}
                       >
-                        {isCompleted ? 'Review Course' : completedLessons > 0 ? 'Continue' : 'Start Course'}
+                        {isCompleted
+                          ? t('academy.reviewCourse', 'Review Course')
+                          : completedLessons > 0
+                          ? t('academy.continueLearning', 'Continue')
+                          : t('academy.startCourse', 'Start Course')}
                       </Link>
                     </div>
                   </div>
@@ -395,42 +408,42 @@ export default function ModernAcademyPage() {
           <div className="dc-simulations-tab-view">
             <div className="dc-sim-banner">
               <div>
-                <h2>Interactive Scenario Branching Simulator</h2>
-                <p>Test your survival instincts under pressure with consequence-driven choices.</p>
+                <h2>{t('academy.simulationsTitle', 'Interactive Scenario Branching Simulator')}</h2>
+                <p>{t('academy.simulationsSubtitle', 'Test your survival instincts under pressure with consequence-driven choices.')}</p>
               </div>
               <Link to="/academy/simulations" className="dc-btn dc-btn-primary">
                 <Play size={16} />
-                <span>Launch Full Simulator</span>
+                <span>{t('academy.launchSimulator', 'Launch Full Simulator')}</span>
               </Link>
             </div>
 
             <div className="dc-sim-cards-grid">
               <div className="dc-sim-promo-card">
                 <Activity size={28} className="dc-promo-icon" />
-                <h3>Earthquake in a Multi-Story Office</h3>
-                <p>Trapped on the 7th floor when violent seismic shaking begins. Avoid elevator death traps and gas line explosions.</p>
-                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">Start Scenario</Link>
+                <h3>{t('academy.sim1Title', 'Earthquake in a Multi-Story Office')}</h3>
+                <p>{t('academy.sim1Desc', 'Trapped on the 7th floor when violent seismic shaking begins. Avoid elevator death traps and gas line explosions.')}</p>
+                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">{t('academy.startScenario', 'Start Scenario')}</Link>
               </div>
 
               <div className="dc-sim-promo-card">
                 <Droplets size={28} className="dc-promo-icon" />
-                <h3>Flash Flood Approaching Your Vehicle</h3>
-                <p>A cloudburst sweeps muddy water over a roadway dip. Learn how fast 12 inches of water sweeps away an SUV.</p>
-                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">Start Scenario</Link>
+                <h3>{t('academy.sim2Title', 'Flash Flood Approaching Your Vehicle')}</h3>
+                <p>{t('academy.sim2Desc', 'A cloudburst sweeps muddy water over a roadway dip. Learn how fast 12 inches of water sweeps away an SUV.')}</p>
+                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">{t('academy.startScenario', 'Start Scenario')}</Link>
               </div>
 
               <div className="dc-sim-promo-card">
                 <Flame size={28} className="dc-promo-icon" />
-                <h3>Nighttime Residential Fire & Smoke Escape</h3>
-                <p>Smoke alarm wakes you at 2:30 AM. Test hot doors, crawl under thermal toxic smoke, and formulate secondary egress.</p>
-                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">Start Scenario</Link>
+                <h3>{t('academy.sim3Title', 'Nighttime Residential Fire & Smoke Escape')}</h3>
+                <p>{t('academy.sim3Desc', 'Smoke alarm wakes you at 2:30 AM. Test hot doors, crawl under thermal toxic smoke, and formulate secondary egress.')}</p>
+                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">{t('academy.startScenario', 'Start Scenario')}</Link>
               </div>
 
               <div className="dc-sim-promo-card">
                 <Wind size={28} className="dc-promo-icon" />
-                <h3>Severe Cyclone Landfall: 12-Hour Alert</h3>
-                <p>Category 4 cyclone approaching. Shutter property properly, avoid the calm eye-of-the-storm trap, and run generators safely.</p>
-                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">Start Scenario</Link>
+                <h3>{t('academy.sim4Title', 'Severe Cyclone Landfall: 12-Hour Alert')}</h3>
+                <p>{t('academy.sim4Desc', 'Category 4 cyclone approaching. Shutter property properly, avoid the calm eye-of-the-storm trap, and run generators safely.')}</p>
+                <Link to="/academy/simulations" className="dc-btn dc-btn-outline">{t('academy.startScenario', 'Start Scenario')}</Link>
               </div>
             </div>
           </div>
@@ -443,7 +456,7 @@ export default function ModernAcademyPage() {
             <div className="dc-earned-certs-block">
               <h3 className="dc-block-heading">
                 <FileText size={18} />
-                <span>Earned Completion Credentials</span>
+                <span>{t('academy.earnedCredentials', 'Earned Completion Credentials')}</span>
               </h3>
 
               {progress?.completedCourses && progress.completedCourses.length > 0 ? (
@@ -458,7 +471,7 @@ export default function ModernAcademyPage() {
                         <div className="dc-cert-card-info">
                           <h4 className="dc-cert-card-title">{cData?.title || cert.courseId}</h4>
                           <span className="dc-cert-card-id">ID: {cert.certificateId || 'Verified'}</span>
-                          <span className="dc-cert-card-score">Score: {cert.score}%</span>
+                          <span className="dc-cert-card-score">{t('academy.certScore', 'Score')}: {cert.score}%</span>
                         </div>
                         <button
                           type="button"
@@ -470,7 +483,7 @@ export default function ModernAcademyPage() {
                           }
                           className="dc-btn dc-btn-outline dc-view-cert-btn"
                         >
-                          View Certificate
+                          {t('academy.viewCertificate', 'View Certificate')}
                         </button>
                       </div>
                     );
@@ -479,7 +492,7 @@ export default function ModernAcademyPage() {
               ) : (
                 <div className="dc-empty-certs-card">
                   <Award size={32} />
-                  <p>No certificates earned yet. Complete any course with an 80%+ quiz score to earn your verified credential!</p>
+                  <p>{t('academy.noCertificates', 'No certificates earned yet. Complete any course with an 80%+ quiz score to earn your verified credential!')}</p>
                 </div>
               )}
             </div>
@@ -488,7 +501,7 @@ export default function ModernAcademyPage() {
             <div className="dc-badges-block">
               <h3 className="dc-block-heading">
                 <Award size={18} />
-                <span>All Achievement Badges</span>
+                <span>{t('academy.allAchievements', 'All Achievement Badges')}</span>
               </h3>
               <div className="dc-badges-grid">
                 {ACADEMY_ACHIEVEMENTS.map((badge) => {
@@ -501,7 +514,7 @@ export default function ModernAcademyPage() {
                       <h4 className="dc-badge-title">{badge.title}</h4>
                       <p className="dc-badge-desc">{badge.description}</p>
                       <span className="dc-badge-status-tag">
-                        {unlocked ? '✓ Unlocked' : 'Locked'}
+                        {unlocked ? `✓ ${t('academy.unlocked', 'Unlocked')}` : t('academy.locked', 'Locked')}
                       </span>
                     </div>
                   );

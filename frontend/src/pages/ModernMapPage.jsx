@@ -288,7 +288,7 @@ export default function ModernMapPage() {
           {/* User Location Pin */}
           <Marker position={center} icon={icons.user}>
             <Popup>
-              <strong>Your Approximate Location</strong>
+              <strong>{t('map.userLocation', 'Your Approximate Location')}</strong>
             </Popup>
           </Marker>
 

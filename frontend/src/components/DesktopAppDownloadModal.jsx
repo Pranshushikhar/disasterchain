@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { NATIVE_APP_CONFIG } from '../config/nativeApp';
 import Icon from './Icons';
 import QRCodeDownload from './QRCodeDownload';
+import { useTranslation } from '../i18n/i18n';
 
 /**
  * DesktopAppDownloadModal
@@ -10,6 +11,8 @@ import QRCodeDownload from './QRCodeDownload';
  * or directly download the APK.
  */
 export default function DesktopAppDownloadModal({ isOpen, onClose }) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -97,7 +100,7 @@ export default function DesktopAppDownloadModal({ isOpen, onClose }) {
                   fontWeight: 700,
                 }}
               >
-                DISASTERCHAIN · NATIVE DISTRIBUTION
+                {t('desktopApp.nativeDistribution', 'DISASTERCHAIN · NATIVE DISTRIBUTION')}
               </div>
               <h2
                 style={{
@@ -108,7 +111,7 @@ export default function DesktopAppDownloadModal({ isOpen, onClose }) {
                   margin: 0,
                 }}
               >
-                DisasterChain Android Application
+                {t('desktopApp.androidTitle', 'DisasterChain Android Application')}
               </h2>
             </div>
           </div>
@@ -116,7 +119,7 @@ export default function DesktopAppDownloadModal({ isOpen, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('desktopApp.closeModal', 'Close modal')}
             style={{
               background: 'transparent',
               border: '1px solid #282A26',
@@ -166,8 +169,7 @@ export default function DesktopAppDownloadModal({ isOpen, onClose }) {
                   margin: '0.35rem 0 0 0',
                 }}
               >
-                Built for the moments when a browser isn&apos;t enough. Provides direct hardware telemetry,
-                background life-safety push alerts, tactical offline mesh maps, and one-tap SOS emergency routing.
+                {t('desktopApp.androidDesc', 'Built for the moments when a browser isn\'t enough. Provides direct hardware telemetry, background life-safety push alerts, tactical offline mesh maps, and one-tap SOS emergency routing.')}
               </p>
             </div>
 
@@ -230,7 +232,7 @@ export default function DesktopAppDownloadModal({ isOpen, onClose }) {
                 }}
               >
                 <Icon name="download" size={16} color="#FFFFFF" />
-                <span>DOWNLOAD APK DIRECTLY</span>
+                <span>{t('desktopApp.downloadApk', 'DOWNLOAD APK DIRECTLY')}</span>
               </button>
 
               <div
