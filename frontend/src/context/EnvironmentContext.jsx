@@ -75,12 +75,23 @@ export const EnvironmentProvider = ({ children }) => {
   const [environment, setEnvironmentState] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved && ENVIRONMENTS.some((e) => e.id === saved)) {
+      if (saved && ENVIRONMENTS.some((e) => e.id === saved) && saved !== 'night' && saved !== 'storm') {
         return saved;
       }
     } catch (e) {}
     return 'calm';
   });
+
+  // Ensure legacy nocturnal/storm dark overrides are reset to sovereign calm theme
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved === 'night' || saved === 'storm') {
+        localStorage.setItem(STORAGE_KEY, 'calm');
+        setEnvironmentState('calm');
+      }
+    } catch (e) {}
+  }, []);
 
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionProgress, setTransitionProgress] = useState(1);

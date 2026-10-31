@@ -197,50 +197,50 @@ body,
   --border-strong: rgba(63, 103, 97, 0.35);
 }
 
-/* 2. STORM ENVIRONMENT: Severe dark atmospheric tempest */
+/* 2. STORM ENVIRONMENT: Severe atmospheric tempest (Warm parchment preserve) */
 [data-environment="storm"] {
-  --dc-bg: #131A1F;
-  --dc-bg-2: #18222A;
-  --dc-surface: #1E2932;
-  --dc-surface-2: #24323D;
-  --dc-surface-3: #2B3A47;
-  --dc-elevated: #222E38;
-  --dc-text: #F1F5F9;
-  --dc-text-secondary: #A0B2C2;
-  --dc-text-muted: #708494;
-  --dc-earth-green: #5D9284;
-  --dc-forest: #8BB7A8;
-  --dc-sand: #CEB590;
-  --dc-water: #6EA3B5;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.14);
-  --border-strong: rgba(110, 163, 181, 0.35);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --dc-bg: #EAE5D9;
+  --dc-bg-2: #DFDACD;
+  --dc-surface: #F4EFE6;
+  --dc-surface-2: #EAE5D9;
+  --dc-surface-3: #DFDACD;
+  --dc-elevated: #FAF7F0;
+  --dc-text: #1E2725;
+  --dc-text-secondary: #65706B;
+  --dc-text-muted: #8C938E;
+  --dc-earth-green: #496B5A;
+  --dc-forest: #263F35;
+  --dc-sand: #D8B98A;
+  --dc-water: #5D8990;
+  --border-subtle: rgba(30, 39, 37, 0.08);
+  --border-medium: rgba(30, 39, 37, 0.14);
+  --border-strong: rgba(73, 107, 90, 0.35);
+  --shadow-sm: 0 1px 3px rgba(30, 39, 37, 0.04);
+  --shadow-md: 0 4px 16px rgba(30, 39, 37, 0.06);
+  --shadow-lg: 0 12px 32px rgba(30, 39, 37, 0.08);
 }
 
-/* 3. NIGHT ENVIRONMENT: Deep nocturnal mission command */
+/* 3. NIGHT ENVIRONMENT: Deep nocturnal mission command (Warm parchment preserve) */
 [data-environment="night"] {
-  --dc-bg: #0A0E13;
-  --dc-bg-2: #0F151C;
-  --dc-surface: #141C25;
-  --dc-surface-2: #1A2430;
-  --dc-surface-3: #212D3C;
-  --dc-elevated: #18222D;
-  --dc-text: #EAF0F6;
-  --dc-text-secondary: #8E9EA8;
-  --dc-text-muted: #647685;
-  --dc-earth-green: #528678;
-  --dc-forest: #8AB7A8;
-  --dc-sand: #D4B98E;
-  --dc-water: #6296A8;
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(98, 150, 168, 0.35);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --dc-bg: #EAE5D9;
+  --dc-bg-2: #DFDACD;
+  --dc-surface: #F4EFE6;
+  --dc-surface-2: #EAE5D9;
+  --dc-surface-3: #DFDACD;
+  --dc-elevated: #FAF7F0;
+  --dc-text: #1E2725;
+  --dc-text-secondary: #65706B;
+  --dc-text-muted: #8C938E;
+  --dc-earth-green: #496B5A;
+  --dc-forest: #263F35;
+  --dc-sand: #D8B98A;
+  --dc-water: #5D8990;
+  --border-subtle: rgba(30, 39, 37, 0.08);
+  --border-medium: rgba(30, 39, 37, 0.14);
+  --border-strong: rgba(73, 107, 90, 0.35);
+  --shadow-sm: 0 1px 3px rgba(30, 39, 37, 0.04);
+  --shadow-md: 0 4px 16px rgba(30, 39, 37, 0.06);
+  --shadow-lg: 0 12px 32px rgba(30, 39, 37, 0.08);
 }
 
 /* 4. SNOW ENVIRONMENT: Frosted alpine crystalline overcast */
@@ -14189,6 +14189,7 @@ body.drawer-open {
 
 /* ==========================================================================
    DISASTERCHAIN AI TRUST & INCIDENT VERIFICATION SYSTEM STYLES
+   Warm parchment base (#F1EBDD), elevated cards (#FFFDF8), forest green accents.
    ========================================================================== */
 
 .dc-admin-verification-hub {
@@ -14205,54 +14206,69 @@ body.drawer-open {
 }
 
 .dc-kpi-card {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  border-radius: var(--radius-md);
-  padding: 1rem;
+  background: var(--dc-elevated, #FFFDF8);
+  border: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  border-radius: var(--radius-md, 12px);
+  padding: 1.15rem 1.25rem;
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
   user-select: none;
 }
 
 .dc-kpi-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.4);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-color: var(--dc-earth-green, #496B5A);
+  box-shadow: var(--shadow-md);
 }
 
 .dc-kpi-card.active {
-  border-color: var(--cyan);
-  background: rgba(14, 165, 233, 0.12);
-  box-shadow: 0 0 16px rgba(14, 165, 233, 0.2);
+  border-color: var(--dc-forest, #263F35);
+  background: var(--dc-surface-2, #EFE9DC);
+  box-shadow: 0 0 0 2px rgba(38, 63, 53, 0.15);
 }
 
-.dc-kpi-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+.dc-kpi-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  justify-content: space-between;
 }
 
-.dc-kpi-val {
-  font-size: 1.5rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: #ffffff;
-  font-family: var(--font-mono, monospace);
-}
-
-.dc-kpi-lbl {
-  font-size: 0.74rem;
-  color: var(--text-muted);
+.dc-kpi-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--dc-text-secondary, #65706B);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-top: 0.15rem;
+}
+
+.dc-kpi-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--dc-forest, #263F35);
+  font-family: var(--font-display, sans-serif);
+}
+
+.dc-kpi-sub {
+  font-size: 0.75rem;
+  color: var(--dc-text-muted, #8C938E);
+}
+
+/* Critical Accent only for urgent metrics */
+.dc-kpi-card.highlight-red .dc-kpi-value {
+  color: var(--dc-emergency, #C94B4B);
+}
+
+.dc-kpi-card.highlight-amber .dc-kpi-value {
+  color: var(--dc-warning, #C38A35);
+}
+
+.dc-kpi-card.highlight-green .dc-kpi-value {
+  color: var(--dc-safe, #4F8060);
 }
 
 .dc-verification-split-layout {
@@ -14269,52 +14285,55 @@ body.drawer-open {
 }
 
 .dc-queue-column {
-  background: rgba(11, 18, 34, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: var(--radius-md);
+  background: var(--dc-elevated, #FFFDF8);
+  border: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  border-radius: var(--radius-md, 12px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   max-height: 820px;
+  box-shadow: var(--shadow-sm);
 }
 
 .dc-queue-header {
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-  background: rgba(15, 23, 42, 0.6);
+  border-bottom: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  background: var(--dc-surface-2, #EFE9DC);
 }
 
 .dc-queue-list {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  divide-y: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .dc-queue-item {
   padding: 1rem 1.15rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-bottom: 1px solid var(--border-subtle, rgba(30, 39, 37, 0.08));
   cursor: pointer;
   transition: background 0.18s ease, border-left 0.18s ease;
   border-left: 3px solid transparent;
+  color: var(--dc-text, #1E2725);
 }
 
 .dc-queue-item:hover {
-  background: rgba(30, 41, 59, 0.4);
+  background: var(--dc-surface, #F8F5EE);
 }
 
 .dc-queue-item.active {
-  background: rgba(14, 165, 233, 0.09);
-  border-left-color: #38bdf8;
+  background: rgba(73, 107, 90, 0.09);
+  border-left-color: var(--dc-earth-green, #496B5A);
 }
 
 .dc-inspector-column {
-  background: rgba(11, 18, 34, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: var(--radius-md);
+  background: var(--dc-elevated, #FFFDF8);
+  border: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  border-radius: var(--radius-md, 12px);
   overflow-y: auto;
   max-height: 820px;
   padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  color: var(--dc-text, #1E2725);
 }
 
 .dc-factor-breakdown-grid {
@@ -14325,9 +14344,9 @@ body.drawer-open {
 }
 
 .dc-factor-card {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: var(--radius-sm);
+  background: var(--dc-surface, #F8F5EE);
+  border: 1px solid var(--border-subtle, rgba(30, 39, 37, 0.08));
+  border-radius: var(--radius-sm, 8px);
   padding: 0.75rem 0.9rem;
 }
 
@@ -14337,12 +14356,14 @@ body.drawer-open {
   align-items: center;
   font-size: 0.76rem;
   margin-bottom: 0.35rem;
+  color: var(--dc-text-secondary, #65706B);
+  font-weight: 600;
 }
 
 .dc-factor-progress {
   width: 100%;
   height: 6px;
-  background: rgba(30, 41, 59, 0.8);
+  background: var(--dc-surface-2, #EFE9DC);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -14353,12 +14374,134 @@ body.drawer-open {
 }
 
 .dc-duplicate-warning-banner {
+  background: #FFFDF5;
+  border: 1px solid rgba(195, 138, 53, 0.35);
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.85rem 1rem;
   animation: dcPulseSlow 3s ease-in-out infinite;
 }
 
 @keyframes dcPulseSlow {
-  0%, 100% { border-color: rgba(245, 158, 11, 0.35); }
-  50% { border-color: rgba(245, 158, 11, 0.7); }
+  0%, 100% { border-color: rgba(195, 138, 53, 0.35); }
+  50% { border-color: rgba(195, 138, 53, 0.7); }
+}
+
+/* ==========================================================================
+   ADMIN DASHBOARD PORTAL — WARM PARCHMENT & FOREST-GREEN THEME
+   Scoped strictly to .dc-admin-portal-page.
+   ========================================================================== */
+
+.dc-admin-portal-page {
+  width: 100%;
+  color: var(--dc-text, #1E2725);
+}
+
+.dc-admin-portal-page .page-header-title {
+  color: var(--dc-forest, #263F35);
+}
+
+.dc-admin-portal-page .page-header-subtitle {
+  color: var(--dc-text-secondary, #65706B);
+}
+
+.dc-admin-portal-page .spatial-panel {
+  background: var(--dc-elevated, #FFFDF8);
+  border: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  box-shadow: var(--shadow-sm);
+  color: var(--dc-text, #1E2725);
+}
+
+.dc-admin-portal-page .glass-card {
+  background: var(--dc-elevated, #FFFDF8);
+  border: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  color: var(--dc-text, #1E2725);
+  box-shadow: var(--shadow-sm);
+}
+
+.dc-admin-portal-page .data-table-container {
+  background: var(--dc-elevated, #FFFDF8);
+  border: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  box-shadow: var(--shadow-sm);
+}
+
+.dc-admin-portal-page table.data-table thead tr {
+  background: var(--dc-surface-2, #EFE9DC);
+  border-bottom: 2px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+}
+
+.dc-admin-portal-page table.data-table th {
+  color: var(--dc-forest, #263F35);
+  font-weight: 700;
+}
+
+.dc-admin-portal-page table.data-table td {
+  color: var(--dc-text, #1E2725);
+  border-bottom: 1px solid var(--border-subtle, rgba(30, 39, 37, 0.08));
+}
+
+.dc-admin-portal-page table.data-table tbody tr:hover {
+  background: var(--dc-surface, #F8F5EE);
+}
+
+.dc-admin-portal-page .form-input,
+.dc-admin-portal-page .form-select,
+.dc-admin-portal-page .form-textarea {
+  background: var(--dc-surface, #F8F5EE);
+  border: 1px solid var(--border-medium, rgba(30, 39, 37, 0.14));
+  color: var(--dc-text, #1E2725);
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.65rem 0.85rem;
+}
+
+.dc-admin-portal-page .form-input:focus,
+.dc-admin-portal-page .form-select:focus,
+.dc-admin-portal-page .form-textarea:focus {
+  border-color: var(--dc-earth-green, #496B5A);
+  box-shadow: 0 0 0 3px rgba(73, 107, 90, 0.15);
+  background: #FFFDF8;
+}
+
+.dc-admin-portal-page .btn-primary {
+  background-color: var(--dc-forest, #263F35);
+  color: #FFFDF8 !important;
+  border-color: var(--dc-forest, #263F35);
+}
+
+.dc-admin-portal-page .btn-primary:hover {
+  background-color: #1A2E26;
+  border-color: #1A2E26;
+}
+
+.dc-admin-portal-page .btn-ghost {
+  background: transparent;
+  color: var(--dc-text-secondary, #65706B);
+}
+
+.dc-admin-portal-page .btn-ghost:hover {
+  background: var(--dc-surface-2, #EFE9DC);
+  color: var(--dc-forest, #263F35);
+}
+
+/* Admin Sidebar Entry Badge & Link */
+.dc-sidebar-admin-link {
+  color: var(--dc-forest, #263F35);
+}
+
+.dc-sidebar-admin-link.active {
+  background-color: rgba(73, 107, 90, 0.12) !important;
+  color: var(--dc-forest, #263F35) !important;
+  font-weight: 700;
+}
+
+.dc-admin-badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(73, 107, 90, 0.15);
+  color: var(--dc-forest, #263F35);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(73, 107, 90, 0.3);
 }
 
 /* ==========================================================================

@@ -4,45 +4,45 @@ import Icon from './Icons';
 const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
   const colorMap = {
     red: {
-      text: 'var(--crimson)',
-      bg: 'rgba(255, 46, 77, 0.1)',
-      border: 'var(--border-red)',
-      glow: 'var(--glow-crimson)',
+      text: 'var(--dc-emergency, #C94B4B)',
+      bg: 'rgba(201, 75, 75, 0.12)',
+      border: 'rgba(201, 75, 75, 0.28)',
+      glow: 'none',
       badgeClass: 'badge-critical',
     },
     amber: {
-      text: 'var(--amber)',
-      bg: 'rgba(245, 158, 11, 0.1)',
-      border: 'rgba(245, 158, 11, 0.3)',
-      glow: 'var(--glow-amber)',
+      text: 'var(--dc-warning, #C38A35)',
+      bg: 'rgba(195, 138, 53, 0.12)',
+      border: 'rgba(195, 138, 53, 0.28)',
+      glow: 'none',
       badgeClass: 'badge-warning',
     },
     green: {
-      text: 'var(--mint)',
-      bg: 'rgba(16, 185, 129, 0.1)',
-      border: 'var(--border-mint)',
-      glow: '0 0 16px rgba(16, 185, 129, 0.25)',
+      text: 'var(--dc-safe, #4F8060)',
+      bg: 'rgba(79, 128, 96, 0.12)',
+      border: 'rgba(79, 128, 96, 0.28)',
+      glow: 'none',
       badgeClass: 'badge-success',
     },
     mint: {
-      text: 'var(--mint)',
-      bg: 'rgba(16, 185, 129, 0.1)',
-      border: 'var(--border-mint)',
-      glow: '0 0 16px rgba(16, 185, 129, 0.25)',
+      text: 'var(--dc-safe, #4F8060)',
+      bg: 'rgba(79, 128, 96, 0.12)',
+      border: 'rgba(79, 128, 96, 0.28)',
+      glow: 'none',
       badgeClass: 'badge-success',
     },
     indigo: {
-      text: 'var(--violet)',
-      bg: 'rgba(129, 140, 248, 0.1)',
-      border: 'rgba(129, 140, 248, 0.3)',
-      glow: 'var(--glow-violet)',
+      text: 'var(--dc-forest, #263F35)',
+      bg: 'var(--dc-surface-2, #EFE9DC)',
+      border: 'var(--border-medium, rgba(30, 39, 37, 0.14))',
+      glow: 'none',
       badgeClass: 'badge-blockchain',
     },
     cyan: {
-      text: 'var(--cyan)',
-      bg: 'rgba(0, 240, 255, 0.1)',
-      border: 'var(--border-highlight)',
-      glow: 'var(--glow-cyan)',
+      text: 'var(--dc-earth-green, #496B5A)',
+      bg: 'rgba(73, 107, 90, 0.12)',
+      border: 'rgba(73, 107, 90, 0.28)',
+      glow: 'none',
       badgeClass: 'badge-info',
     },
   };
@@ -66,15 +66,18 @@ const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
         flexDirection: 'column',
         gap: '0.75rem',
         padding: '1.25rem 1.4rem',
-        background: 'rgba(11, 17, 30, 0.88)',
+        background: 'var(--dc-elevated, #FFFDF8)',
+        border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
         borderLeft: `4px solid ${theme.text}`,
         borderRadius: 'var(--radius-lg, 12px)',
         minHeight: '136px',
         boxSizing: 'border-box',
+        boxShadow: 'var(--shadow-sm)',
+        transition: 'transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-        <span className="micro-label" style={{ color: 'var(--text-secondary)' }}>
+        <span className="micro-label" style={{ color: 'var(--dc-text-secondary, #65706B)', fontWeight: 600, fontSize: '0.8rem' }}>
           {title}
         </span>
         <div
@@ -88,7 +91,6 @@ const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: theme.glow,
           }}
         >
           {renderIcon()}
@@ -96,20 +98,20 @@ const StatCard = ({ title, value, subtitle, icon, color = 'cyan', badge }) => {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.65rem', flexWrap: 'wrap' }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 800, color: 'var(--dc-forest, #263F35)', lineHeight: 1 }}>
           {value}
         </span>
         {badge && (
-          <span className={`badge ${theme.badgeClass}`} style={{ fontSize: '0.65rem', padding: '0.15rem 0.5rem' }}>
+          <span className={`badge ${theme.badgeClass}`} style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem' }}>
             {badge}
           </span>
         )}
       </div>
 
       {subtitle && (
-        <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', lineHeight: 1.4, marginTop: 'auto' }}>
+        <span style={{ fontSize: '0.78rem', color: 'var(--dc-text-muted, #8C938E)', lineHeight: 1.3 }}>
           {subtitle}
-        </div>
+        </span>
       )}
     </div>
   );

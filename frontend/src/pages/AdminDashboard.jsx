@@ -255,7 +255,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="dc-admin-portal-page">
       <div className="page-header">
         <div>
           <div className="badge badge-blockchain" style={{ marginBottom: '0.4rem' }}>
@@ -1257,7 +1257,7 @@ const AdminDashboard = () => {
                                 fontWeight: 700,
                                 textTransform: 'uppercase',
                                 background: 'rgba(56, 189, 248, 0.12)',
-                                color: '#38bdf8',
+                                color: 'var(--dc-forest, #263F35)',
                                 border: '1px solid rgba(56, 189, 248, 0.25)',
                               }}
                             >
@@ -1439,7 +1439,7 @@ const AdminDashboard = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(3, 7, 18, 0.9)',
+            backgroundColor: 'rgba(30, 39, 37, 0.6)',
             backdropFilter: 'blur(10px)',
             display: 'flex',
             alignItems: 'center',
@@ -1454,9 +1454,9 @@ const AdminDashboard = () => {
               maxWidth: '520px',
               width: '100%',
               padding: '2.25rem',
-              background: '#0c1424',
-              border: '1px solid var(--border-highlight)',
-              boxShadow: 'var(--glow-cyan)',
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+              boxShadow: 'var(--shadow-lg)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
@@ -1465,19 +1465,19 @@ const AdminDashboard = () => {
                   width: '44px',
                   height: '44px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'linear-gradient(135deg, var(--cyan), var(--mint))',
+                  background: 'var(--dc-surface-2, #EFE9DC)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Icon name="key" size={22} color="#ffffff" />
+                <Icon name="key" size={22} color="var(--dc-forest, #263F35)" />
               </div>
               <div>
                 <h3 style={{ margin: 0, color: 'var(--dc-text, #1E2725)', fontSize: '1.2rem', fontWeight: 800 }}>
                   Single-Use Recovery Code Generated
                 </h3>
-                <span style={{ fontSize: '0.75rem', color: 'var(--cyan)', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--dc-earth-green, #496B5A)', fontWeight: 700 }}>
                   OPERATOR VERIFICATION APPROVED
                 </span>
               </div>
@@ -1485,12 +1485,12 @@ const AdminDashboard = () => {
 
             <div
               style={{
-                background: 'rgba(245, 158, 11, 0.1)',
-                border: '1px solid rgba(245, 158, 11, 0.35)',
+                background: 'rgba(195, 138, 53, 0.08)',
+                border: '1px solid rgba(195, 138, 53, 0.28)',
                 borderRadius: 'var(--radius-xs)',
                 padding: '0.85rem 1rem',
                 fontSize: '0.82rem',
-                color: '#fcd34d',
+                color: 'var(--dc-text, #1E2725)',
                 lineHeight: 1.45,
                 marginBottom: '1.5rem',
               }}
@@ -1501,8 +1501,8 @@ const AdminDashboard = () => {
             {/* Code Display Box */}
             <div
               style={{
-                background: 'rgba(5, 8, 14, 0.8)',
-                border: '2px dashed var(--border-highlight)',
+                background: 'var(--dc-surface-2, #EFE9DC)',
+                border: '2px dashed var(--dc-earth-green, #496B5A)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '1.25rem',
                 textAlign: 'center',
@@ -1559,7 +1559,7 @@ const AdminDashboard = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(3, 7, 18, 0.85)',
+            backgroundColor: 'rgba(30, 39, 37, 0.6)',
             backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
@@ -1574,9 +1574,9 @@ const AdminDashboard = () => {
               maxWidth: '460px',
               width: '100%',
               padding: '2rem',
-              background: '#0c1424',
-              border: '1px solid rgba(244, 63, 94, 0.4)',
-              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7)',
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid rgba(201, 75, 75, 0.35)',
+              boxShadow: 'var(--shadow-lg)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
@@ -1585,7 +1585,7 @@ const AdminDashboard = () => {
                 <h3 style={{ margin: 0, color: 'var(--dc-text, #1E2725)', fontSize: '1.15rem', fontWeight: 800 }}>
                   Reject Password Recovery
                 </h3>
-                <span style={{ fontSize: '0.75rem', color: '#f43f5e', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--dc-emergency, #C94B4B)', fontWeight: 700 }}>
                   SECURITY VERIFICATION DENIAL
                 </span>
               </div>
@@ -1619,7 +1619,7 @@ const AdminDashboard = () => {
                 disabled={rejectingRecoveryId === rejectionModalTarget._id}
                 onClick={handleRejectRecovery}
                 className="btn btn-primary"
-                style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)', borderColor: '#f43f5e' }}
+                style={{ background: 'var(--dc-emergency, #C94B4B)', borderColor: 'var(--dc-emergency, #C94B4B)' }}
               >
                 {rejectingRecoveryId === rejectionModalTarget._id ? 'Rejecting...' : 'Confirm Rejection'}
               </button>
@@ -1634,7 +1634,7 @@ const AdminDashboard = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(3, 7, 18, 0.85)',
+            backgroundColor: 'rgba(30, 39, 37, 0.6)',
             backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
@@ -1649,9 +1649,9 @@ const AdminDashboard = () => {
               maxWidth: '460px',
               width: '100%',
               padding: '2rem',
-              background: '#0c1424',
-              border: '1px solid var(--border-highlight)',
-              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7)',
+              background: 'var(--dc-elevated, #FFFDF8)',
+              border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
+              boxShadow: 'var(--shadow-lg)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
@@ -1670,7 +1670,7 @@ const AdminDashboard = () => {
 
             <div
               style={{
-                background: 'rgba(5, 8, 14, 0.6)',
+                background: 'var(--dc-surface-2, #EFE9DC)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-xs)',
                 padding: '1rem',
@@ -1705,7 +1705,7 @@ const AdminDashboard = () => {
                 disabled={verifyingUserId === confirmVerifyUser._id}
                 onClick={() => handleVerifyUser(confirmVerifyUser._id)}
                 className="btn btn-primary"
-                style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', borderColor: '#10b981' }}
+                style={{ background: 'var(--dc-forest, #263F35)', borderColor: 'var(--dc-forest, #263F35)' }}
               >
                 {verifyingUserId === confirmVerifyUser._id ? 'Verifying...' : 'Verify Account'}
               </button>

@@ -80,8 +80,8 @@ const BlockchainReceiptModal = ({ isOpen = true, onClose, record, item }) => {
         {/* Block Data Box */}
         <div
           style={{
-            background: 'rgba(11, 18, 34, 0.95)',
-            border: '1px solid var(--border-subtle)',
+            background: 'var(--dc-surface-2, #EFE9DC)',
+            border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))',
             borderRadius: 'var(--radius-lg)',
             padding: '1.25rem',
             fontSize: '0.85rem',
@@ -94,11 +94,11 @@ const BlockchainReceiptModal = ({ isOpen = true, onClose, record, item }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase' }}>{t('blockchain.transactionId', 'TRANSACTION ID')}</div>
-              <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.95rem' }}>{targetRecord.transactionId || 'TXN-881204'}</div>
+              <div style={{ color: 'var(--dc-forest, #263F35)', fontWeight: 700, fontSize: '0.95rem' }}>{targetRecord.transactionId || 'TXN-881204'}</div>
             </div>
             <div>
               <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', textAlign: 'right' }}>{t('blockchain.blockNumber', 'BLOCK NUMBER')}</div>
-              <div style={{ color: '#818cf8', fontWeight: 700, textAlign: 'right' }}>#{targetRecord.blockNumber || 1001}</div>
+              <div style={{ color: 'var(--dc-earth-green, #496B5A)', fontWeight: 700, textAlign: 'right' }}>#{targetRecord.blockNumber || 1001}</div>
             </div>
           </div>
 
@@ -109,13 +109,13 @@ const BlockchainReceiptModal = ({ isOpen = true, onClose, record, item }) => {
                 type="button"
                 onClick={handleCopyHash}
                 className="btn btn-ghost btn-sm"
-                style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', color: copied ? '#34d399' : '#818cf8' }}
+                style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', color: copied ? '#34d399' : 'var(--dc-earth-green, #496B5A)' }}
               >
                 <Icon name={copied ? 'check' : 'copy'} size={13} />
                 <span>{copied ? t('common.copied', 'Copied!') : t('transparency.copyHash', 'Copy Hash')}</span>
               </button>
             </div>
-            <div style={{ color: '#38bdf8', wordBreak: 'break-all', fontSize: '0.78rem', background: 'rgba(0,0,0,0.35)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+            <div style={{ color: 'var(--dc-forest, #263F35)', wordBreak: 'break-all', fontSize: '0.78rem', background: 'var(--dc-elevated, #FFFDF8)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-medium, rgba(30, 39, 37, 0.14))' }}>
               {targetRecord.blockHash || '0x7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069'}
             </div>
           </div>
@@ -129,7 +129,7 @@ const BlockchainReceiptModal = ({ isOpen = true, onClose, record, item }) => {
 
           <div>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '0.2rem', textTransform: 'uppercase' }}>{t('blockchain.digitalSignature', 'DIGITAL SIGNATURE')}</div>
-            <div style={{ color: '#a78bfa', wordBreak: 'break-all', fontSize: '0.74rem' }}>
+            <div style={{ color: 'var(--dc-earth-green, #496B5A)', wordBreak: 'break-all', fontSize: '0.74rem' }}>
               {targetRecord.signature || '0xa41c7b89d6e4f3a2b1c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6'}
             </div>
           </div>

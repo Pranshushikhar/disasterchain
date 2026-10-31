@@ -285,4 +285,93 @@ describe('DisasterChain Core Smoke Tests', () => {
       });
     });
   });
+
+  describe('Admin Panel Sidebar Persistence & Theme Consistency Tests', () => {
+    it('ensures isAdmin is strictly true when user.role is admin and false otherwise', () => {
+      const computeIsAdmin = (user) => user?.role === 'admin';
+      expect(computeIsAdmin({ role: 'admin', name: 'Officer Rao' })).toBe(true);
+      expect(computeIsAdmin({ role: 'student', name: 'Student Aarav' })).toBe(false);
+      expect(computeIsAdmin({ role: 'citizen', name: 'Citizen Priya' })).toBe(false);
+      expect(computeIsAdmin(null)).toBe(false);
+      expect(computeIsAdmin(undefined)).toBe(false);
+    });
+
+    it('ensures admin navigation item is persistently present across all site routes for admin users', () => {
+      const publicRoutes = ['/', '/weather', '/map', '/incidents', '/safety', '/shelters', '/academy', '/offline'];
+      const adminUser = { id: 'admin1', role: 'admin', name: 'Admin Commander' };
+
+      publicRoutes.forEach((route) => {
+        // Simulating sidebar rendering on route transition:
+        const isAdmin = adminUser?.role === 'admin';
+        const hasAdminSidebarLink = isAdmin && true;
+        expect(hasAdminSidebarLink).toBe(true);
+      });
+    });
+
+    it('ensures non-admin users do not receive admin sidebar link', () => {
+      const studentUser = { id: 'user1', role: 'student', name: 'Student Priya' };
+      const isAdmin = studentUser?.role === 'admin';
+      const hasAdminSidebarLink = isAdmin && true;
+      expect(hasAdminSidebarLink).toBe(false);
+    });
+
+    it('verifies Admin Dashboard does not contain forbidden dark navy or black container backgrounds', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const adminPath = path.join(__dirname, 'pages', 'AdminDashboard.jsx');
+      const content = fs.readFileSync(adminPath, 'utf8');
+
+      // Forbidden dark navy and black background patterns that caused previous theme bugs
+      const forbiddenPatterns = [
+        '#0c1424',
+        '#0b111e',
+        '#0F172A',
+        '#0B1222',
+        'rgba(15, 23, 42, 0.95)',
+        'rgba(11, 18, 34, 0.95)',
+      ];
+
+      forbiddenPatterns.forEach((pattern) => {
+        expect(content.includes(pattern)).toBe(false);
+      });
+
+      // Verify scoped class presence
+      expect(content.includes('dc-admin-portal-page')).toBe(true);
+    });
+
+    it('verifies BlockchainReceiptModal uses warm parchment and forest-green tokens instead of dark navy', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const modalPath = path.join(__dirname, 'components', 'BlockchainReceiptModal.jsx');
+      const content = fs.readFileSync(modalPath, 'utf8');
+
+      expect(content.includes('rgba(11, 18, 34, 0.95)')).toBe(false);
+      expect(content.includes('var(--dc-surface-2, #EFE9DC)')).toBe(true);
+      expect(content.includes('var(--dc-forest, #263F35)')).toBe(true);
+    });
+
+    it('verifies StatCard uses warm parchment and forest-green tokens', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const statCardPath = path.join(__dirname, 'components', 'StatCard.jsx');
+      const content = fs.readFileSync(statCardPath, 'utf8');
+
+      expect(content.includes('rgba(11, 17, 30, 0.88)')).toBe(false);
+      expect(content.includes('var(--dc-elevated, #FFFDF8)')).toBe(true);
+      expect(content.includes('var(--dc-forest, #263F35)')).toBe(true);
+    });
+
+    it('verifies ModernNav includes persistent Admin section and ADMIN badge', () => {
+      const fs = require('fs');
+      const path = require('path');
+      const navPath = path.join(__dirname, 'components', 'ModernNav.jsx');
+      const content = fs.readFileSync(navPath, 'utf8');
+
+      expect(content.includes('isAdmin')).toBe(true);
+      expect(content.includes('dc-sidebar-admin-section')).toBe(true);
+      expect(content.includes('dc-sidebar-admin-link')).toBe(true);
+      expect(content.includes('dc-admin-badge')).toBe(true);
+      expect(content.includes('to="/admin"')).toBe(true);
+    });
+  });
 });

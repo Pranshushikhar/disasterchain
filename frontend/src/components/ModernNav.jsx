@@ -7,6 +7,7 @@ import {
   MapPin,
   AlertTriangle,
   Shield,
+  ShieldAlert,
   PhoneCall,
   Sparkles,
   Compass,
@@ -40,7 +41,7 @@ const SIDEBAR_COLLAPSED_KEY = 'disasterchain_sidebar_collapsed';
 export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, onStartTour }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const weatherGPT = useWeatherGPT();
   const { environment, setEnvironment, currentMeta, isSoundEnabled, toggleSound } = useEnvironment();
   const { t, currentLanguage, setLanguage, languages, languageConfig, isRtl } = useTranslation();
@@ -269,6 +270,34 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
             </nav>
           </div>
 
+          {/* SECTION: ADMINISTRATION (Persistently visible after admin login across all pages) */}
+          {isAdmin && (
+            <div className="dc-sidebar-section" id="dc-sidebar-admin-section">
+              {!isCollapsed && (
+                <span className="dc-sidebar-section-title">
+                  {t('admin.adminCommand', 'ADMINISTRATION')}
+                </span>
+              )}
+              <nav className="dc-sidebar-items" aria-label="Administrator Command">
+                <NavLink
+                  to="/admin"
+                  id="dc-sidebar-admin"
+                  className={`dc-sidebar-link dc-sidebar-admin-link ${isCurrentActive('/admin') ? 'active' : ''}`}
+                  title={isCollapsed ? t('admin.adminTitle', 'Admin Command') : undefined}
+                >
+                  <ShieldAlert size={18} className="dc-sidebar-icon dc-admin-icon" />
+                  {!isCollapsed && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                      <span className="dc-sidebar-label">{t('admin.adminCommand', 'Admin Command')}</span>
+                      <span className="dc-admin-badge">ADMIN</span>
+                    </div>
+                  )}
+                  {isCurrentActive('/admin') && <span className="dc-sidebar-active-indicator" />}
+                </NavLink>
+              </nav>
+            </div>
+          )}
+
           {/* SECTION: OTHER */}
           <div className="dc-sidebar-section">
             {!isCollapsed && (
@@ -369,7 +398,14 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                 </div>
                 {!isCollapsed && (
                   <div className="dc-sidebar-user-meta">
-                    <span className="dc-sidebar-username">{user?.name?.split(' ')[0] || 'Operator'}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                      <span className="dc-sidebar-username">{user?.name?.split(' ')[0] || 'Operator'}</span>
+                      {isAdmin && (
+                        <span className="dc-admin-badge" style={{ fontSize: '0.62rem', padding: '1px 5px' }}>
+                          ADMIN
+                        </span>
+                      )}
+                    </div>
                     <button
                       onClick={() => {
                         logout();
@@ -546,6 +582,26 @@ export default function ModernNav({ onOpenSos, onReplayIntro, onOpenAppModal, on
                     <span>WeatherGPT Copilot</span>
                   </button>
                 </nav>
+
+                {isAdmin && (
+                  <>
+                    <div className="dc-drawer-divider" />
+                    <span className="dc-sidebar-section-title">ADMINISTRATION</span>
+                    <nav className="dc-drawer-nav">
+                      <NavLink
+                        to="/admin"
+                        onClick={() => setIsMobileDrawerOpen(false)}
+                        className={`dc-drawer-link ${isCurrentActive('/admin') ? 'active' : ''}`}
+                      >
+                        <ShieldAlert size={18} />
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                          <span>{t('admin.adminCommand', 'Admin Command')}</span>
+                          <span className="dc-admin-badge">ADMIN</span>
+                        </div>
+                      </NavLink>
+                    </nav>
+                  </>
+                )}
 
                 <div className="dc-drawer-divider" />
                 <span className="dc-sidebar-section-title">SYSTEM TOOLS</span>
